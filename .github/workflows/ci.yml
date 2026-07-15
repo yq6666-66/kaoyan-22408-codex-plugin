@@ -1,33 +1,155 @@
-name: validate
+name: CI
 
 on:
   push:
+    branches:
+      - "**"
+    tags:
+      - "v*"
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
   validate:
+    name: validate
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      artifact: ${{ steps.meta.outputs.artifact }}
+    steps:
+      - name: Checkout complete history
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Install pinned development dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+      - name: Run static, unit, security, and local-validator evidence gates
+        run: python scripts/check.py --verify-system-evidence
+      - name: Verify dynamic forward-evaluation evidence
+        run: python evals/verify_forward_evidence.py --max-age-days 30
+      - name: Build Ubuntu release archive
+        run: python scripts/build_release.py
+      - name: Read manifest-derived metadata
+        id: meta
+        run: python ci/release_metadata.py --artifact-suffix ubuntu --github-output "$GITHUB_OUTPUT"
+      - name: Upload Ubuntu release archive
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ${{ steps.meta.outputs.artifact }}
+          path: |
+            dist/${{ steps.meta.outputs.archive }}
+            dist/${{ steps.meta.outputs.checksum }}
+          if-no-files-found: error
+          retention-days: 14
+
+  windows:
+    name: windows
+    runs-on: windows-latest
+    timeout-minutes: 20
+    outputs:
+      artifact: ${{ steps.meta.outputs.artifact }}
+    steps:
+      - name: Checkout complete history
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Install pinned core dependencies
+        run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema==4.25.1
+      - name: Validate repository
+        run: python scripts/validate_repository.py
+      - name: Build Windows release archive
+        run: python scripts/build_release.py
+      - name: Read manifest-derived metadata
+        id: meta
+        shell: pwsh
+        run: python ci/release_metadata.py --artifact-suffix windows --github-output $env:GITHUB_OUTPUT
+      - name: Upload Windows release archive
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ${{ steps.meta.outputs.artifact }}
+          path: |
+            dist/${{ steps.meta.outputs.archive }}
+            dist/${{ steps.meta.outputs.checksum }}
+          if-no-files-found: error
+          retention-days: 14
+
+  reproducible:
+    name: reproducible
+    needs:
+      - validate
+      - windows
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           persist-credentials: false
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
-          python-version: "3.13"
-      - name: Install security scanner
-        run: python -m pip install semgrep==1.162.0
-      - name: Validate repository
-        run: python scripts/check.py --skip-system-validators
-      - name: Build release archive
-        run: python scripts/build_release.py
-      - name: Upload release archive
-        uses: actions/upload-artifact@v7
+          python-version: "3.12"
+      - name: Download Ubuntu artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          name: kaoyan-22408-1.0.0
-          path: dist/kaoyan-22408-1.0.0.zip
-          if-no-files-found: error
+          name: ${{ needs.validate.outputs.artifact }}
+          path: artifacts/ubuntu
+      - name: Download Windows artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: ${{ needs.windows.outputs.artifact }}
+          path: artifacts/windows
+      - name: Require byte-identical archives
+        run: python ci/verify_reproducible.py artifacts/ubuntu artifacts/windows
+
+  release:
+    name: release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs:
+      - validate
+      - windows
+      - reproducible
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Require tag to match manifest version
+        id: meta
+        run: python ci/release_metadata.py --expect-tag "$GITHUB_REF_NAME" --github-output "$GITHUB_OUTPUT"
+      - name: Download verified Ubuntu artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: ${{ needs.validate.outputs.artifact }}
+          path: dist
+      - name: Publish immutable GitHub Release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "${{ steps.meta.outputs.tag }}"
+          "dist/${{ steps.meta.outputs.archive }}"
+          "dist/${{ steps.meta.outputs.checksum }}"
+          --verify-tag
+          --title "kaoyan-22408 ${{ steps.meta.outputs.tag }}"
+          --generate-notes

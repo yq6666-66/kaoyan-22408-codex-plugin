@@ -1,16 +1,26 @@
 #!/usr/bin/env python3
-"""Validate the public repository and the Skills-only release contract."""
+"""Validate the public Skills-only repository and its release payload."""
 
 from __future__ import annotations
 
+import io
 import json
+import math
 import re
+import subprocess
 import sys
 from collections import Counter, defaultdict
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
+import yaml
+from jsonschema import Draft202012Validator, FormatChecker
+from jsonschema.exceptions import SchemaError, ValidationError as JsonSchemaValidationError
+from yaml.constructor import ConstructorError
+from yaml.nodes import MappingNode
 
+
+PLUGIN_RELATIVE_PATH = PurePosixPath("plugins/kaoyan-22408")
 EXPECTED_SKILLS = {
     "kaoyan-22408-planner",
     "kaoyan-review-executor",
@@ -30,15 +40,132 @@ EXPECTED_REFERENCES = {
     "capability-routing-contract.md",
     "evidence-copyright-contract.md",
     "portable-learning-records.md",
+    "portable-learning-records.schema.json",
 }
 
 ALLOWED_PLUGIN_ROOTS = {".codex-plugin", "skills", "references", "assets"}
-FORBIDDEN_PATH_PARTS = {"app", "android", "corpus", "raw", "index", "user"}
 PLACEHOLDER = "TO" + "DO"
+SEMVER = re.compile(r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?$")
+FORBIDDEN_PATH_PARTS = {"app", "android", "corpus", "raw", "index", "user"}
+HISTORY_FORBIDDEN_PATH_PARTS = {"app", "android", "corpus", "raw"}
+
+PORTABLE_RECORD_SKILLS = {
+    "kaoyan-22408-planner",
+    "kaoyan-review-executor",
+    "kaoyan-progress-diagnostician",
+    "kaoyan-error-loop-coach",
+    "kaoyan-mock-exam-coach",
+}
+
+EVIDENCE_SKILLS = set(EXPECTED_SKILLS)
+
+OUTPUT_TAG_SKILLS = {
+    "[用户材料]": {
+        "kaoyan-error-loop-coach",
+        "kaoyan-mock-exam-coach",
+        "kaoyan-408-tutor",
+        "kaoyan-math2-coach",
+        "kaoyan-english2-coach",
+        "kaoyan-politics-coach",
+        "kaoyan-past-paper-analyst",
+        "kaoyan-material-study-assistant",
+    },
+    "[原创练习]": {
+        "kaoyan-error-loop-coach",
+        "kaoyan-mock-exam-coach",
+        "kaoyan-408-tutor",
+        "kaoyan-math2-coach",
+        "kaoyan-english2-coach",
+        "kaoyan-politics-coach",
+        "kaoyan-past-paper-analyst",
+        "kaoyan-material-study-assistant",
+    },
+    "[官方核验]": {"kaoyan-official-info-researcher"},
+    "[待核验]": {"kaoyan-politics-coach", "kaoyan-official-info-researcher"},
+}
+
+LEGACY_PATTERNS = (
+    re.compile(r"\b" + "bai" + r"du\b", re.IGNORECASE),
+    re.compile(r"\bnet" + r"disk\b", re.IGNORECASE),
+    re.compile(r"\blocal" + r"storage\b", re.IGNORECASE),
+    re.compile(r"\bstudy" + r"-state\b", re.IGNORECASE),
+)
+
+SENSITIVE_PATTERNS = (
+    re.compile(r"\bgh[pousr]_[A-Za-z0-9]{20,}\b"),
+    re.compile(r"\bgithub_pat_[A-Za-z0-9_]{20,}\b"),
+    re.compile(r"\bsk-[A-Za-z0-9_-]{20,}\b"),
+    re.compile(r"\bfigd_[A-Za-z0-9_-]{20,}\b"),
+    re.compile(r"\bAKIA[0-9A-Z]{16}\b"),
+    re.compile(r"\bAIza[0-9A-Za-z_-]{30,}\b"),
+    re.compile(r"\bxox[baprs]-[A-Za-z0-9-]{10,}\b"),
+    re.compile(r"\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b"),
+    re.compile(r"\baws[_ -]?secret[_ -]?access[_ -]?key\s*[:=]\s*[\"']?[A-Za-z0-9/+=]{30,}", re.IGNORECASE),
+    re.compile(r"\bAccountKey\s*=\s*[A-Za-z0-9+/]{40,}={0,2}", re.IGNORECASE),
+    re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----"),
+    re.compile(
+        r"\b(?:api[_ -]?key|access[_ -]?token|client[_ -]?secret|secret[_ -]?key|cookie)"
+        r"\s*[:=]\s*[\"']?[^\s\"']{8,}",
+        re.IGNORECASE,
+    ),
+)
+
+HISTORY_SECRET_PATTERNS = (
+    re.compile(rb"\bgh[pousr]_[A-Za-z0-9]{20,}\b"),
+    re.compile(rb"\bgithub_pat_[A-Za-z0-9_]{20,}\b"),
+    re.compile(rb"\bsk-[A-Za-z0-9_-]{20,}\b"),
+    re.compile(rb"\bfigd_[A-Za-z0-9_-]{20,}\b"),
+    re.compile(rb"\bAKIA[0-9A-Z]{16}\b"),
+    re.compile(rb"\bAIza[0-9A-Za-z_-]{30,}\b"),
+    re.compile(rb"\bxox[baprs]-[A-Za-z0-9-]{10,}\b"),
+    re.compile(rb"\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b"),
+    re.compile(rb"\baws[_ -]?secret[_ -]?access[_ -]?key\s*[:=]\s*[\"']?[A-Za-z0-9/+=]{30,}", re.IGNORECASE),
+    re.compile(rb"\bAccountKey\s*=\s*[A-Za-z0-9+/]{40,}={0,2}", re.IGNORECASE),
+    re.compile(
+        rb"\b(?:api[_ -]?key|access[_ -]?token|client[_ -]?secret|secret[_ -]?key|cookie)"
+        rb"\s*[:=]\s*[\"']?[A-Za-z0-9+/=_-]{16,}",
+        re.IGNORECASE,
+    ),
+    re.compile(rb"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----"),
+)
+
+HISTORY_LEGACY_PATTERNS = (
+    re.compile(rb"\b" + b"bai" + rb"du\b", re.IGNORECASE),
+    re.compile(rb"\bnet" + rb"disk\b", re.IGNORECASE),
+    re.compile(rb"\blocal" + rb"storage\b", re.IGNORECASE),
+    re.compile(rb"\bstudy" + rb"-state\b", re.IGNORECASE),
+)
 
 
 class ValidationError(RuntimeError):
-    pass
+    """Raised when a repository contract is violated."""
+
+
+class UniqueKeyLoader(yaml.SafeLoader):
+    """Safe YAML loader that rejects duplicate mapping keys."""
+
+
+def _construct_unique_mapping(
+    loader: UniqueKeyLoader, node: MappingNode, deep: bool = False
+) -> dict[Any, Any]:
+    mapping: dict[Any, Any] = {}
+    for key_node, value_node in node.value:
+        key = loader.construct_object(key_node, deep=deep)
+        if key in mapping:
+            raise ConstructorError(
+                "while constructing a mapping",
+                node.start_mark,
+                f"duplicate key: {key!r}",
+                key_node.start_mark,
+            )
+        mapping[key] = loader.construct_object(value_node, deep=deep)
+    return mapping
+
+
+UniqueKeyLoader.add_constructor(
+    yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+    _construct_unique_mapping,
+)
 
 
 def require(condition: bool, message: str) -> None:
@@ -46,222 +173,560 @@ def require(condition: bool, message: str) -> None:
         raise ValidationError(message)
 
 
+def read_utf8_text(path: Path, *, require_lf: bool = True) -> str:
+    try:
+        payload = path.read_bytes()
+    except OSError as exc:
+        raise ValidationError(f"cannot read {path}: {exc}") from exc
+    require(b"\x00" not in payload, f"text file contains NUL bytes: {path}")
+    if require_lf:
+        require(b"\r" not in payload, f"release text must use LF, not CRLF: {path}")
+    try:
+        return payload.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise ValidationError(f"file is not valid UTF-8: {path}: {exc}") from exc
+
+
 def load_json(path: Path) -> Any:
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        raise ValidationError(f"无法读取 JSON：{path}: {exc}") from exc
+        return json.loads(read_utf8_text(path))
+    except json.JSONDecodeError as exc:
+        raise ValidationError(f"invalid JSON: {path}: {exc}") from exc
 
 
-def parse_frontmatter(path: Path) -> dict[str, str]:
-    lines = path.read_text(encoding="utf-8").splitlines()
-    require(lines and lines[0] == "---", f"缺少 YAML frontmatter：{path}")
+def load_yaml(path: Path) -> Any:
+    try:
+        return yaml.load(read_utf8_text(path), Loader=UniqueKeyLoader)
+    except (TypeError, yaml.YAMLError) as exc:
+        raise ValidationError(f"invalid YAML: {path}: {exc}") from exc
+
+
+def parse_frontmatter(path: Path) -> dict[str, Any]:
+    text = read_utf8_text(path)
+    lines = text.splitlines()
+    require(lines and lines[0] == "---", f"missing YAML frontmatter: {path}")
     try:
         end = lines.index("---", 1)
     except ValueError as exc:
-        raise ValidationError(f"frontmatter 未闭合：{path}") from exc
+        raise ValidationError(f"unclosed YAML frontmatter: {path}") from exc
+    require(any(line.strip() for line in lines[end + 1 :]), f"empty Skill body: {path}")
+    try:
+        metadata = yaml.load("\n".join(lines[1:end]), Loader=UniqueKeyLoader)
+    except (TypeError, yaml.YAMLError) as exc:
+        raise ValidationError(f"invalid YAML frontmatter: {path}: {exc}") from exc
+    require(isinstance(metadata, dict), f"frontmatter must be a mapping: {path}")
+    require(set(metadata) == {"name", "description"}, f"frontmatter must contain only name/description: {path}")
+    require(all(isinstance(value, str) for value in metadata.values()), f"frontmatter values must be strings: {path}")
+    return metadata
 
-    values: dict[str, str] = {}
-    for line in lines[1:end]:
-        require(":" in line, f"无效 frontmatter 行：{path}: {line}")
-        key, value = line.split(":", 1)
-        values[key.strip()] = value.strip().strip('"').strip("'")
-    require(set(values) == {"name", "description"}, f"frontmatter 只能包含 name/description：{path}")
-    return values
+
+def expected_release_files() -> frozenset[str]:
+    names = {
+        ".codex-plugin/plugin.json",
+        "assets/kaoyan-22408.svg",
+        *(f"references/{name}" for name in EXPECTED_REFERENCES),
+    }
+    for skill in EXPECTED_SKILLS:
+        names.add(f"skills/{skill}/SKILL.md")
+        names.add(f"skills/{skill}/agents/openai.yaml")
+    return frozenset(names)
 
 
-def check_manifest(plugin: Path) -> None:
+ALLOWED_RELEASE_FILES = expected_release_files()
+
+
+def check_manifest(plugin: Path) -> dict[str, Any]:
     manifest_path = plugin / ".codex-plugin" / "plugin.json"
     manifest = load_json(manifest_path)
-    require(manifest.get("name") == "kaoyan-22408", "manifest name 必须为 kaoyan-22408")
-    require(manifest.get("version") == "1.0.0", "manifest version 必须为 1.0.0")
-    require(manifest.get("skills") == "./skills/", "manifest skills 路径错误")
+    require(isinstance(manifest, dict), "plugin manifest must be an object")
+    require(manifest.get("name") == "kaoyan-22408", "manifest name must be kaoyan-22408")
+    version = manifest.get("version")
+    require(isinstance(version, str) and SEMVER.fullmatch(version) is not None, "manifest version must be strict semver")
+    require(manifest.get("skills") == "./skills/", "manifest skills path must be ./skills/")
     for key in ("apps", "mcpServers", "hooks"):
-        require(key not in manifest, f"Skills-only manifest 不得包含 {key}")
+        require(key not in manifest, f"Skills-only manifest must not contain {key}")
 
     interface = manifest.get("interface")
-    require(isinstance(interface, dict), "manifest 缺少 interface")
-    require(interface.get("category") == "Education", "插件分类必须为 Education")
-    require("screenshots" not in interface, "Skills-only 插件不应声明截图")
+    require(isinstance(interface, dict), "manifest is missing interface")
+    require(interface.get("category") == "Education", "manifest category must be Education")
+    require("screenshots" not in interface, "Skills-only manifest must not declare screenshots")
     prompts = interface.get("defaultPrompt")
-    require(isinstance(prompts, list) and 1 <= len(prompts) <= 3, "Starter Prompts 必须为 1 至 3 条")
-    require(all(isinstance(item, str) and len(item) <= 128 for item in prompts), "Starter Prompt 超过 128 字符")
+    require(isinstance(prompts, list) and 1 <= len(prompts) <= 3, "defaultPrompt must contain 1 to 3 entries")
+    require(
+        all(isinstance(item, str) and 1 <= len(item) <= 128 for item in prompts),
+        "each defaultPrompt must contain at most 128 characters",
+    )
     for key in ("websiteURL", "privacyPolicyURL", "termsOfServiceURL"):
-        require(str(interface.get(key, "")).startswith("https://"), f"{key} 必须为 HTTPS URL")
+        require(str(interface.get(key, "")).startswith("https://"), f"{key} must be an HTTPS URL")
     for key in ("composerIcon", "logo"):
-        rel = interface.get(key)
-        require(isinstance(rel, str) and rel.startswith("./"), f"{key} 必须为相对路径")
-        require((plugin / rel[2:]).is_file(), f"{key} 指向的文件不存在")
+        relative = interface.get(key)
+        require(isinstance(relative, str) and relative.startswith("./"), f"{key} must be a relative path")
+        require((plugin / relative[2:]).is_file(), f"{key} target does not exist")
+    return manifest
 
 
 def check_skill(skill_dir: Path) -> None:
     name = skill_dir.name
-    expected_files = {"SKILL.md", "agents/openai.yaml"}
-    actual_files = {
-        path.relative_to(skill_dir).as_posix()
-        for path in skill_dir.rglob("*")
-        if path.is_file()
-    }
-    require(actual_files == expected_files, f"{name} 只能包含 SKILL.md 与 agents/openai.yaml")
-
     skill_path = skill_dir / "SKILL.md"
-    content = skill_path.read_text(encoding="utf-8")
+    content = read_utf8_text(skill_path)
     metadata = parse_frontmatter(skill_path)
-    require(metadata["name"] == name, f"Skill 名称与目录不一致：{name}")
-    require(len(metadata["description"]) >= 25, f"Skill description 过短：{name}")
-    require(PLACEHOLDER not in content.upper(), f"Skill 含未完成占位符：{name}")
-    for reference in EXPECTED_REFERENCES:
-        require(reference in content, f"{name} 未引用共享契约 {reference}")
+    require(metadata["name"] == name, f"Skill name does not match directory: {name}")
+    require(25 <= len(metadata["description"]) <= 1024, f"Skill description length is invalid: {name}")
+    require(PLACEHOLDER not in content.upper(), f"Skill contains an unfinished placeholder: {name}")
+    require("capability-routing-contract.md" in content, f"Skill does not load the routing contract: {name}")
+    if name in EVIDENCE_SKILLS:
+        require("evidence-copyright-contract.md" in content, f"Skill lacks conditional evidence contract loading: {name}")
+    if name in PORTABLE_RECORD_SKILLS:
+        require("portable-learning-records.md" in content, f"Skill lacks portable-record contract loading: {name}")
+    for tag, skills in OUTPUT_TAG_SKILLS.items():
+        if name in skills:
+            require(tag in content, f"Skill does not require the output evidence tag {tag}: {name}")
 
     yaml_path = skill_dir / "agents" / "openai.yaml"
-    yaml_text = yaml_path.read_text(encoding="utf-8")
-    require(PLACEHOLDER not in yaml_text.upper(), f"openai.yaml 含未完成占位符：{name}")
-    fields: dict[str, str] = {}
-    pattern = re.compile(r'^  (display_name|short_description|default_prompt): "(.*)"$')
-    for line in yaml_text.splitlines():
-        match = pattern.match(line)
-        if match:
-            fields[match.group(1)] = match.group(2)
-    require(set(fields) == {"display_name", "short_description", "default_prompt"}, f"openai.yaml 字段无效：{name}")
-    require(25 <= len(fields["short_description"]) <= 64, f"short_description 长度应为 25 至 64：{name}")
-    require(f"${name}" in fields["default_prompt"], f"default_prompt 必须显式包含 ${name}")
+    document = load_yaml(yaml_path)
+    require(isinstance(document, dict) and set(document) == {"interface"}, f"openai.yaml root is invalid: {name}")
+    interface = document.get("interface")
+    required_fields = {"display_name", "short_description", "default_prompt"}
+    require(isinstance(interface, dict) and set(interface) == required_fields, f"openai.yaml interface fields are invalid: {name}")
+    require(all(isinstance(interface[field], str) for field in required_fields), f"openai.yaml values must be strings: {name}")
+    require(25 <= len(interface["short_description"]) <= 64, f"short_description must contain 25 to 64 characters: {name}")
+    require(f"${name}" in interface["default_prompt"], f"default_prompt must explicitly include ${name}")
+    require(PLACEHOLDER not in read_utf8_text(yaml_path).upper(), f"openai.yaml contains a placeholder: {name}")
 
 
 def check_links(plugin: Path) -> None:
     link_pattern = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
     plugin_resolved = plugin.resolve()
     for md_path in plugin.rglob("*.md"):
-        for target in link_pattern.findall(md_path.read_text(encoding="utf-8")):
+        for target in link_pattern.findall(read_utf8_text(md_path)):
             clean = target.split("#", 1)[0].strip()
             if not clean or clean.startswith(("https://", "http://", "mailto:")):
                 continue
             resolved = (md_path.parent / clean).resolve()
-            require(resolved == plugin_resolved or plugin_resolved in resolved.parents, f"引用越出插件目录：{md_path}: {target}")
-            require(resolved.exists(), f"引用文件不存在：{md_path}: {target}")
+            require(
+                resolved == plugin_resolved or plugin_resolved in resolved.parents,
+                f"Markdown link leaves plugin tree: {md_path}: {target}",
+            )
+            require(resolved.exists(), f"Markdown link target does not exist: {md_path}: {target}")
+
+
+def check_portable_schema(plugin: Path) -> None:
+    schema_path = plugin / "references" / "portable-learning-records.schema.json"
+    schema = load_json(schema_path)
+    require(isinstance(schema, dict), "portable record schema must be an object")
+    require(schema.get("$schema") == "https://json-schema.org/draft/2020-12/schema", "portable record schema must use Draft 2020-12")
+    try:
+        Draft202012Validator.check_schema(schema)
+    except SchemaError as exc:
+        raise ValidationError(f"invalid portable-record JSON Schema: {exc.message}") from exc
+
+    output_samples = (
+        {
+            "schemaVersion": "1.1",
+            "recordType": "StudyProfile",
+            "targetExam": None,
+            "targetDate": None,
+            "weeklyHours": None,
+            "currentPhase": None,
+            "constraints": [],
+        },
+        {
+            "schemaVersion": "1.1",
+            "recordType": "ProgressSnapshot",
+            "period": {"start": None, "end": None},
+            "metrics": [],
+            "accuracy": [],
+            "blockers": [],
+        },
+        {
+            "schemaVersion": "1.1",
+            "recordType": "ReviewQueue",
+            "generatedAt": None,
+            "items": [],
+        },
+    )
+    validator = Draft202012Validator(schema, format_checker=FormatChecker())
+    for sample in output_samples:
+        try:
+            validator.validate(sample)
+        except JsonSchemaValidationError as exc:
+            raise ValidationError(f"portable-record schema rejects a required 1.1 shape: {exc.message}") from exc
+
+    defs = schema.get("$defs")
+    require(isinstance(defs, dict) and "legacyInput" in defs, "portable-record schema must expose $defs/legacyInput")
+    legacy_root = {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$ref": "#/$defs/legacyInput",
+        "$defs": defs,
+    }
+    legacy_validator = Draft202012Validator(legacy_root, format_checker=FormatChecker())
+    legacy_samples = (
+        {
+            "schemaVersion": "1.0",
+            "period": {"start": "2026-07-01", "end": "2026-07-07"},
+            "plannedUnits": 10,
+            "completedUnits": 8,
+            "accuracy": 0.7,
+            "sampleSize": 20,
+            "legacyExtension": "preserve me",
+        },
+        {
+            "schemaVersion": "1.0",
+            "items": [{"topic": "limit", "retestDate": "D+3"}],
+        },
+        {
+            "schemaVersion": "1.0",
+            "targetExam": "未提供",
+            "targetDate": "",
+            "weeklyHours": "unknown",
+            "currentPhase": "",
+            "constraints": [],
+            "blockers": ["legacy extension that also resembles progress data"],
+            "unrecognizedExtension": {"preserve": True},
+        },
+    )
+    for sample in legacy_samples:
+        try:
+            legacy_validator.validate(sample)
+        except JsonSchemaValidationError as exc:
+            raise ValidationError(f"portable-record schema rejects a supported 1.0 input: {exc.message}") from exc
+    require(
+        all(not validator.is_valid(sample) for sample in legacy_samples),
+        "portable-record root schema must reject all Schema 1.0 inputs",
+    )
+    invalid_11_date = {
+        "schemaVersion": "1.1",
+        "recordType": "ReviewQueue",
+        "generatedAt": None,
+        "items": [
+            {
+                "subject": None,
+                "topic": "limit",
+                "errorCause": None,
+                "errorCauseStatus": None,
+                "nextRetestDate": "D+3",
+                "retestOffsetDays": None,
+                "status": "pending",
+                "masteryEvidence": [],
+            }
+        ],
+    }
+    require(
+        not validator.is_valid(invalid_11_date),
+        "portable-record schema must reject D+N in a Schema 1.1 date field",
+    )
+    invalid_date_and_offset = {
+        **invalid_11_date,
+        "items": [
+            {
+                **invalid_11_date["items"][0],
+                "nextRetestDate": "2026-07-18",
+                "retestOffsetDays": 3,
+            }
+        ],
+    }
+    require(
+        not validator.is_valid(invalid_date_and_offset),
+        "portable-record schema must reject simultaneous nextRetestDate and retestOffsetDays",
+    )
+    invalid_zero_total = {
+        "schemaVersion": "1.1",
+        "recordType": "ProgressSnapshot",
+        "period": {"start": None, "end": None},
+        "metrics": [],
+        "accuracy": [
+            {"subject": "math2", "correct": 1, "total": 0, "rate": None}
+        ],
+        "blockers": [],
+    }
+    require(
+        not validator.is_valid(invalid_zero_total),
+        "portable-record schema must reject correct > 0 when total is zero",
+    )
+    valid_accuracy_record = {
+        "schemaVersion": "1.1",
+        "recordType": "ProgressSnapshot",
+        "period": {"start": None, "end": None},
+        "metrics": [],
+        "accuracy": [
+            {"subject": "english2", "correct": 16, "total": 20, "rate": 0.8}
+        ],
+        "blockers": [],
+    }
+    check_progress_accuracy_semantics(valid_accuracy_record)
+    semantic_mutations = (
+        {"subject": "english2", "correct": 21, "total": 20, "rate": 1.0},
+        {"subject": "english2", "correct": 16, "total": 20, "rate": 0.7},
+    )
+    for entry in semantic_mutations:
+        record = {**valid_accuracy_record, "accuracy": [entry]}
+        try:
+            check_progress_accuracy_semantics(record)
+        except ValidationError:
+            continue
+        raise ValidationError("portable-record semantic gate accepted inconsistent accuracy values")
+
+
+def check_progress_accuracy_semantics(record: dict[str, Any]) -> None:
+    """Enforce numeric relationships JSON Schema cannot express portably."""
+
+    require(record.get("recordType") == "ProgressSnapshot", "accuracy semantics require ProgressSnapshot")
+    accuracy = record.get("accuracy")
+    require(isinstance(accuracy, list), "ProgressSnapshot accuracy must be an array")
+    for index, entry in enumerate(accuracy):
+        require(isinstance(entry, dict), f"accuracy[{index}] must be an object")
+        correct = entry.get("correct")
+        total = entry.get("total")
+        rate = entry.get("rate")
+        if correct is not None and total is not None:
+            require(correct <= total, f"accuracy[{index}].correct must not exceed total")
+        if total == 0:
+            require(correct in {None, 0}, f"accuracy[{index}].correct must be 0 or null when total is zero")
+            require(rate is None, f"accuracy[{index}].rate must be null when total is zero")
+        elif correct is not None and total is not None and rate is not None:
+            expected_rate = correct / total
+            require(
+                math.isclose(rate, expected_rate, rel_tol=0.0, abs_tol=1e-12),
+                f"accuracy[{index}].rate must equal correct / total",
+            )
 
 
 def check_release_tree(plugin: Path) -> None:
     roots = {path.name for path in plugin.iterdir()}
-    require(roots == ALLOWED_PLUGIN_ROOTS, f"插件根目录不符合发布允许列表：{sorted(roots)}")
-    require((plugin / "assets" / "kaoyan-22408.svg").is_file(), "缺少正式 SVG Logo")
-    require({p.name for p in (plugin / "assets").iterdir()} == {"kaoyan-22408.svg"}, "assets 只能包含正式 SVG Logo")
-    require({p.name for p in (plugin / "references").iterdir()} == EXPECTED_REFERENCES, "共享契约必须恰好为三份")
+    require(roots == ALLOWED_PLUGIN_ROOTS, f"plugin roots do not match the release allowlist: {sorted(roots)}")
 
     for path in plugin.rglob("*"):
-        require(not path.is_symlink(), f"发布树不得包含符号链接：{path}")
-        relative = path.relative_to(plugin)
-        lowered_parts = {part.lower() for part in relative.parts}
-        require(not (lowered_parts & FORBIDDEN_PATH_PARTS), f"发布树含禁止路径：{relative}")
+        require(not path.is_symlink(), f"release tree must not contain symbolic links: {path}")
 
-    local_user_path = r"(?i)(?:[a-z]:\\" + "users" + r"\\|/" + "users" + r"/|/home/[^/\s]+/)"
-    forbidden_content = [
-        re.compile(r"(?i)\b(?:baidu|netdisk|localstorage|study-state)\b"),
-        re.compile(local_user_path),
-        re.compile(r"\b(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,}|figd_[A-Za-z0-9_-]{20,})\b"),
-        re.compile(r"(?i)\b(?:api[_ -]?key|access[_ -]?token|cookie)\s*[:=]\s*[^\s]{8,}"),
-    ]
-    for path in plugin.rglob("*"):
-        if not path.is_file():
-            continue
-        text = path.read_text(encoding="utf-8")
-        require(PLACEHOLDER not in text.upper(), f"发布文件含未完成占位符：{path.relative_to(plugin)}")
-        for pattern in forbidden_content:
-            require(not pattern.search(text), f"发布文件含敏感或旧系统残留：{path.relative_to(plugin)}")
+    actual_files = {
+        path.relative_to(plugin).as_posix()
+        for path in plugin.rglob("*")
+        if path.is_file()
+    }
+    require(actual_files == ALLOWED_RELEASE_FILES, "release tree does not match the exact full-path allowlist")
+
+    for relative in sorted(actual_files):
+        pure = PurePosixPath(relative)
+        require(not ({part.lower() for part in pure.parts} & FORBIDDEN_PATH_PARTS), f"forbidden release path: {relative}")
+        text = read_utf8_text(plugin / Path(*pure.parts))
+        require(PLACEHOLDER not in text.upper(), f"release file contains an unfinished placeholder: {relative}")
+        for pattern in LEGACY_PATTERNS:
+            require(pattern.search(text) is None, f"release file contains a removed-system marker: {relative}")
+        for pattern in SENSITIVE_PATTERNS:
+            require(pattern.search(text) is None, f"release file contains a likely secret: {relative}")
 
 
-def check_scenarios(repo: Path) -> None:
-    submission = load_json(repo / "submission" / "test-cases.json")
-    require(set(submission) == {"schemaVersion", "positive", "negative"}, "提交测试集字段错误")
-    require(len(submission["positive"]) == 5, "提交测试集必须恰好有 5 个正向场景")
-    require(len(submission["negative"]) == 3, "提交测试集必须恰好有 3 个负向场景")
-    ids = [case.get("id") for group in ("positive", "negative") for case in submission[group]]
-    require(len(ids) == len(set(ids)), "提交测试场景 ID 重复")
-    required_case_fields = {"id", "prompt", "expectedBehavior", "expectedResultShape", "fixture"}
-    for group in ("positive", "negative"):
-        for case in submission[group]:
-            require(required_case_fields <= set(case), f"提交测试场景字段不完整：{case.get('id')}")
-
+def check_forward_cases(repo: Path) -> None:
     forward = load_json(repo / "tests" / "forward-cases.json")
-    require(forward.get("schemaVersion") == "1.0", "前向测试版本错误")
+    require(isinstance(forward, dict) and forward.get("schemaVersion") == "1.1", "forward cases must use schemaVersion 1.1")
     cases = forward.get("cases")
-    require(isinstance(cases, list) and len(cases) == 36, "前向测试必须恰好有 36 个场景")
+    require(isinstance(cases, list) and len(cases) == 36, "forward cases must contain exactly 36 cases")
+    ids = [case.get("id") for case in cases if isinstance(case, dict)]
+    require(len(ids) == 36 and len(set(ids)) == 36 and all(isinstance(item, str) and item for item in ids), "forward case IDs must be unique non-empty strings")
     counts: dict[str, Counter[str]] = defaultdict(Counter)
     for case in cases:
+        require(isinstance(case, dict), "each forward case must be an object")
         skill = case.get("skillUnderTest")
         kind = case.get("kind")
-        require(skill in EXPECTED_SKILLS, f"前向测试包含未知 Skill：{skill}")
-        require(kind in {"positive", "conflict"}, f"前向测试类型错误：{case.get('id')}")
-        require(case.get("expectedPrimary") in EXPECTED_SKILLS, f"前向测试主路由错误：{case.get('id')}")
-        require(isinstance(case.get("prompt"), str) and case["prompt"].strip(), f"前向测试缺少 prompt：{case.get('id')}")
-        require(isinstance(case.get("expectedBehavior"), list) and case["expectedBehavior"], f"前向测试缺少行为断言：{case.get('id')}")
+        require(skill in EXPECTED_SKILLS, f"forward case contains an unknown Skill: {case.get('id')}")
+        require(kind in {"positive", "conflict"}, f"forward case kind is invalid: {case.get('id')}")
+        require(case.get("expectedPrimary") in EXPECTED_SKILLS, f"forward case route is invalid: {case.get('id')}")
+        require(isinstance(case.get("prompt"), str) and case["prompt"].strip(), f"forward case has no prompt: {case.get('id')}")
+        require(isinstance(case.get("expectedBehavior"), list) and case["expectedBehavior"], f"forward case has no behavior assertions: {case.get('id')}")
+        require(
+            all(isinstance(item, str) and item.strip() for item in case["expectedBehavior"]),
+            f"forward behavior assertions must be non-empty strings: {case.get('id')}",
+        )
         if kind == "positive":
-            require(case["expectedPrimary"] == skill, f"正向场景未路由到被测 Skill：{case.get('id')}")
+            require(case["expectedPrimary"] == skill, f"positive case does not route to the Skill under test: {case.get('id')}")
         else:
-            require(case.get("expectedNotPrimary") == skill, f"冲突场景必须排除被测 Skill：{case.get('id')}")
-            require(case["expectedPrimary"] != skill, f"冲突场景仍路由到被测 Skill：{case.get('id')}")
+            require(case.get("expectedNotPrimary") == skill, f"conflict case does not exclude the Skill under test: {case.get('id')}")
+            require(case["expectedPrimary"] != skill, f"conflict case still routes to the excluded Skill: {case.get('id')}")
         counts[skill][kind] += 1
     for skill in EXPECTED_SKILLS:
-        require(counts[skill] == Counter({"positive": 2, "conflict": 1}), f"{skill} 必须有 2 正向 + 1 冲突场景")
+        require(counts[skill] == Counter({"positive": 2, "conflict": 1}), f"{skill} must have 2 positive and 1 conflict cases")
+
+
+def check_behavior_cases(repo: Path) -> None:
+    behavior = load_json(repo / "tests" / "behavior-cases.json")
+    require(isinstance(behavior, dict) and behavior.get("schemaVersion") == "1.1", "behavior cases must use schemaVersion 1.1")
+    cases = behavior.get("cases")
+    require(isinstance(cases, list) and len(cases) == 12, "behavior cases must contain exactly 12 cases")
+    ids: list[str] = []
+    for case in cases:
+        require(isinstance(case, dict), "each behavior case must be an object")
+        case_id = case.get("id")
+        require(isinstance(case_id, str) and case_id.strip(), "behavior case ID must be a non-empty string")
+        ids.append(case_id)
+        has_prompt = isinstance(case.get("prompt"), str) and bool(case["prompt"].strip())
+        has_turns = isinstance(case.get("turns"), list) and bool(case["turns"])
+        has_transcript = isinstance(case.get("transcript"), list) and bool(case["transcript"])
+        require(
+            has_prompt or has_turns or has_transcript,
+            f"behavior case must contain prompt, turns, or transcript: {case_id}",
+        )
+        rubric = case.get("rubric", case.get("expectedBehavior"))
+        require(isinstance(rubric, (list, dict)) and bool(rubric), f"behavior case must contain a non-empty rubric: {case_id}")
+        if isinstance(rubric, list):
+            require(
+                all(isinstance(item, str) and item.strip() for item in rubric),
+                f"behavior rubric entries must be non-empty strings: {case_id}",
+            )
+        if has_transcript:
+            for turn in case["transcript"]:
+                require(isinstance(turn, dict), f"behavior transcript turn must be an object: {case_id}")
+                require(turn.get("role") in {"user", "assistant"}, f"behavior transcript role is invalid: {case_id}")
+                require(
+                    isinstance(turn.get("content"), str) and turn["content"].strip(),
+                    f"behavior transcript content is empty: {case_id}",
+                )
+    require(len(ids) == len(set(ids)), "behavior case IDs must be unique")
 
 
 def check_repository_docs(repo: Path) -> None:
     required = {
         "README.md",
+        "CHANGELOG.md",
         "LICENSE",
         "PRIVACY.md",
         "TERMS.md",
         "SECURITY.md",
         "THIRD_PARTY_CONTENT.md",
         ".agents/plugins/marketplace.json",
-        "submission/listing.json",
-        "submission/test-cases.json",
-        "submission/release-notes.md",
-        "tests/forward-eval-report.md",
+        "tests/forward-cases.json",
+        "tests/behavior-cases.json",
+        "tests/system-validator-evidence.json",
     }
     for relative in required:
-        require((repo / relative).is_file(), f"缺少仓库文件：{relative}")
+        require((repo / relative).is_file(), f"required repository file is missing: {relative}")
+    require(not (repo / "submission").exists(), "obsolete submission directory must be absent")
+
     marketplace = load_json(repo / ".agents" / "plugins" / "marketplace.json")
-    require(marketplace.get("name") == "kaoyan-22408", "marketplace 名称错误")
+    require(isinstance(marketplace, dict) and marketplace.get("name") == "kaoyan-22408", "marketplace name is invalid")
     plugins = marketplace.get("plugins")
-    require(isinstance(plugins, list) and len(plugins) == 1, "marketplace 必须只有一个插件条目")
-    require(plugins[0].get("category") == "Education", "marketplace 分类错误")
-    require(plugins[0].get("source", {}).get("path") == "./plugins/kaoyan-22408", "marketplace source.path 错误")
-
-    listing = load_json(repo / "submission" / "listing.json")
-    require(listing.get("slug") == "kaoyan-22408", "提交 listing slug 错误")
-    require(listing.get("category") == "Education", "提交 listing 分类错误")
-    require(listing.get("regions") == "all-available", "提交 listing 地区设置错误")
-    require(listing.get("screenshots") == [], "Skills-only listing 不应包含截图")
+    require(isinstance(plugins, list) and len(plugins) == 1, "marketplace must contain exactly one plugin")
+    entry = plugins[0]
+    require(isinstance(entry, dict) and entry.get("name") == "kaoyan-22408", "marketplace plugin name is invalid")
+    require(entry.get("category") == "Education", "marketplace category must be Education")
+    require(entry.get("source", {}).get("path") == "./plugins/kaoyan-22408", "marketplace source.path is invalid")
+    require(entry.get("policy", {}).get("installation") == "AVAILABLE", "marketplace installation policy is invalid")
+    require(entry.get("policy", {}).get("authentication") == "ON_INSTALL", "marketplace authentication policy is invalid")
 
 
-def validate_repo(repo: Path | None = None) -> list[str]:
+def _run_git(repo: Path, arguments: list[str], *, input_bytes: bytes | None = None) -> subprocess.CompletedProcess[bytes]:
+    try:
+        result = subprocess.run(
+            ["git", *arguments],
+            cwd=repo,
+            input=input_bytes,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+        )
+    except OSError as exc:
+        raise ValidationError(f"cannot run git: {exc}") from exc
+    require(result.returncode == 0, f"git {' '.join(arguments)} failed: {result.stderr.decode('utf-8', 'replace').strip()}")
+    return result
+
+
+def check_git_history(repo: Path) -> None:
+    objects_output = _run_git(repo, ["rev-list", "--objects", "--all"]).stdout.decode("utf-8", "strict")
+    object_paths: dict[str, str] = {}
+    object_ids: list[str] = []
+    for line in objects_output.splitlines():
+        object_id, _, path = line.partition(" ")
+        if object_id and object_id not in object_paths:
+            object_ids.append(object_id)
+            object_paths[object_id] = path
+        if path:
+            parts = {part.lower() for part in PurePosixPath(path).parts}
+            require(not (parts & HISTORY_FORBIDDEN_PATH_PARTS), f"Git history contains a removed private-data path: {path}")
+            encoded_path = path.encode("utf-8")
+            for pattern in HISTORY_SECRET_PATTERNS:
+                require(pattern.search(encoded_path) is None, f"Git history contains a likely secret in a path: {path}")
+
+    if not object_ids:
+        return
+    batch = _run_git(repo, ["cat-file", "--batch"], input_bytes=("\n".join(object_ids) + "\n").encode("ascii")).stdout
+    stream = io.BytesIO(batch)
+    for requested_id in object_ids:
+        header = stream.readline().rstrip(b"\n")
+        fields = header.split()
+        require(len(fields) >= 3, f"unexpected git cat-file response for {requested_id}")
+        object_type = fields[1]
+        size = int(fields[2])
+        payload = stream.read(size)
+        require(len(payload) == size and stream.read(1) == b"\n", f"truncated git object: {requested_id}")
+        path = object_paths.get(requested_id, "")
+        if object_type in {b"blob", b"commit", b"tag"}:
+            for pattern in HISTORY_SECRET_PATTERNS:
+                require(pattern.search(payload) is None, f"Git history contains a likely secret in {path or requested_id}")
+        if object_type == b"blob" and path not in {".semgrep.yml", "scripts/validate_repository.py"}:
+            for pattern in HISTORY_LEGACY_PATTERNS:
+                require(pattern.search(payload) is None, f"Git history contains a removed-system marker in {path or requested_id}")
+
+
+def check_forward_evidence(repo: Path) -> None:
+    evidence = repo / "tests" / "forward-eval-evidence.json"
+    if not evidence.exists():
+        return
+    verifier = repo / "evals" / "verify_forward_evidence.py"
+    require(verifier.is_file(), "forward-eval evidence exists but its verifier is missing")
+    result = subprocess.run(
+        [sys.executable, str(verifier), "--max-age-days", "30"],
+        cwd=repo,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        check=False,
+    )
+    detail = (result.stderr or result.stdout).strip()
+    require(result.returncode == 0, f"forward-eval evidence is invalid or stale: {detail}")
+
+
+def validate_repo(
+    repo: Path | None = None,
+    *,
+    verify_evidence: bool = True,
+    scan_history: bool = True,
+) -> list[str]:
     repo = (repo or Path(__file__).resolve().parents[1]).resolve()
-    plugin = repo / "plugins" / "kaoyan-22408"
-    require(plugin.is_dir(), f"插件目录不存在：{plugin}")
+    plugin = repo / Path(*PLUGIN_RELATIVE_PATH.parts)
+    require(plugin.is_dir(), f"plugin directory does not exist: {plugin}")
 
     check_repository_docs(repo)
     check_manifest(plugin)
     check_release_tree(plugin)
+    check_portable_schema(plugin)
 
-    skill_dirs = {path.name: path for path in (plugin / "skills").iterdir() if path.is_dir()}
-    require(set(skill_dirs) == EXPECTED_SKILLS, "Skill 集合必须与 v1.0 设计完全一致")
+    skill_root = plugin / "skills"
+    skill_dirs = {path.name: path for path in skill_root.iterdir() if path.is_dir()}
+    require(set(skill_dirs) == EXPECTED_SKILLS, "Skill set must match the 12-Skill design")
     for name in sorted(EXPECTED_SKILLS):
         check_skill(skill_dirs[name])
     check_links(plugin)
-    check_scenarios(repo)
+    check_forward_cases(repo)
+    check_behavior_cases(repo)
+    if scan_history:
+        check_git_history(repo)
+    if verify_evidence:
+        check_forward_evidence(repo)
     return [
-        "manifest 与 marketplace 通过",
-        "12 个 Skills 与 openai.yaml 通过",
-        "三份共享契约与引用通过",
-        "发布允许列表与敏感残留检查通过",
-        "36 个前向场景及 5+3 提交测试集通过",
+        "manifest and marketplace",
+        "12 Skills and openai.yaml files",
+        "shared contracts and portable-record JSON Schema",
+        "exact release allowlist, UTF-8/LF, and sensitive-content scan",
+        "36 routing cases and 12 behavior cases",
+        "Git-history and forward-evidence gates",
     ]
 
 
 def main() -> int:
     try:
         results = validate_repo()
-    except ValidationError as exc:
+    except (OSError, UnicodeError, ValidationError) as exc:
         print(f"[FAIL] {exc}", file=sys.stderr)
         return 1
     for result in results:

@@ -1,0 +1,78 @@
+{
+  "generatedAt": "2026-07-15T13:07:42Z",
+  "plugin": {
+    "name": "kaoyan-22408",
+    "treeSha256": "12bb38137921bb0574a17938da50ffbab7fbde04c62decdb2864e004b592bc5f",
+    "version": "1.1.0"
+  },
+  "results": {
+    "plugin": {
+      "exitCode": 0,
+      "passed": true
+    },
+    "skills": {
+      "kaoyan-22408-planner": {
+        "exitCode": 0,
+        "passed": true
+      },
+      "kaoyan-408-tutor": {
+        "exitCode": 0,
+        "passed": true
+      },
+      "kaoyan-english2-coach": {
+        "exitCode": 0,
+        "passed": true
+      },
+      "kaoyan-error-loop-coach": {
+        "exitCode": 0,
+        "passed": true
+      },
+      "kaoyan-material-study-assistant": {
+        "exitCode": 0,
+        "passed": true
+      },
+      "kaoyan-math2-coach": {
+        "exitCode": 0,
+        "passed": true
+      },
+      "kaoyan-mock-exam-coach": {
+        "exitCode": 0,
+        "passed": true
+      },
+      "kaoyan-official-info-researcher": {
+        "exitCode": 0,
+        "passed": true
+      },
+      "kaoyan-past-paper-analyst": {
+        "exitCode": 0,
+        "passed": true
+      },
+      "kaoyan-politics-coach": {
+        "exitCode": 0,
+        "passed": true
+      },
+      "kaoyan-progress-diagnostician": {
+        "exitCode": 0,
+        "passed": true
+      },
+      "kaoyan-review-executor": {
+        "exitCode": 0,
+        "passed": true
+      }
+    }
+  },
+  "runtime": {
+    "pythonVersion": "3.14.0"
+  },
+  "schemaVersion": "1.0",
+  "validators": {
+    "plugin": {
+      "sha256": "4e84c911479e4d158d723ed8ccc881d3499e580fbf5650e60d379a1a25ac3186",
+      "source": "plugin-creator/scripts/validate_plugin.py"
+    },
+    "skill": {
+      "sha256": "5347a0a09cfb546bba1c0d1a30dae0a233d9a05f57bd4e7877155c588bcdabf7",
+      "source": "skill-creator/scripts/quick_validate.py"
+    }
+  }
+}

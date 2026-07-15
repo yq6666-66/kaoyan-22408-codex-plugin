@@ -1,84 +1,118 @@
 # 考研 22408 Skills 插件
 
-面向数学二、英语二、408 与政治的中文学习插件，可在支持 Skills 的 ChatGPT 与 Codex 环境中使用。项目只包含工作流说明、共享契约和品牌图标，不提供独立应用、后台服务、账号系统或学习数据存储。
+`kaoyan-22408` 是面向数学二、英语二、408 与政治的中文学习插件，可在支持 Skills 插件的 ChatGPT 与 Codex 环境中使用。项目只包含 12 个 Skills、共享契约与品牌图标，不提供独立应用、App、MCP、后台服务、账号、内置题库或学习状态持久化。
+
+当前版本：`1.1.0`
 
 ## 能力
 
-插件包含 12 个单一职责 Skill：
-
-| Skill | 用途 |
+| Skill | 主责 |
 | --- | --- |
-| `kaoyan-22408-planner` | 阶段、月度、周度与跨科时间规划 |
-| `kaoyan-review-executor` | 把既有计划展开为当前学习任务 |
-| `kaoyan-progress-diagnostician` | 根据用户提供的快照诊断进度与风险 |
-| `kaoyan-error-loop-coach` | 错因聚类、间隔复测与掌握证据判断 |
-| `kaoyan-mock-exam-coach` | 原创或用户授权题目的计时测验与交卷后复盘 |
-| `kaoyan-408-tutor` | 408 题目、概念、缺失题面与答案冲突处理 |
-| `kaoyan-math2-coach` | 数学二解题、错因与专项训练 |
+| `kaoyan-22408-planner` | 阶段、月度、周度、目标日期倒排与跨科时间分配 |
+| `kaoyan-review-executor` | 把既有计划或用户给出的本次目标、科目与时长展开为当前学习时段 |
+| `kaoyan-progress-diagnostician` | 根据用户提供的记录诊断进度、风险与调整信号 |
+| `kaoyan-error-loop-coach` | 跨题错因聚类、间隔复测与掌握证据判断 |
+| `kaoyan-mock-exam-coach` | 组织原创或用户授权题目的自计时测验，并在交卷后评分复盘 |
+| `kaoyan-408-tutor` | 408 单题、概念、题面缺失与答案冲突处理 |
+| `kaoyan-math2-coach` | 数学二解题、单题错误定位与专项训练 |
 | `kaoyan-english2-coach` | 英语二阅读、翻译、完形、新题型与写作批改 |
 | `kaoyan-politics-coach` | 政治理论、材料题与背诵复测 |
-| `kaoyan-past-paper-analyst` | 分析用户上传或明确有权使用的真题 |
-| `kaoyan-material-study-assistant` | 把用户提供的材料转成摘要、卡片与练习 |
-| `kaoyan-official-info-researcher` | 核验当年大纲、报名、招生与考试安排 |
+| `kaoyan-past-paper-analyst` | 分析用户实际提供且有权使用的真题文件 |
+| `kaoyan-material-study-assistant` | 把用户提供的材料转成摘要、卡片、提纲与练习 |
+| `kaoyan-official-info-researcher` | 核验当年大纲、报名、招生、考试安排与当前政策事实 |
 
-## 数据边界
+材料路由按意图判断：讲解材料中的学科概念或题目时使用对应学科 Skill；做摘要、卡片、提纲或改写时使用 `kaoyan-material-study-assistant`。
 
-- 发布者没有接收会话或文件的服务器。
-- 插件不会保存计划、作答、进度或访问凭据，也不会暗示拥有跨会话记忆。
-- 真题和学习材料只处理用户在当前会话提供或明确有权使用的内容。
-- 跨会话继续时，用户可复制插件输出的 `StudyProfile`、`ProgressSnapshot` 或 `ReviewQueue`。
-- 最新招考信息只以教育部、研招网和目标院校官方站点为主要依据；不能核验时会明确说明。
+## 数据与内容边界
+
+- 发布者没有接收会话、文件、学习记录或 API Key 的服务器。
+- 插件只处理当前会话内容，不写入用户设备，也不暗示拥有跨会话记忆。
+- 真题和学习材料只处理用户当前会话直接提供的有限内容，或用户有权使用且实际提供的文件；不会搜索、补全或重建整套资料。
+- 跨会话继续时，用户可复制插件输出的 Schema 1.1 `StudyProfile`、`ProgressSnapshot` 或 `ReviewQueue` JSON。
+- 招考信息以教育部、研招网和目标院校官网为依据；时政与政策事实以中国政府网、国务院、中央部门或事项发布机构官网为依据。不能核验时会标记 `[待核验]`。
+- 输出使用 `[用户材料]`、`[原创练习]`、`[官方核验]`、`[待核验]` 区分证据来源。
 
 详见 [隐私政策](PRIVACY.md)、[使用条款](TERMS.md) 与 [第三方内容边界](THIRD_PARTY_CONTENT.md)。
 
-## 安装与使用
+## 分发与兼容性
 
-### 从 GitHub marketplace 安装
+GitHub 仓库是 repo marketplace 的安装源。GitHub Release 中的 ZIP 与 SHA-256 文件用于审计、离线检查和复现构建，不是另一套应用安装包。
 
-仓库公开后，可在 Codex CLI 中添加并安装：
+| 环境 | 使用方式 |
+| --- | --- |
+| 支持插件命令的新版 Codex CLI / IDE | 添加固定版本的 GitHub marketplace，再从插件目录安装 |
+| ChatGPT Desktop / Codex Desktop | 克隆并打开仓库，重启桌面端，再从 repo marketplace 选择 `kaoyan-22408` |
+| 不支持插件命令的旧版 CLI | CLI 不能直接安装；使用上面的桌面端 repo marketplace 流程 |
+| ChatGPT Web | 仅当个人或工作区已经提供、安装或分享该插件时可用；不能直接从 GitHub 搜索安装 |
+
+### 新版 CLI 安装
+
+以下命令要求当前 CLI 的 `codex plugin` 帮助中存在相应子命令：
 
 ```text
-codex plugin marketplace add yq6666-66/kaoyan-22408-codex-plugin
+codex plugin marketplace add yq6666-66/kaoyan-22408-codex-plugin --ref v1.1.0
 codex plugin add kaoyan-22408@kaoyan-22408
 ```
 
-安装后新建任务，让宿主加载新的 Skills。也可在 ChatGPT 桌面端或 Codex 的插件目录中选择该 marketplace。
+安装后新建任务，让宿主重新加载 Skills。
+
+### 桌面端安装
+
+```text
+git clone --branch v1.1.0 --depth 1 https://github.com/yq6666-66/kaoyan-22408-codex-plugin.git
+```
+
+在 ChatGPT Desktop 或 Codex Desktop 中打开克隆后的仓库，重启桌面端，然后从仓库提供的 marketplace 安装 `kaoyan-22408`。桌面端菜单名称可能随版本变化。
 
 ### 本地开发安装
 
-在仓库根目录运行：
+在仓库根目录运行跨平台安装器：
+
+```text
+python scripts/install_local.py
+```
+
+只验证、不安装：
+
+```text
+python scripts/install_local.py --validate-only
+```
+
+Windows 也可使用只负责转发参数与退出码的 PowerShell 包装：
 
 ```powershell
 ./scripts/install-local.ps1
+./scripts/install-local.ps1 -ValidateOnly
 ```
 
-脚本从当前仓库解析路径，不复制个人数据，也不依赖某个缓存版本目录。若本机 Codex CLI 尚未提供插件子命令，脚本会完成验证并提示重启 ChatGPT 桌面端；桌面端会读取仓库中的 marketplace。
+退出码含义：`0` 表示验证成功或实际安装成功；`1` 表示验证、命令或安装失败；`2` 表示当前 Codex 不支持插件命令，需要改用桌面端 repo marketplace 人工安装。只有 `codex plugin add` 确实成功时，安装器才会输出 `Installed kaoyan-22408`。
 
-### 调用示例
+## 调用示例
 
-Codex 使用 `$skill-name` 显式调用；ChatGPT 可从插件或 Skill 选择器调用。例如：
+Codex 可使用 `$skill-name` 显式调用；ChatGPT 可从插件或 Skill 选择器调用。例如：
 
 ```text
-使用 $kaoyan-22408-planner，根据 2026-12-26 的目标日期和每周 35 小时时间预算制定跨科周计划。
+使用 $kaoyan-review-executor。我现在有 90 分钟，目标是复习数据结构树与二叉树并完成一次闭卷复述，请安排这个学习时段。
 ```
 
 ```text
-使用 $kaoyan-mock-exam-coach，生成 10 道原创操作系统章节测；我交卷前不要显示答案或提示。
+使用 $kaoyan-mock-exam-coach，生成 10 道原创操作系统章节测；我会自行计时，明确交卷前不要显示答案、提示或得分线索。
 ```
 
-## 开发与验证
+## 开发、验证与发布包
 
 ```text
 python scripts/check.py
 python scripts/build_release.py
 ```
 
-`check.py` 运行仓库契约测试，并在本机存在官方插件与 Skill 校验器时一并执行。`build_release.py` 只把 manifest、12 个 Skills、三份共享契约与 SVG Logo 写入发布压缩包。
+`check.py` 运行仓库静态检查、结构校验和测试。`build_release.py` 从 `plugin.json.version` 派生 ZIP 文件名，同时生成对应的 `.zip.sha256`，并只打包完整路径允许列表中的插件文件。正式发布还要求官方插件校验、12 个 Skill 校验、动态前向评测证据，以及 Windows 与 Ubuntu 构建得到完全相同的 SHA-256。
 
-提交门户材料位于 `submission/`，其中测试集严格为 5 个正向场景和 3 个负向场景。公开目录提交仍需要通过 OpenAI Platform 的身份与权限检查。
+版本记录见 [CHANGELOG.md](CHANGELOG.md)。
 
 ## 支持与许可
 
+- 源码与 marketplace：[GitHub 仓库](https://github.com/yq6666-66/kaoyan-22408-codex-plugin)
 - 问题与建议：[GitHub Issues](https://github.com/yq6666-66/kaoyan-22408-codex-plugin/issues)
 - 安全问题：[SECURITY.md](SECURITY.md)
 - 许可：[MIT](LICENSE)

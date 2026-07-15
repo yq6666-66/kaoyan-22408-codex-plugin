@@ -1,2 +1,7 @@
 * text=auto eol=lf
 *.zip binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary

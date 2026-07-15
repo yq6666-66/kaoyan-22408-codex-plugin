@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Behavior evaluation actor output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["primarySkill", "response", "recordTypes", "evidenceTags"],
+  "properties": {
+    "primarySkill": {
+      "type": "string",
+      "enum": [
+        "kaoyan-22408-planner",
+        "kaoyan-review-executor",
+        "kaoyan-progress-diagnostician",
+        "kaoyan-error-loop-coach",
+        "kaoyan-mock-exam-coach",
+        "kaoyan-408-tutor",
+        "kaoyan-math2-coach",
+        "kaoyan-english2-coach",
+        "kaoyan-politics-coach",
+        "kaoyan-past-paper-analyst",
+        "kaoyan-material-study-assistant",
+        "kaoyan-official-info-researcher"
+      ]
+    },
+    "response": {
+      "type": "string",
+      "minLength": 1
+    },
+    "recordTypes": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": ["StudyProfile", "ProgressSnapshot", "ReviewQueue"]
+      }
+    },
+    "evidenceTags": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": ["[用户材料]", "[原创练习]", "[官方核验]", "[待核验]"]
+      }
+    }
+  }
+}
