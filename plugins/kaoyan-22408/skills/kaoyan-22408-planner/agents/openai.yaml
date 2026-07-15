@@ -1,0 +1,4 @@
+interface:
+  display_name: "考研 22408 规划师"
+  short_description: "制定考研22408阶段、月度、周度计划并合理分配四科时间预算"
+  default_prompt: "使用 $kaoyan-22408-planner 根据我的目标日期和时间预算制定跨科周计划。"

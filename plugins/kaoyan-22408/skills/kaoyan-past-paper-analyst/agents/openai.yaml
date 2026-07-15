@@ -1,0 +1,4 @@
+interface:
+  display_name: "考研真题分析师"
+  short_description: "分析用户上传或明确授权的真题并提炼考点分布与训练建议"
+  default_prompt: "使用 $kaoyan-past-paper-analyst 分析我上传的真题文件并总结命题特点。"

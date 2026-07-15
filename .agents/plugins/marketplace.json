@@ -1,0 +1,20 @@
+{
+  "name": "kaoyan-22408",
+  "interface": {
+    "displayName": "考研 22408"
+  },
+  "plugins": [
+    {
+      "name": "kaoyan-22408",
+      "source": {
+        "source": "local",
+        "path": "./plugins/kaoyan-22408"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Education"
+    }
+  ]
+}

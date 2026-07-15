@@ -1,0 +1,4 @@
+interface:
+  display_name: "考研进度诊断师"
+  short_description: "根据用户提供的学习快照诊断完成进度、风险与计划调整信号"
+  default_prompt: "使用 $kaoyan-progress-diagnostician 分析我粘贴的进度快照并指出风险。"

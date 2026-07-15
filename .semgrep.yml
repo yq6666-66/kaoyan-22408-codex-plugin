@@ -1,0 +1,48 @@
+rules:
+  - id: release-legacy-data-marker
+    message: Release payload contains a marker from a removed data workflow.
+    severity: ERROR
+    languages: [generic]
+    paths:
+      include:
+        - /plugins/kaoyan-22408/**
+      exclude:
+        - /.semgrep.yml
+    pattern-regex: '(?i)\b(?:baidu|netdisk|localstorage|study-state)\b'
+
+  - id: hardcoded-local-user-path
+    message: A user-specific absolute path must not be committed.
+    severity: ERROR
+    languages: [generic]
+    paths:
+      exclude:
+        - /.semgrep.yml
+        - /scripts/validate_repository.py
+    pattern-regex: '(?i)(?:[a-z]:\\users\\|/users/|/home/[^/\s]+/)'
+
+  - id: likely-plaintext-secret
+    message: A value resembles a plaintext service credential.
+    severity: ERROR
+    languages: [generic]
+    paths:
+      exclude:
+        - /.semgrep.yml
+    pattern-regex: '\b(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,}|figd_[A-Za-z0-9_-]{20,})\b'
+
+  - id: forbidden-force-push
+    message: Release automation must not force-push Git history.
+    severity: ERROR
+    languages: [generic]
+    paths:
+      exclude:
+        - /.semgrep.yml
+    pattern-regex: '(?i)git\s+push[^\n]*(?:--force|-f\b)'
+
+  - id: python-shell-execution
+    message: Avoid shell-based command execution in release tooling.
+    severity: ERROR
+    languages: [python]
+    patterns:
+      - pattern-either:
+          - pattern: subprocess.$FUNC(..., shell=True, ...)
+          - pattern: os.system(...)

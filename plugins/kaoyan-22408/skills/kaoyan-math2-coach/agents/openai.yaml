@@ -1,0 +1,4 @@
+interface:
+  display_name: "考研数学二教练"
+  short_description: "讲解数学二题目、定位错误根因并设计针对性的专项训练"
+  default_prompt: "使用 $kaoyan-math2-coach 讲解这道数学二题并给我专项训练建议。"

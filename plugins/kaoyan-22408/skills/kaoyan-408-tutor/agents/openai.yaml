@@ -1,0 +1,4 @@
+interface:
+  display_name: "考研 408 辅导老师"
+  short_description: "讲解408单题与核心概念并妥善处理题面缺失和答案冲突"
+  default_prompt: "使用 $kaoyan-408-tutor 分析这道408题并检查题面是否完整。"

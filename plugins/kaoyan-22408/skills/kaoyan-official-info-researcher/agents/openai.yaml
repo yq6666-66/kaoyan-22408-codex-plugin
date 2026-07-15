@@ -1,0 +1,4 @@
+interface:
+  display_name: "考研官方信息核验员"
+  short_description: "核验当年大纲、报名、院校招生与考试安排并标注来源日期"
+  default_prompt: "使用 $kaoyan-official-info-researcher 核验今年的报名与考试安排。"

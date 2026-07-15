@@ -1,0 +1,4 @@
+interface:
+  display_name: "考研英语二教练"
+  short_description: "辅导英语二阅读翻译完形新题型并细致批改用户写作片段"
+  default_prompt: "使用 $kaoyan-english2-coach 批改这段英语二作文并给出改写建议。"

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">Kaoyan 22408</title>
+  <desc id="desc">A teal study badge for the 22408 kaoyan plugin.</desc>
+  <rect width="256" height="256" rx="48" fill="#0f766e"/>
+  <path d="M58 70c0-10 8-18 18-18h104c10 0 18 8 18 18v116c0 10-8 18-18 18H76c-10 0-18-8-18-18V70z" fill="#f8fafc"/>
+  <path d="M84 86h88M84 116h88M84 146h58" stroke="#0f766e" stroke-width="12" stroke-linecap="round"/>
+  <path d="M74 186h108" stroke="#134e4a" stroke-width="10" stroke-linecap="round"/>
+  <text x="128" y="227" text-anchor="middle" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#f8fafc">22408</text>
+</svg>

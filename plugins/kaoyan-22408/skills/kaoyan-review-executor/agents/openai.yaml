@@ -1,0 +1,4 @@
+interface:
+  display_name: "考研复习执行器"
+  short_description: "把既定考研计划拆成今天或下一学习时段可直接完成的具体任务"
+  default_prompt: "使用 $kaoyan-review-executor 把我的周计划展开为今天的学习任务。"

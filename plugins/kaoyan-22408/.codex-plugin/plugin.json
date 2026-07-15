@@ -1,0 +1,47 @@
+{
+  "name": "kaoyan-22408",
+  "version": "1.0.0",
+  "description": "面向考研 22408 的中文学习 Skills，提供规划、执行、诊断、学科辅导、错题复测、模考、材料分析与官方信息核验。",
+  "author": {
+    "name": "yq6666-66",
+    "url": "https://github.com/yq6666-66"
+  },
+  "homepage": "https://github.com/yq6666-66/kaoyan-22408-codex-plugin",
+  "repository": "https://github.com/yq6666-66/kaoyan-22408-codex-plugin",
+  "license": "MIT",
+  "keywords": [
+    "kaoyan",
+    "22408",
+    "408",
+    "math-ii",
+    "english-ii",
+    "politics",
+    "education"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "考研 22408",
+    "shortDescription": "面向数学二、英语二、408 与政治的中文学习助手",
+    "longDescription": "纯 Skills 考研学习插件，覆盖跨科规划、当日执行、进度诊断、错题复测、原创模考、四科学习辅导、用户材料分析和官方招考信息核验。插件不提供后台服务，也不保存用户材料或学习记录。",
+    "developerName": "yq6666-66",
+    "category": "Education",
+    "capabilities": [
+      "Education",
+      "Planning",
+      "Tutoring",
+      "Assessment",
+      "Research"
+    ],
+    "websiteURL": "https://github.com/yq6666-66/kaoyan-22408-codex-plugin",
+    "privacyPolicyURL": "https://github.com/yq6666-66/kaoyan-22408-codex-plugin/blob/main/PRIVACY.md",
+    "termsOfServiceURL": "https://github.com/yq6666-66/kaoyan-22408-codex-plugin/blob/main/TERMS.md",
+    "defaultPrompt": [
+      "根据目标日期和每周时间预算，制定数学二、英语二、408、政治的跨科周计划",
+      "分析我粘贴的进度快照和错题，指出风险并生成复测队列",
+      "用原创题目生成一次章节测；我交卷后再评分和复盘"
+    ],
+    "brandColor": "#0F766E",
+    "composerIcon": "./assets/kaoyan-22408.svg",
+    "logo": "./assets/kaoyan-22408.svg"
+  }
+}
