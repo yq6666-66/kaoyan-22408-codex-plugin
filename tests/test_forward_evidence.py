@@ -21,9 +21,9 @@ from common import (  # noqa: E402
 )
 from verify_forward_evidence import EvidenceError, verify_evidence  # noqa: E402
 from run_forward_eval import (  # noqa: E402
-    EvaluationError,
     isolated_config_arguments,
     plugin_prompt_context,
+    prepare_isolated_codex_home,
     resolve_codex,
 )
 
@@ -138,32 +138,23 @@ class ForwardEvidenceTests(unittest.TestCase):
         resolved = resolve_codex("codex", platform="nt")
         self.assertTrue(resolved.casefold().endswith(("codex.cmd", "codex.exe")))
 
-    def test_eval_isolation_disables_global_mcp_without_copying_secrets(self) -> None:
+    def test_eval_isolation_uses_minimal_temporary_codex_home(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
-            home = Path(temporary)
-            (home / "config.toml").write_text(
-                '[mcp_servers."server with space"]\n'
-                'command = "example"\n'
-                '[mcp_servers.other.env]\n'
-                'TOKEN = "must-not-leak"\n',
-                encoding="utf-8",
+            root = Path(temporary)
+            source = root / "source"
+            source.mkdir()
+            (source / "auth.json").write_text('{"auth_mode":"test"}', encoding="utf-8")
+            (source / "config.toml").write_text("ignored = true", encoding="utf-8")
+            (source / "models_cache.json").write_text("{}", encoding="utf-8")
+            isolated = prepare_isolated_codex_home(root / "run", source)
+            self.assertEqual({path.name for path in isolated.iterdir()}, {"auth.json"})
+            self.assertEqual(
+                (isolated / "auth.json").read_text(encoding="utf-8"),
+                '{"auth_mode":"test"}',
             )
-            arguments = isolated_config_arguments(home)
-        joined = "\n".join(arguments)
-        self.assertIn("mcp_servers.server with space.enabled=false", arguments)
-        self.assertIn("mcp_servers.other.enabled=false", arguments)
-        self.assertNotIn("must-not-leak", joined)
+        arguments = isolated_config_arguments()
         self.assertIn("plugins", arguments)
-
-    def test_eval_isolation_rejects_ambiguous_mcp_names(self) -> None:
-        with tempfile.TemporaryDirectory() as temporary:
-            home = Path(temporary)
-            (home / "config.toml").write_text(
-                '[mcp_servers."ambiguous.name"]\ncommand = "example"\n',
-                encoding="utf-8",
-            )
-            with self.assertRaisesRegex(EvaluationError, "cannot safely isolate"):
-                isolated_config_arguments(home)
+        self.assertIn("shell_tool", arguments)
 
     def test_prompt_context_is_plugin_only_and_tool_free(self) -> None:
         route_context = plugin_prompt_context(full=False)

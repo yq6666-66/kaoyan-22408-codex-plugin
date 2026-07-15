@@ -14,7 +14,6 @@ import sys
 import tempfile
 import threading
 import time
-import tomllib
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
@@ -61,30 +60,55 @@ def resolve_codex(command: str, *, platform: str = os.name) -> str:
     return shutil.which(command) or command
 
 
-def isolated_config_arguments(config_home: Path | None = None) -> list[str]:
-    """Disable unrelated global integrations without reading or copying their secrets."""
-    home = config_home or Path(os.environ.get("CODEX_HOME", Path.home() / ".codex"))
-    config_path = home / "config.toml"
-    server_names: list[str] = []
-    if config_path.is_file():
-        with config_path.open("rb") as handle:
-            config = tomllib.load(handle)
-        servers = config.get("mcp_servers", {})
-        if isinstance(servers, dict):
-            server_names = sorted(str(name) for name in servers)
-
+def isolated_config_arguments() -> list[str]:
+    """Disable every nonessential agent feature in the temporary Codex home."""
     arguments: list[str] = []
-    for name in server_names:
-        if not name or any(character in name for character in '.=\\"\r\n'):
-            raise EvaluationError(f"cannot safely isolate MCP server name: {name!r}")
-        arguments.extend(["--config", f"mcp_servers.{name}.enabled=false"])
-    for feature in ("apps", "memories", "multi_agent", "plugins"):
+    for feature in (
+        "apps",
+        "memories",
+        "multi_agent",
+        "plugins",
+        "shell_snapshot",
+        "shell_tool",
+    ):
         arguments.extend(["--disable", feature])
     return arguments
 
 
-def verify_mcp_isolation(codex: str, arguments: list[str], service_tier: str) -> None:
+def prepare_isolated_codex_home(root: Path, source_home: Path | None = None) -> Path:
+    """Create a minimal temporary home containing only the CLI login material."""
+    source = source_home or Path(os.environ.get("CODEX_HOME", Path.home() / ".codex"))
+    auth = source / "auth.json"
+    if not auth.is_file() or auth.is_symlink():
+        raise EvaluationError("Codex auth.json is unavailable; run `codex login` before evaluation")
+    destination = root / "codex-home"
+    destination.mkdir(mode=0o700, parents=True)
+    target = destination / "auth.json"
+    shutil.copyfile(auth, target)
+    target.chmod(0o600)
+    return destination
+
+
+def isolated_environment(codex_home: Path) -> dict[str, str]:
+    env = os.environ.copy()
+    env.update(
+        {
+            "CODEX_HOME": str(codex_home),
+            "HOME": str(codex_home),
+            "USERPROFILE": str(codex_home),
+        }
+    )
+    return env
+
+
+def verify_mcp_isolation(
+    codex: str,
+    arguments: list[str],
+    service_tier: str,
+    codex_home: Path,
+) -> None:
     """Fail closed if the masked CLI listing still reports an enabled MCP server."""
+    env = isolated_environment(codex_home)
     output = run_checked(
         [
             codex,
@@ -93,16 +117,22 @@ def verify_mcp_isolation(codex: str, arguments: list[str], service_tier: str) ->
             "--config",
             f'service_tier="{service_tier}"',
             *arguments,
-        ]
+        ],
+        env=env,
     )
     if re.search(r"(?m)\s+enabled\s+", output):
         raise EvaluationError("one or more global MCP servers remain enabled")
 
 
-def run_checked(command: list[str], cwd: Path = REPO) -> str:
+def run_checked(
+    command: list[str],
+    cwd: Path = REPO,
+    env: dict[str, str] | None = None,
+) -> str:
     completed = subprocess.run(
         command,
         cwd=cwd,
+        env=env,
         check=False,
         capture_output=True,
         text=True,
@@ -181,6 +211,7 @@ def structured_call(
     model: str,
     service_tier: str,
     isolated_config: list[str],
+    codex_home: Path,
     prompt: str,
     schema: Path,
     workspace: Path,
@@ -211,8 +242,14 @@ def structured_call(
         model,
         "-",
     ]
-    env = os.environ.copy()
-    env.update({"NO_COLOR": "1", "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"})
+    env = isolated_environment(codex_home)
+    env.update(
+        {
+            "NO_COLOR": "1",
+            "PYTHONUTF8": "1",
+            "PYTHONIOENCODING": "utf-8",
+        }
+    )
     completed = subprocess.run(
         command,
         input=prompt,
@@ -226,7 +263,11 @@ def structured_call(
         timeout=timeout,
     )
     if completed.returncode != 0:
-        detail = (completed.stderr or completed.stdout).strip()
+        detail = "\n".join(
+            part.strip()
+            for part in (completed.stdout, completed.stderr)
+            if part and part.strip()
+        )
         raise EvaluationError(f"Codex call failed ({completed.returncode}): {detail[-6000:]}")
     if not result_path.is_file():
         raise EvaluationError("Codex did not write --output-last-message")
@@ -327,6 +368,7 @@ def evaluate_route_case(
     model: str,
     service_tier: str,
     isolated_config: list[str],
+    codex_home: Path,
     plugin_context: str,
     workspace: Path,
     results_dir: Path,
@@ -343,6 +385,7 @@ def evaluate_route_case(
         model=model,
         service_tier=service_tier,
         isolated_config=isolated_config,
+        codex_home=codex_home,
         prompt=route_prompt(case, plugin_context),
         schema=workspace / "schemas" / "route-output.schema.json",
         workspace=workspace,
@@ -368,6 +411,7 @@ def evaluate_behavior_case(
     model: str,
     service_tier: str,
     isolated_config: list[str],
+    codex_home: Path,
     plugin_context: str,
     workspace: Path,
     results_dir: Path,
@@ -384,6 +428,7 @@ def evaluate_behavior_case(
         model=model,
         service_tier=service_tier,
         isolated_config=isolated_config,
+        codex_home=codex_home,
         prompt=behavior_prompt(case, plugin_context),
         schema=workspace / "schemas" / "behavior-output.schema.json",
         workspace=workspace,
@@ -398,6 +443,7 @@ def evaluate_behavior_case(
         model=model,
         service_tier=service_tier,
         isolated_config=isolated_config,
+        codex_home=codex_home,
         prompt=judge_prompt(case, actor),
         schema=workspace / "schemas" / "judge-output.schema.json",
         workspace=workspace,
@@ -497,7 +543,6 @@ def main() -> int:
 
     codex = resolve_codex(args.codex)
     isolated_config = isolated_config_arguments()
-    verify_mcp_isolation(codex, isolated_config, args.service_tier)
     codex_version = run_checked([codex, "--version"])
     source_revision = run_checked(["git", "rev-parse", "HEAD"])
     runtime_hash = hashlib.sha256(
@@ -508,6 +553,8 @@ def main() -> int:
 
     with tempfile.TemporaryDirectory(prefix="kaoyan-22408-forward-eval-") as temporary:
         root = Path(temporary)
+        codex_home = prepare_isolated_codex_home(root)
+        verify_mcp_isolation(codex, isolated_config, args.service_tier, codex_home)
         workspace = prepare_workspace(root)
         results_dir = root / "results"
         common = {
@@ -515,6 +562,7 @@ def main() -> int:
             "model": args.model,
             "service_tier": args.service_tier,
             "isolated_config": isolated_config,
+            "codex_home": codex_home,
             "workspace": workspace,
             "results_dir": results_dir,
             "cache_dir": cache_dir,
