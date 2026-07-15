@@ -47,6 +47,18 @@ def log(message: str) -> None:
         print(message, flush=True)
 
 
+def resolve_codex(command: str, *, platform: str = os.name) -> str:
+    """Prefer an executable Windows shim instead of an extensionless npm file."""
+    candidate = Path(command)
+    is_bare_name = candidate.name == command and not candidate.suffix
+    if platform == "nt" and is_bare_name:
+        for suffix in (".cmd", ".exe"):
+            resolved = shutil.which(f"{command}{suffix}")
+            if resolved:
+                return resolved
+    return shutil.which(command) or command
+
+
 def run_checked(command: list[str], cwd: Path = REPO) -> str:
     completed = subprocess.run(
         command,
@@ -383,7 +395,8 @@ def main() -> int:
     if not args.allow_dirty and not relevant_inputs_are_clean():
         raise EvaluationError("plugin, cases, or eval harness is dirty; commit inputs before official evaluation")
 
-    codex_version = run_checked([args.codex, "--version"])
+    codex = resolve_codex(args.codex)
+    codex_version = run_checked([codex, "--version"])
     source_revision = run_checked(["git", "rev-parse", "HEAD"])
     runtime_hash = hashlib.sha256(f"{codex_version}\0{args.model}".encode("utf-8")).hexdigest()[:16]
     cache_key = f"{plugin_hash}-{case_hash}-{evaluator_hash}-{runtime_hash}"
@@ -394,7 +407,7 @@ def main() -> int:
         workspace = prepare_workspace(root)
         results_dir = root / "results"
         common = {
-            "codex": args.codex,
+            "codex": codex,
             "model": args.model,
             "workspace": workspace,
             "results_dir": results_dir,

@@ -20,6 +20,7 @@ from common import (  # noqa: E402
     plugin_tree_sha256,
 )
 from verify_forward_evidence import EvidenceError, verify_evidence  # noqa: E402
+from run_forward_eval import resolve_codex  # noqa: E402
 
 
 def valid_evidence() -> dict:
@@ -126,6 +127,10 @@ class ForwardEvidenceTests(unittest.TestCase):
         evidence["behavior_results"][0]["judge"]["criteria"][0]["criterion"] = "changed"
         with self.assertRaisesRegex(EvidenceError, "rubric text/order"):
             self.verify(evidence)
+
+    def test_windows_codex_resolution_uses_executable_shim(self) -> None:
+        resolved = resolve_codex("codex", platform="nt")
+        self.assertTrue(resolved.casefold().endswith(("codex.cmd", "codex.exe")))
 
 
 if __name__ == "__main__":
