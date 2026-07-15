@@ -172,6 +172,7 @@ def main() -> int:
         return 1
     print(f"[OK] route evaluation: {evidence['route_summary']['passed']}/36")
     print(f"[OK] behavior evaluation: {evidence['behavior_summary']['passed']}/12")
+    print(f"[OK] runtime: {evidence['codex_version']} / {evidence['model']} / {evidence['service_tier']}")
     print(f"[OK] plugin tree: {evidence['plugin_tree_sha256']}")
     print(f"[OK] cases: {evidence['cases_sha256']}")
     print(f"[OK] evaluator: {evidence['evaluator_sha256']}")

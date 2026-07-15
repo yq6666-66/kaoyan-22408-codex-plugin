@@ -13,6 +13,7 @@
     "evaluator_sha256",
     "codex_version",
     "model",
+    "service_tier",
     "route_summary",
     "behavior_summary",
     "route_results",
@@ -28,6 +29,7 @@
     "evaluator_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "codex_version": {"type": "string", "minLength": 1},
     "model": {"type": "string", "minLength": 1},
+    "service_tier": {"enum": ["fast", "flex"]},
     "route_summary": {"$ref": "#/$defs/summary"},
     "behavior_summary": {"$ref": "#/$defs/summary"},
     "route_results": {

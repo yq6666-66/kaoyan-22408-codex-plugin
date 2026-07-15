@@ -36,6 +36,7 @@ def valid_evidence() -> dict:
         "evaluator_sha256": evaluator_sha256(),
         "codex_version": "codex-cli test",
         "model": "test-model",
+        "service_tier": "fast",
         "route_summary": {"passed": 36, "total": 36},
         "behavior_summary": {"passed": 12, "total": 12},
         "route_results": [

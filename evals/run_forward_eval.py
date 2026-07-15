@@ -108,6 +108,7 @@ def structured_call(
     *,
     codex: str,
     model: str,
+    service_tier: str,
     prompt: str,
     schema: Path,
     workspace: Path,
@@ -120,6 +121,8 @@ def structured_call(
     command = [
         codex,
         "exec",
+        "--config",
+        f'service_tier="{service_tier}"',
         "--ephemeral",
         "--sandbox",
         "read-only",
@@ -347,6 +350,7 @@ def render_report(evidence: dict[str, Any]) -> str:
 - 生成时间：{evidence['generated_at']}
 - Codex：{evidence['codex_version']}
 - 模型：{evidence['model']}
+- 服务层级：{evidence['service_tier']}
 - 源提交：{evidence['source_revision']}
 - 插件树 SHA-256：`{evidence['plugin_tree_sha256']}`
 - 测试集 SHA-256：`{evidence['cases_sha256']}`
@@ -366,6 +370,12 @@ def render_report(evidence: dict[str, Any]) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", help="Codex model identifier; required for a full run")
+    parser.add_argument(
+        "--service-tier",
+        choices=("fast", "flex"),
+        default="fast",
+        help="CLI-compatible service tier; explicitly overrides the host config",
+    )
     parser.add_argument("--codex", default="codex", help="Codex executable")
     parser.add_argument("--workers", type=int, default=2, choices=range(1, 5))
     parser.add_argument("--timeout", type=int, default=900, help="seconds per Codex call")
@@ -398,7 +408,9 @@ def main() -> int:
     codex = resolve_codex(args.codex)
     codex_version = run_checked([codex, "--version"])
     source_revision = run_checked(["git", "rev-parse", "HEAD"])
-    runtime_hash = hashlib.sha256(f"{codex_version}\0{args.model}".encode("utf-8")).hexdigest()[:16]
+    runtime_hash = hashlib.sha256(
+        f"{codex_version}\0{args.model}\0{args.service_tier}".encode("utf-8")
+    ).hexdigest()[:16]
     cache_key = f"{plugin_hash}-{case_hash}-{evaluator_hash}-{runtime_hash}"
     cache_dir = args.cache_dir.resolve() / cache_key
 
@@ -409,6 +421,7 @@ def main() -> int:
         common = {
             "codex": codex,
             "model": args.model,
+            "service_tier": args.service_tier,
             "workspace": workspace,
             "results_dir": results_dir,
             "cache_dir": cache_dir,
@@ -448,6 +461,7 @@ def main() -> int:
         "evaluator_sha256": evaluator_hash,
         "codex_version": codex_version,
         "model": args.model,
+        "service_tier": args.service_tier,
         "route_summary": {"passed": route_passed, "total": 36},
         "behavior_summary": {"passed": behavior_passed, "total": 12},
         "route_results": route_results,
