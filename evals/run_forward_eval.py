@@ -144,6 +144,37 @@ def prepare_workspace(root: Path) -> Path:
     return workspace
 
 
+def plugin_prompt_context(*, full: bool) -> str:
+    """Embed only hash-bound plugin inputs so actors never need filesystem tools."""
+    files: list[Path] = [
+        PLUGIN / ".codex-plugin" / "plugin.json",
+        PLUGIN / "references" / "capability-routing-contract.md",
+    ]
+    if full:
+        files.extend(sorted((PLUGIN / "references").glob("*")))
+        files.extend(sorted((PLUGIN / "skills").glob("*/SKILL.md")))
+    else:
+        for skill_file in sorted((PLUGIN / "skills").glob("*/SKILL.md")):
+            text = skill_file.read_text(encoding="utf-8")
+            parts = text.split("---", 2)
+            if len(parts) != 3:
+                raise EvaluationError(f"Skill frontmatter is malformed: {skill_file}")
+            files.append(skill_file)
+
+    sections: list[str] = []
+    seen: set[Path] = set()
+    for path in files:
+        if path in seen or not path.is_file() or path.is_symlink():
+            continue
+        seen.add(path)
+        text = path.read_text(encoding="utf-8")
+        if not full and path.name == "SKILL.md":
+            text = f"---{text.split('---', 2)[1]}---"
+        relative = path.relative_to(PLUGIN).as_posix()
+        sections.append(f"===== {relative} =====\n{text}")
+    return "\n\n".join(sections)
+
+
 def structured_call(
     *,
     codex: str,
@@ -243,24 +274,29 @@ def cached_call(
     return result
 
 
-def route_prompt(case: dict[str, Any]) -> str:
-    return f"""你正在使用当前目录中的纯 Skills 插件完成真实用户请求。
-先读取 plugin/.codex-plugin/plugin.json、plugin/references/capability-routing-contract.md，以及需要比较的 Skill frontmatter；只选择一个主责 Skill。
+def route_prompt(case: dict[str, Any], plugin_context: str) -> str:
+    return f"""你正在使用一个纯 Skills 插件完成真实用户请求。不要调用任何工具；下面已经提供完成判断所需的全部插件上下文。
+只选择一个主责 Skill。
 不要读取或猜测任何测试期望。根据插件自己的路由边界，给出主责 Skill、简短理由和实际响应的第一段预览。
+
+插件上下文：
+{plugin_context}
 
 用户请求：
 {case['prompt']}
 """
 
 
-def behavior_prompt(case: dict[str, Any]) -> str:
+def behavior_prompt(case: dict[str, Any], plugin_context: str) -> str:
     transcript = "\n".join(
         f"{turn['role']}: {turn['content']}" for turn in case["transcript"]
     )
-    return f"""你正在使用当前目录中的纯 Skills 插件处理一段会话。
-先读取 plugin/.codex-plugin/plugin.json、plugin/references/capability-routing-contract.md，并按所选 Skill 的条件加载说明读取其他契约。
+    return f"""你正在使用一个纯 Skills 插件处理一段会话。不要调用任何工具；下面已经提供完整的插件 manifest、共享契约和 12 个 Skill 说明。
 根据最后一个用户意图选择唯一主责 Skill，然后直接给出本轮完整回复。遵守当前会话、无写入、无长期记忆、来源与版权边界。
 recordTypes 只列出回复中实际生成的便携记录类型；evidenceTags 只列出回复中实际出现的证据标签。
+
+插件上下文：
+{plugin_context}
 
 会话：
 {transcript}
@@ -270,7 +306,7 @@ recordTypes 只列出回复中实际生成的便携记录类型；evidenceTags �
 def judge_prompt(case: dict[str, Any], actor: dict[str, Any]) -> str:
     rubric = "\n".join(f"{index + 1}. {item}" for index, item in enumerate(case["rubric"]))
     actor_json = json.dumps(actor, ensure_ascii=False, indent=2)
-    return f"""你是独立验收员。当前目录含被测插件，但你与生成回复的代理没有共享上下文。
+    return f"""你是独立验收员，与生成回复的代理没有共享上下文。不要调用任何工具；只根据下列验收标准和被测输出判断。
 核对主责 Skill 和回复是否满足下面全部标准。每条 criteria 必须按原顺序逐条复制标准文本，给出可在回复中定位的证据；不得因措辞友好而放宽边界。
 只有主责 Skill 正确且全部标准通过时，passed 才能为 true。
 
@@ -291,6 +327,7 @@ def evaluate_route_case(
     model: str,
     service_tier: str,
     isolated_config: list[str],
+    plugin_context: str,
     workspace: Path,
     results_dir: Path,
     cache_dir: Path,
@@ -306,7 +343,7 @@ def evaluate_route_case(
         model=model,
         service_tier=service_tier,
         isolated_config=isolated_config,
-        prompt=route_prompt(case),
+        prompt=route_prompt(case, plugin_context),
         schema=workspace / "schemas" / "route-output.schema.json",
         workspace=workspace,
         result_path=results_dir / "routes" / f"{case['id']}.json",
@@ -331,6 +368,7 @@ def evaluate_behavior_case(
     model: str,
     service_tier: str,
     isolated_config: list[str],
+    plugin_context: str,
     workspace: Path,
     results_dir: Path,
     cache_dir: Path,
@@ -346,7 +384,7 @@ def evaluate_behavior_case(
         model=model,
         service_tier=service_tier,
         isolated_config=isolated_config,
-        prompt=behavior_prompt(case),
+        prompt=behavior_prompt(case, plugin_context),
         schema=workspace / "schemas" / "behavior-output.schema.json",
         workspace=workspace,
         result_path=results_dir / "actors" / f"{case['id']}.json",
@@ -484,10 +522,12 @@ def main() -> int:
             "timeout": args.timeout,
             "retries": args.retries,
         }
+        route_common = {**common, "plugin_context": plugin_prompt_context(full=False)}
+        behavior_common = {**common, "plugin_context": plugin_prompt_context(full=True)}
         route_results: list[dict[str, Any]] = []
         with ThreadPoolExecutor(max_workers=args.workers) as executor:
             futures = {
-                executor.submit(evaluate_route_case, case, **common): case["id"]
+                executor.submit(evaluate_route_case, case, **route_common): case["id"]
                 for case in route_data["cases"]
             }
             for future in as_completed(futures):
@@ -497,7 +537,7 @@ def main() -> int:
         behavior_results: list[dict[str, Any]] = []
         with ThreadPoolExecutor(max_workers=args.workers) as executor:
             futures = {
-                executor.submit(evaluate_behavior_case, case, **common): case["id"]
+                executor.submit(evaluate_behavior_case, case, **behavior_common): case["id"]
                 for case in behavior_data["cases"]
             }
             for future in as_completed(futures):

@@ -20,7 +20,12 @@ from common import (  # noqa: E402
     plugin_tree_sha256,
 )
 from verify_forward_evidence import EvidenceError, verify_evidence  # noqa: E402
-from run_forward_eval import EvaluationError, isolated_config_arguments, resolve_codex  # noqa: E402
+from run_forward_eval import (  # noqa: E402
+    EvaluationError,
+    isolated_config_arguments,
+    plugin_prompt_context,
+    resolve_codex,
+)
 
 
 def valid_evidence() -> dict:
@@ -159,6 +164,16 @@ class ForwardEvidenceTests(unittest.TestCase):
             )
             with self.assertRaisesRegex(EvaluationError, "cannot safely isolate"):
                 isolated_config_arguments(home)
+
+    def test_prompt_context_is_plugin_only_and_tool_free(self) -> None:
+        route_context = plugin_prompt_context(full=False)
+        behavior_context = plugin_prompt_context(full=True)
+        self.assertIn("capability-routing-contract.md", route_context)
+        self.assertIn("kaoyan-review-executor", route_context)
+        self.assertNotIn("## 展开时段", route_context)
+        self.assertIn("## 展开时段", behavior_context)
+        self.assertNotIn("expectedPrimary", behavior_context)
+        self.assertNotIn("tests/", behavior_context)
 
 
 if __name__ == "__main__":
