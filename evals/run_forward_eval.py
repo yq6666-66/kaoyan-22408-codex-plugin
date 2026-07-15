@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -74,13 +75,28 @@ def isolated_config_arguments(config_home: Path | None = None) -> list[str]:
 
     arguments: list[str] = []
     for name in server_names:
-        escaped = name.replace("\\", "\\\\").replace('"', '\\"')
-        arguments.extend(
-            ["--config", f'mcp_servers."{escaped}".enabled=false']
-        )
+        if not name or any(character in name for character in '.=\\"\r\n'):
+            raise EvaluationError(f"cannot safely isolate MCP server name: {name!r}")
+        arguments.extend(["--config", f"mcp_servers.{name}.enabled=false"])
     for feature in ("apps", "memories", "multi_agent", "plugins"):
         arguments.extend(["--disable", feature])
     return arguments
+
+
+def verify_mcp_isolation(codex: str, arguments: list[str], service_tier: str) -> None:
+    """Fail closed if the masked CLI listing still reports an enabled MCP server."""
+    output = run_checked(
+        [
+            codex,
+            "mcp",
+            "list",
+            "--config",
+            f'service_tier="{service_tier}"',
+            *arguments,
+        ]
+    )
+    if re.search(r"(?m)\s+enabled\s+", output):
+        raise EvaluationError("one or more global MCP servers remain enabled")
 
 
 def run_checked(command: list[str], cwd: Path = REPO) -> str:
@@ -443,6 +459,7 @@ def main() -> int:
 
     codex = resolve_codex(args.codex)
     isolated_config = isolated_config_arguments()
+    verify_mcp_isolation(codex, isolated_config, args.service_tier)
     codex_version = run_checked([codex, "--version"])
     source_revision = run_checked(["git", "rev-parse", "HEAD"])
     runtime_hash = hashlib.sha256(

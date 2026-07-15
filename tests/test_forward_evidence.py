@@ -20,7 +20,7 @@ from common import (  # noqa: E402
     plugin_tree_sha256,
 )
 from verify_forward_evidence import EvidenceError, verify_evidence  # noqa: E402
-from run_forward_eval import isolated_config_arguments, resolve_codex  # noqa: E402
+from run_forward_eval import EvaluationError, isolated_config_arguments, resolve_codex  # noqa: E402
 
 
 def valid_evidence() -> dict:
@@ -145,10 +145,20 @@ class ForwardEvidenceTests(unittest.TestCase):
             )
             arguments = isolated_config_arguments(home)
         joined = "\n".join(arguments)
-        self.assertIn('mcp_servers."server with space".enabled=false', arguments)
-        self.assertIn('mcp_servers."other".enabled=false', arguments)
+        self.assertIn("mcp_servers.server with space.enabled=false", arguments)
+        self.assertIn("mcp_servers.other.enabled=false", arguments)
         self.assertNotIn("must-not-leak", joined)
         self.assertIn("plugins", arguments)
+
+    def test_eval_isolation_rejects_ambiguous_mcp_names(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            home = Path(temporary)
+            (home / "config.toml").write_text(
+                '[mcp_servers."ambiguous.name"]\ncommand = "example"\n',
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(EvaluationError, "cannot safely isolate"):
+                isolated_config_arguments(home)
 
 
 if __name__ == "__main__":
