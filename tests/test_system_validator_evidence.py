@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 import tempfile
@@ -29,7 +30,7 @@ class SystemValidatorEvidenceTests(unittest.TestCase):
             (REPO / "plugins/kaoyan-22408/.codex-plugin/plugin.json").read_text(encoding="utf-8")
         )
         self.evidence = {
-            "schemaVersion": "1.0",
+            "schemaVersion": "1.1",
             "generatedAt": self.now.isoformat().replace("+00:00", "Z"),
             "plugin": {
                 "name": "kaoyan-22408",
@@ -39,8 +40,14 @@ class SystemValidatorEvidenceTests(unittest.TestCase):
             "runtime": {"pythonVersion": "3.13.0"},
             "validators": {
                 "plugin": {
-                    "source": "plugin-creator/scripts/validate_plugin.py",
-                    "sha256": "a" * 64,
+                    "mode": "spec-backed-repository",
+                    "source": "scripts/validate_repository.py",
+                    "sha256": hashlib.sha256(
+                        (REPO / "scripts/validate_repository.py").read_bytes()
+                    ).hexdigest(),
+                    "specSource": "plugin-creator/references/plugin-json-spec.md",
+                    "specSha256": "a" * 64,
+                    "standaloneOfficialValidatorAvailable": False,
                 },
                 "skill": {
                     "source": "skill-creator/scripts/quick_validate.py",
@@ -86,6 +93,13 @@ class SystemValidatorEvidenceTests(unittest.TestCase):
         incomplete["results"]["skills"].pop(next(iter(EXPECTED_SKILLS)))
         self.write(incomplete)
         with self.assertRaisesRegex(EvidenceError, "exactly 12"):
+            verify_evidence(REPO, self.path, now=self.now)
+
+    def test_stale_repository_validator_hash_is_rejected(self) -> None:
+        stale = deepcopy(self.evidence)
+        stale["validators"]["plugin"]["sha256"] = "0" * 64
+        self.write(stale)
+        with self.assertRaisesRegex(EvidenceError, "repository validator hash"):
             verify_evidence(REPO, self.path, now=self.now)
 
 

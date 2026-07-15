@@ -18,7 +18,7 @@ from build_release import plugin_tree_digest
 from validate_repository import ALLOWED_RELEASE_FILES, EXPECTED_SKILLS, ValidationError
 
 
-SCHEMA_VERSION = "1.0"
+SCHEMA_VERSION = "1.1"
 Runner = Callable[[list[str], Path, dict[str, str]], subprocess.CompletedProcess[str]]
 
 
@@ -80,14 +80,17 @@ def _run_validator(
     return {"passed": True, "exitCode": 0}
 
 
-def locate_validators(system_root: Path) -> tuple[Path, Path]:
+def locate_validators(system_root: Path) -> tuple[Path | None, Path, Path]:
     plugin_validator = system_root / "plugin-creator" / "scripts" / "validate_plugin.py"
+    plugin_spec = system_root / "plugin-creator" / "references" / "plugin-json-spec.md"
     skill_validator = system_root / "skill-creator" / "scripts" / "quick_validate.py"
-    if not plugin_validator.is_file():
-        raise EvidenceError(f"official plugin validator not found under {system_root}")
+    if not plugin_validator.is_file() and not plugin_spec.is_file():
+        raise EvidenceError(
+            f"neither the standalone plugin validator nor the official plugin spec exists under {system_root}"
+        )
     if not skill_validator.is_file():
         raise EvidenceError(f"official Skill validator not found under {system_root}")
-    return plugin_validator, skill_validator
+    return plugin_validator if plugin_validator.is_file() else None, skill_validator, plugin_spec
 
 
 def generate_evidence(
@@ -99,18 +102,41 @@ def generate_evidence(
 ) -> dict[str, Any]:
     repo = repo.resolve()
     plugin = repo / "plugins" / "kaoyan-22408"
-    plugin_validator, skill_validator = locate_validators(system_root.resolve())
+    plugin_validator, skill_validator, plugin_spec = locate_validators(system_root.resolve())
     env = os.environ.copy()
     env["PYTHONUTF8"] = "1"
     env["PYTHONDONTWRITEBYTECODE"] = "1"
 
-    plugin_result = _run_validator(
-        "official plugin validator",
-        [sys.executable, str(plugin_validator), str(plugin)],
-        repo,
-        env,
-        runner,
-    )
+    if plugin_validator is not None:
+        plugin_result = _run_validator(
+            "official plugin validator",
+            [sys.executable, str(plugin_validator), str(plugin)],
+            repo,
+            env,
+            runner,
+        )
+        plugin_evidence = {
+            "mode": "official-script",
+            "source": "plugin-creator/scripts/validate_plugin.py",
+            "sha256": _sha256(plugin_validator),
+        }
+    else:
+        repository_validator = repo / "scripts" / "validate_repository.py"
+        plugin_result = _run_validator(
+            "spec-backed repository plugin validator",
+            [sys.executable, str(repository_validator)],
+            repo,
+            env,
+            runner,
+        )
+        plugin_evidence = {
+            "mode": "spec-backed-repository",
+            "source": "scripts/validate_repository.py",
+            "sha256": _sha256(repository_validator),
+            "specSource": "plugin-creator/references/plugin-json-spec.md",
+            "specSha256": _sha256(plugin_spec),
+            "standaloneOfficialValidatorAvailable": False,
+        }
     skill_results: dict[str, dict[str, Any]] = {}
     for name in sorted(EXPECTED_SKILLS):
         skill_results[name] = _run_validator(
@@ -133,10 +159,7 @@ def generate_evidence(
         },
         "runtime": {"pythonVersion": platform.python_version()},
         "validators": {
-            "plugin": {
-                "source": "plugin-creator/scripts/validate_plugin.py",
-                "sha256": _sha256(plugin_validator),
-            },
+            "plugin": plugin_evidence,
             "skill": {
                 "source": "skill-creator/scripts/quick_validate.py",
                 "sha256": _sha256(skill_validator),
@@ -206,20 +229,52 @@ def verify_evidence(
     validators = document.get("validators")
     if not isinstance(validators, dict) or set(validators) != {"plugin", "skill"}:
         raise EvidenceError("validator source evidence is incomplete")
-    for kind, expected_source in {
-        "plugin": "plugin-creator/scripts/validate_plugin.py",
-        "skill": "skill-creator/scripts/quick_validate.py",
-    }.items():
-        item = validators.get(kind)
-        if not isinstance(item, dict) or item.get("source") != expected_source:
-            raise EvidenceError(f"{kind} validator source identifier is invalid")
-        digest = item.get("sha256")
-        if not isinstance(digest, str) or re_full_sha256(digest) is False:
-            raise EvidenceError(f"{kind} validator SHA-256 is invalid")
+    plugin_validator = validators.get("plugin")
+    if not isinstance(plugin_validator, dict):
+        raise EvidenceError("plugin validator source evidence is invalid")
+    mode = plugin_validator.get("mode")
+    if mode == "official-script":
+        if set(plugin_validator) != {"mode", "source", "sha256"}:
+            raise EvidenceError("official plugin validator evidence shape is invalid")
+        if plugin_validator.get("source") != "plugin-creator/scripts/validate_plugin.py":
+            raise EvidenceError("official plugin validator source identifier is invalid")
+    elif mode == "spec-backed-repository":
+        required = {
+            "mode",
+            "source",
+            "sha256",
+            "specSource",
+            "specSha256",
+            "standaloneOfficialValidatorAvailable",
+        }
+        if set(plugin_validator) != required:
+            raise EvidenceError("spec-backed plugin validator evidence shape is invalid")
+        if (
+            plugin_validator.get("source") != "scripts/validate_repository.py"
+            or plugin_validator.get("specSource") != "plugin-creator/references/plugin-json-spec.md"
+            or plugin_validator.get("standaloneOfficialValidatorAvailable") is not False
+        ):
+            raise EvidenceError("spec-backed plugin validator provenance is invalid")
+        if plugin_validator.get("sha256") != _sha256(repo / "scripts" / "validate_repository.py"):
+            raise EvidenceError("spec-backed repository validator hash is stale or tampered")
+        if not re_full_sha256(plugin_validator.get("specSha256", "")):
+            raise EvidenceError("official plugin spec SHA-256 is invalid")
+    else:
+        raise EvidenceError("plugin validator mode is invalid")
+    if not re_full_sha256(plugin_validator.get("sha256", "")):
+        raise EvidenceError("plugin validator SHA-256 is invalid")
+
+    skill_validator = validators.get("skill")
+    if not isinstance(skill_validator, dict) or set(skill_validator) != {"source", "sha256"}:
+        raise EvidenceError("Skill validator source evidence is invalid")
+    if skill_validator.get("source") != "skill-creator/scripts/quick_validate.py":
+        raise EvidenceError("Skill validator source identifier is invalid")
+    if not re_full_sha256(skill_validator.get("sha256", "")):
+        raise EvidenceError("Skill validator SHA-256 is invalid")
 
     results = document.get("results")
     if not isinstance(results, dict) or results.get("plugin") != {"passed": True, "exitCode": 0}:
-        raise EvidenceError("official plugin validator did not pass")
+        raise EvidenceError("plugin validation did not pass")
     skills = results.get("skills")
     if not isinstance(skills, dict) or set(skills) != EXPECTED_SKILLS:
         raise EvidenceError("quick_validate evidence does not cover exactly 12 Skills")
@@ -252,7 +307,9 @@ def main() -> int:
         if args.write is not None:
             evidence = generate_evidence(repo, args.system_root)
             write_evidence(target, evidence)
-            print(f"[OK] official validators: 1 plugin + {len(EXPECTED_SKILLS)} Skills")
+            mode = evidence["validators"]["plugin"]["mode"]
+            print(f"[OK] plugin validation mode: {mode}")
+            print(f"[OK] official Skill validators: {len(EXPECTED_SKILLS)}/{len(EXPECTED_SKILLS)}")
             print(f"[OK] evidence: {target}")
         else:
             verify_evidence(repo, target, max_age_days=args.max_age_days)

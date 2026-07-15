@@ -13,6 +13,7 @@ import sys
 import tempfile
 import threading
 import time
+import tomllib
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
@@ -57,6 +58,29 @@ def resolve_codex(command: str, *, platform: str = os.name) -> str:
             if resolved:
                 return resolved
     return shutil.which(command) or command
+
+
+def isolated_config_arguments(config_home: Path | None = None) -> list[str]:
+    """Disable unrelated global integrations without reading or copying their secrets."""
+    home = config_home or Path(os.environ.get("CODEX_HOME", Path.home() / ".codex"))
+    config_path = home / "config.toml"
+    server_names: list[str] = []
+    if config_path.is_file():
+        with config_path.open("rb") as handle:
+            config = tomllib.load(handle)
+        servers = config.get("mcp_servers", {})
+        if isinstance(servers, dict):
+            server_names = sorted(str(name) for name in servers)
+
+    arguments: list[str] = []
+    for name in server_names:
+        escaped = name.replace("\\", "\\\\").replace('"', '\\"')
+        arguments.extend(
+            ["--config", f'mcp_servers."{escaped}".enabled=false']
+        )
+    for feature in ("apps", "memories", "multi_agent", "plugins"):
+        arguments.extend(["--disable", feature])
+    return arguments
 
 
 def run_checked(command: list[str], cwd: Path = REPO) -> str:
@@ -109,6 +133,7 @@ def structured_call(
     codex: str,
     model: str,
     service_tier: str,
+    isolated_config: list[str],
     prompt: str,
     schema: Path,
     workspace: Path,
@@ -123,6 +148,7 @@ def structured_call(
         "exec",
         "--config",
         f'service_tier="{service_tier}"',
+        *isolated_config,
         "--ephemeral",
         "--sandbox",
         "read-only",
@@ -248,6 +274,7 @@ def evaluate_route_case(
     codex: str,
     model: str,
     service_tier: str,
+    isolated_config: list[str],
     workspace: Path,
     results_dir: Path,
     cache_dir: Path,
@@ -262,6 +289,7 @@ def evaluate_route_case(
         codex=codex,
         model=model,
         service_tier=service_tier,
+        isolated_config=isolated_config,
         prompt=route_prompt(case),
         schema=workspace / "schemas" / "route-output.schema.json",
         workspace=workspace,
@@ -286,6 +314,7 @@ def evaluate_behavior_case(
     codex: str,
     model: str,
     service_tier: str,
+    isolated_config: list[str],
     workspace: Path,
     results_dir: Path,
     cache_dir: Path,
@@ -300,6 +329,7 @@ def evaluate_behavior_case(
         codex=codex,
         model=model,
         service_tier=service_tier,
+        isolated_config=isolated_config,
         prompt=behavior_prompt(case),
         schema=workspace / "schemas" / "behavior-output.schema.json",
         workspace=workspace,
@@ -313,6 +343,7 @@ def evaluate_behavior_case(
         codex=codex,
         model=model,
         service_tier=service_tier,
+        isolated_config=isolated_config,
         prompt=judge_prompt(case, actor),
         schema=workspace / "schemas" / "judge-output.schema.json",
         workspace=workspace,
@@ -411,6 +442,7 @@ def main() -> int:
         raise EvaluationError("plugin, cases, or eval harness is dirty; commit inputs before official evaluation")
 
     codex = resolve_codex(args.codex)
+    isolated_config = isolated_config_arguments()
     codex_version = run_checked([codex, "--version"])
     source_revision = run_checked(["git", "rev-parse", "HEAD"])
     runtime_hash = hashlib.sha256(
@@ -427,6 +459,7 @@ def main() -> int:
             "codex": codex,
             "model": args.model,
             "service_tier": args.service_tier,
+            "isolated_config": isolated_config,
             "workspace": workspace,
             "results_dir": results_dir,
             "cache_dir": cache_dir,
