@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-15T14:13:39Z",
+  "generatedAt": "2026-07-16T14:20:00Z",
   "plugin": {
     "name": "kaoyan-22408",
     "treeSha256": "26263728a18918983b695f5157bb16e06779770558f6110b67870d801e0a2349",
@@ -67,12 +67,9 @@
   "schemaVersion": "1.1",
   "validators": {
     "plugin": {
-      "mode": "spec-backed-repository",
-      "sha256": "35c0e868a664ca5f787461ae6ec2ac93acea98a92f9bc9d6e0096d7985e9a7cc",
-      "source": "scripts/validate_repository.py",
-      "specSha256": "5d7223255decc44fcb93f3aa80bb17afc1469b2d3c339d65d9473c5c0c54fcdd",
-      "specSource": "plugin-creator/references/plugin-json-spec.md",
-      "standaloneOfficialValidatorAvailable": false
+      "mode": "official-script",
+      "sha256": "4e84c911479e4d158d723ed8ccc881d3499e580fbf5650e60d379a1a25ac3186",
+      "source": "plugin-creator/scripts/validate_plugin.py"
     },
     "skill": {
       "sha256": "5347a0a09cfb546bba1c0d1a30dae0a233d9a05f57bd4e7877155c588bcdabf7",

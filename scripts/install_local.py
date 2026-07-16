@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import shutil
 import subprocess
@@ -14,6 +15,7 @@ from typing import Callable, TextIO
 
 PLUGIN_NAME = "kaoyan-22408"
 MARKETPLACE_NAME = "kaoyan-22408"
+ANSI_ESCAPE = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
 Runner = Callable[[list[str], Path], subprocess.CompletedProcess[str]]
 Which = Callable[[str], str | None]
 
@@ -41,21 +43,31 @@ def _relay(result: subprocess.CompletedProcess[str], stream: TextIO) -> None:
         print(result.stderr.rstrip(), file=stream)
 
 
+def _marketplace_sources(output: str) -> list[str]:
+    sources: list[str] = []
+    for raw_line in output.splitlines():
+        line = ANSI_ESCAPE.sub("", raw_line).strip()
+        if not line:
+            continue
+        fields = line.split(maxsplit=1)
+        if len(fields) == 2 and fields[0].casefold() == MARKETPLACE_NAME.casefold():
+            sources.append(fields[1].strip().strip("\"'"))
+    return sources
+
+
 def _marketplace_present(output: str) -> bool:
-    return re.search(
-        rf"(?m)(?:^|[\s\"']){re.escape(MARKETPLACE_NAME)}(?:$|[\s\"'])",
-        output,
-    ) is not None
+    return bool(_marketplace_sources(output))
 
 
-def _normalized_path_text(value: str) -> str:
-    normalized = value.casefold().replace("\\", "/")
-    return re.sub(r"/+", "/", normalized).rstrip("/")
+def _canonical_path_text(value: str | Path) -> str:
+    resolved = Path(str(value)).expanduser().resolve()
+    return os.path.normcase(os.path.normpath(str(resolved)))
 
 
 def _marketplace_points_to_repo(output: str, repo: Path) -> bool:
-    expected = _normalized_path_text(str(repo.resolve()))
-    return expected in _normalized_path_text(output)
+    sources = _marketplace_sources(output)
+    expected = _canonical_path_text(repo)
+    return bool(sources) and all(_canonical_path_text(source) == expected for source in sources)
 
 
 def install_local(

@@ -28,7 +28,7 @@ rules:
       exclude:
         - /.semgrep.yml
         - /scripts/validate_repository.py
-    pattern-regex: '\b(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,}|figd_[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{30,}|xox[baprs]-[0-9A-Za-z-]{20,})\b'
+    pattern-regex: '\b(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,}|figd_[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{30,}|xox[baprs]-[0-9A-Za-z-]{20,}|npm_[A-Za-z0-9]{20,}|glpat-[A-Za-z0-9_-]{20,})\b'
 
   - id: likely-jwt
     message: A three-segment value resembles a plaintext JWT.
@@ -48,7 +48,7 @@ rules:
       exclude:
         - /.semgrep.yml
         - /scripts/validate_repository.py
-    pattern-regex: '-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----'
+    pattern-regex: '-----BEGIN (?:(?:RSA |EC |OPENSSH |DSA |ENCRYPTED )?PRIVATE KEY|PGP PRIVATE KEY BLOCK)-----'
 
   - id: assigned-cloud-secret
     message: A cloud secret appears to be assigned in plaintext.

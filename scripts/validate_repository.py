@@ -99,10 +99,13 @@ SENSITIVE_PATTERNS = (
     re.compile(r"\bAKIA[0-9A-Z]{16}\b"),
     re.compile(r"\bAIza[0-9A-Za-z_-]{30,}\b"),
     re.compile(r"\bxox[baprs]-[A-Za-z0-9-]{10,}\b"),
+    re.compile(r"\bnpm_[A-Za-z0-9]{20,}\b"),
+    re.compile(r"\bglpat-[A-Za-z0-9_-]{20,}\b"),
     re.compile(r"\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b"),
     re.compile(r"\baws[_ -]?secret[_ -]?access[_ -]?key\s*[:=]\s*[\"']?[A-Za-z0-9/+=]{30,}", re.IGNORECASE),
     re.compile(r"\bAccountKey\s*=\s*[A-Za-z0-9+/]{40,}={0,2}", re.IGNORECASE),
-    re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----"),
+    re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA |ENCRYPTED )?PRIVATE KEY-----"),
+    re.compile(r"-----BEGIN PGP " + r"PRIVATE KEY BLOCK-----"),
     re.compile(
         r"\b(?:api[_ -]?key|access[_ -]?token|client[_ -]?secret|secret[_ -]?key|cookie)"
         r"\s*[:=]\s*[\"']?[^\s\"']{8,}",
@@ -118,6 +121,8 @@ HISTORY_SECRET_PATTERNS = (
     re.compile(rb"\bAKIA[0-9A-Z]{16}\b"),
     re.compile(rb"\bAIza[0-9A-Za-z_-]{30,}\b"),
     re.compile(rb"\bxox[baprs]-[A-Za-z0-9-]{10,}\b"),
+    re.compile(rb"\bnpm_[A-Za-z0-9]{20,}\b"),
+    re.compile(rb"\bglpat-[A-Za-z0-9_-]{20,}\b"),
     re.compile(rb"\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b"),
     re.compile(rb"\baws[_ -]?secret[_ -]?access[_ -]?key\s*[:=]\s*[\"']?[A-Za-z0-9/+=]{30,}", re.IGNORECASE),
     re.compile(rb"\bAccountKey\s*=\s*[A-Za-z0-9+/]{40,}={0,2}", re.IGNORECASE),
@@ -126,7 +131,8 @@ HISTORY_SECRET_PATTERNS = (
         rb"\s*[:=]\s*[\"']?[A-Za-z0-9+/=_-]{16,}",
         re.IGNORECASE,
     ),
-    re.compile(rb"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----"),
+    re.compile(rb"-----BEGIN (?:RSA |EC |OPENSSH |DSA |ENCRYPTED )?PRIVATE KEY-----"),
+    re.compile(rb"-----BEGIN PGP " + rb"PRIVATE KEY BLOCK-----"),
 )
 
 HISTORY_LEGACY_PATTERNS = (

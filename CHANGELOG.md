@@ -18,6 +18,8 @@
 - 修正模考流程：用户自行计时；题面、版本、分值和通用 rubric 在出卷时冻结；明确交卷前不泄露答案或得分线索。
 - 统一用户材料授权边界、证据标签和官方一手来源范围。
 - GitHub 仓库成为唯一 marketplace 分发源；Release ZIP 只作为可审计、可校验的插件包。
+- 本地安装器现在要求同名 marketplace 的规范化根路径与当前仓库完全一致，拒绝路径后缀或重复来源混淆。
+- 密钥扫描补充加密私钥、PGP 私钥、npm Token 与 GitLab Personal Access Token 类别，并覆盖当前发布树、完整 Git 历史和 Semgrep。
 
 ### 移除
 

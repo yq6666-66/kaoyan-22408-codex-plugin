@@ -135,6 +135,18 @@ class LocalInstallerTests(unittest.TestCase):
         self.assertIn("ambiguous source", stderr)
         self.assertEqual(len(runner.commands), 3)
 
+    def test_same_name_with_repo_path_suffix_is_rejected(self) -> None:
+        results = [
+            completed(["check"]),
+            completed(["help"], stdout="Usage: codex plugin"),
+            completed(["list"], stdout=f"kaoyan-22408  {REPO.resolve()}-shadow"),
+        ]
+        code, stdout, stderr, runner = self.run_installer(results)
+        self.assertEqual(code, 1)
+        self.assertNotIn("Installed", stdout)
+        self.assertIn("ambiguous source", stderr)
+        self.assertEqual(len(runner.commands), 3)
+
     def test_failed_install_never_prints_installed(self) -> None:
         results = [
             completed(["check"]),

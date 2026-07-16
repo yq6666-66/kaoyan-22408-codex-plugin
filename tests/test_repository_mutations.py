@@ -75,6 +75,21 @@ class RepositoryMutationTests(unittest.TestCase):
                 self.assert_invalid()
         path.write_text(original, encoding="utf-8", newline="\n")
 
+    def test_additional_private_key_and_source_token_categories_are_rejected(self) -> None:
+        path = self.plugin / "references" / "evidence-copyright-contract.md"
+        original = path.read_text(encoding="utf-8")
+        mutations = {
+            "encrypted-private-key": "-----BEGIN " + "ENCRYPTED PRIVATE KEY-----",
+            "pgp-private-key": "-----BEGIN PGP " + "PRIVATE KEY BLOCK-----",
+            "npm-token": "npm_" + ("N" * 36),
+            "gitlab-token": "glpat-" + ("G" * 24),
+        }
+        for label, value in mutations.items():
+            with self.subTest(label=label):
+                path.write_text(original + value + "\n", encoding="utf-8", newline="\n")
+                self.assert_invalid()
+        path.write_text(original, encoding="utf-8", newline="\n")
+
     def test_removed_system_marker_is_rejected(self) -> None:
         path = self.plugin / "references" / "evidence-copyright-contract.md"
         marker = "local" + "Storage"
@@ -118,6 +133,25 @@ class RepositoryMutationTests(unittest.TestCase):
         commit_all(self.repo, marker)
         with self.assertRaisesRegex(ValidationError, "Git history contains a likely secret"):
             check_git_history(self.repo)
+
+    def test_additional_secret_categories_are_rejected_from_git_history(self) -> None:
+        mutations = {
+            "encrypted-private-key": "-----BEGIN " + "ENCRYPTED PRIVATE KEY-----",
+            "pgp-private-key": "-----BEGIN PGP " + "PRIVATE KEY BLOCK-----",
+            "npm-token": "npm_" + ("N" * 36),
+            "gitlab-token": "glpat-" + ("G" * 24),
+        }
+        for label, value in mutations.items():
+            with self.subTest(label=label), tempfile.TemporaryDirectory() as temporary:
+                repo = copy_as_committed_repo(Path(temporary) / "repo")
+                path = repo / "temporary-secret.txt"
+                path.write_text(value + "\n", encoding="utf-8", newline="\n")
+                commit_all(repo, f"add {label} fixture")
+                with self.assertRaisesRegex(
+                    ValidationError,
+                    "Git history contains a likely secret",
+                ):
+                    check_git_history(repo)
 
 
 if __name__ == "__main__":
