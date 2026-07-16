@@ -85,7 +85,7 @@
       ],
       "expectedPrimary": "kaoyan-progress-diagnostician",
       "rubric": [
-        "分别保留 hour、question、article 等实际单位，不把不同单位相加",
+        "分别保留小时、题数和文章篇数的单位语义，不把不同单位相加",
         "正确率对象包含 correct 16、total 20、rate 0.8",
         "附带规范的 ProgressSnapshot 1.1，未知周期日期使用 null"
       ]
@@ -96,7 +96,7 @@
       "transcript": [
         {
           "role": "user",
-          "content": "请生成 2 道原创数学二章节测，限时 20 分钟。我交卷后再统一评分。"
+          "content": "请生成 2 道原创数学二极限章节测，限时 20 分钟。我交卷后再统一评分。"
         }
       ],
       "expectedPrimary": "kaoyan-mock-exam-coach",

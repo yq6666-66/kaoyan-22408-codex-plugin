@@ -347,16 +347,23 @@ recordTypes 只列出回复中实际生成的便携记录类型；evidenceTags �
 
 
 def judge_prompt(case: dict[str, Any], actor: dict[str, Any]) -> str:
-    rubric = "\n".join(f"{index + 1}. {item}" for index, item in enumerate(case["rubric"]))
+    transcript = "\n".join(
+        f"{turn['role']}: {turn['content']}" for turn in case["transcript"]
+    )
+    rubric_json = json.dumps(case["rubric"], ensure_ascii=False)
     actor_json = json.dumps(actor, ensure_ascii=False, indent=2)
-    return f"""你是独立验收员，与生成回复的代理没有共享上下文。不要调用任何工具；只根据下列验收标准和被测输出判断。
-核对主责 Skill 和回复是否满足下面全部标准。每条 criteria 必须按原顺序逐条复制标准文本，给出可在回复中定位的证据；不得因措辞友好而放宽边界。
+    return f"""你是独立验收员，与生成回复的代理没有共享上下文。不要调用任何工具；只根据下列原始会话、验收标准和被测输出判断。
+核对主责 Skill 和回复是否满足下面全部标准。每条 criteria[].criterion 必须逐字复制验收标准 JSON 数组中对应的字符串，不得添加编号、项目符号、前后缀或改写，并给出可在回复中定位的证据；不得因措辞友好而放宽边界。
+判断用户是否提供了日期、材料、题面或既有 rubric 时，必须以原始会话为准，不得只根据被测回复猜测。
 只有主责 Skill 正确且全部标准通过时，passed 才能为 true。
 
 预期主责 Skill：{case['expectedPrimary']}
 
-验收标准：
-{rubric}
+原始会话：
+{transcript}
+
+验收标准 JSON 数组：
+{rubric_json}
 
 被测代理结构化输出：
 {actor_json}

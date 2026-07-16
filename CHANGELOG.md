@@ -24,6 +24,7 @@
 - 密钥扫描补充加密私钥、PGP 私钥、npm Token 与 GitLab Personal Access Token 类别，并覆盖当前发布树、完整 Git 历史和 Semgrep。
 - 普通 CI 中的仓库内前向证据检查明确降级为非权威一致性检查；Release 必须通过仓库外固定公钥的认证门禁。
 - 行为评测输出 Schema 改用 Codex 结构化输出支持的关键字子集，最终 evidence schema 继续负责唯一性约束。
+- 行为评测 judge 现在同时读取原始会话，并逐字复用 rubric 文本，避免因缺少用户输入上下文或自动编号造成误判。
 
 ### 移除
 
