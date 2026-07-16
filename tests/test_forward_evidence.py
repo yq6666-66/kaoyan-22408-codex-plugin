@@ -23,6 +23,7 @@ from common import (  # noqa: E402
 from verify_forward_evidence import EvidenceError, verify_evidence  # noqa: E402
 from run_forward_eval import (  # noqa: E402
     isolated_config_arguments,
+    judge_prompt,
     plugin_prompt_context,
     prepare_isolated_codex_home,
     resolve_codex,
@@ -191,6 +192,20 @@ class ForwardEvidenceTests(unittest.TestCase):
                     stack.extend(value.values())
                 elif isinstance(value, list):
                     stack.extend(value)
+
+    def test_judge_receives_transcript_and_exact_rubric_strings(self) -> None:
+        case = load_json(BEHAVIOR_CASES)["cases"][2]
+        actor = {
+            "primarySkill": case["expectedPrimary"],
+            "response": "test response",
+            "recordTypes": [],
+            "evidenceTags": [],
+        }
+        prompt = judge_prompt(case, actor)
+        self.assertIn(case["transcript"][0]["content"], prompt)
+        self.assertIn(json.dumps(case["rubric"], ensure_ascii=False), prompt)
+        self.assertIn("不得添加编号", prompt)
+        self.assertNotIn(f"1. {case['rubric'][0]}", prompt)
 
 
 if __name__ == "__main__":
