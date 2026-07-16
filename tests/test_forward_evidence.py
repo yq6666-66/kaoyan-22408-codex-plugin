@@ -6,6 +6,7 @@ import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from unittest.mock import patch
 
 
 REPO = Path(__file__).resolve().parents[1]
@@ -135,8 +136,17 @@ class ForwardEvidenceTests(unittest.TestCase):
             self.verify(evidence)
 
     def test_windows_codex_resolution_uses_executable_shim(self) -> None:
-        resolved = resolve_codex("codex", platform="nt")
-        self.assertTrue(resolved.casefold().endswith(("codex.cmd", "codex.exe")))
+        available = {
+            "codex.cmd": r"C:\tools\codex.cmd",
+            "codex": "/usr/local/bin/codex",
+        }
+        with patch(
+            "run_forward_eval.shutil.which",
+            side_effect=lambda command: available.get(command),
+        ) as which:
+            resolved = resolve_codex("codex", platform="nt")
+        self.assertEqual(resolved, r"C:\tools\codex.cmd")
+        self.assertEqual(which.call_args_list[0].args, ("codex.cmd",))
 
     def test_eval_isolation_uses_minimal_temporary_codex_home(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
