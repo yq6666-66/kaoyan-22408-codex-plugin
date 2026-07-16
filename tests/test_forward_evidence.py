@@ -176,6 +176,22 @@ class ForwardEvidenceTests(unittest.TestCase):
         self.assertNotIn("expectedPrimary", behavior_context)
         self.assertNotIn("tests/", behavior_context)
 
+    def test_codex_output_schemas_avoid_unsupported_unique_items(self) -> None:
+        for name in (
+            "route-output.schema.json",
+            "behavior-output.schema.json",
+            "judge-output.schema.json",
+        ):
+            schema = load_json(REPO / "evals" / "schemas" / name)
+            stack = [schema]
+            while stack:
+                value = stack.pop()
+                if isinstance(value, dict):
+                    self.assertNotIn("uniqueItems", value, name)
+                    stack.extend(value.values())
+                elif isinstance(value, list):
+                    stack.extend(value)
+
 
 if __name__ == "__main__":
     unittest.main()

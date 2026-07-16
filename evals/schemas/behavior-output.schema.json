@@ -28,7 +28,6 @@
     },
     "recordTypes": {
       "type": "array",
-      "uniqueItems": true,
       "items": {
         "type": "string",
         "enum": ["StudyProfile", "ProgressSnapshot", "ReviewQueue"]
@@ -36,7 +35,6 @@
     },
     "evidenceTags": {
       "type": "array",
-      "uniqueItems": true,
       "items": {
         "type": "string",
         "enum": ["[用户材料]", "[原创练习]", "[官方核验]", "[待核验]"]
