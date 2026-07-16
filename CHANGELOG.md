@@ -23,6 +23,7 @@
 - 本地安装器在 GBK/ASCII 等控制台中安全转义不可编码的 validator 日志字符，避免校验通过后因输出编码崩溃。
 - 密钥扫描补充加密私钥、PGP 私钥、npm Token 与 GitLab Personal Access Token 类别，并覆盖当前发布树、完整 Git 历史和 Semgrep。
 - 普通 CI 中的仓库内前向证据检查明确降级为非权威一致性检查；Release 必须通过仓库外固定公钥的认证门禁。
+- 行为评测输出 Schema 改用 Codex 结构化输出支持的关键字子集，最终 evidence schema 继续负责唯一性约束。
 
 ### 移除
 
