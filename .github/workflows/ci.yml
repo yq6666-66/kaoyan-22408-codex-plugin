@@ -33,7 +33,8 @@ jobs:
         run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
       - name: Run static, unit, security, and local-validator evidence gates
         run: python scripts/check.py --verify-system-evidence
-      - name: Verify dynamic forward-evaluation evidence
+      - name: Check forward-evidence consistency (non-authoritative)
+        if: ${{ hashFiles('tests/forward-eval-evidence.json') != '' }}
         run: python evals/verify_forward_evidence.py --max-age-days 30
       - name: Build Ubuntu release archive
         run: python scripts/build_release.py
@@ -97,6 +98,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
+          fetch-depth: 0
           persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
@@ -130,11 +132,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
+          fetch-depth: 0
           persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.12"
+      - name: Require tag commit to be on protected main
+        run: git merge-base --is-ancestor "$GITHUB_SHA" refs/remotes/origin/main
+      - name: Install authenticated-evidence verifier dependency
+        run: python -m pip install --disable-pip-version-check jsonschema==4.25.1
+      - name: Verify externally authenticated forward evidence
+        env:
+          ALLOWED_SIGNERS: ${{ vars.KAOYAN_FORWARD_EVAL_ALLOWED_SIGNERS }}
+        run: |
+          if [ -z "$ALLOWED_SIGNERS" ]; then
+            echo "KAOYAN_FORWARD_EVAL_ALLOWED_SIGNERS is not configured" >&2
+            exit 1
+          fi
+          printf '%s\n' "$ALLOWED_SIGNERS" > "$RUNNER_TEMP/kaoyan-forward-eval.allowed_signers"
+          python evals/forward_attestation.py verify \
+            --repo . \
+            --allowed-signers "$RUNNER_TEMP/kaoyan-forward-eval.allowed_signers"
       - name: Require tag to match manifest version
         id: meta
         run: python ci/release_metadata.py --expect-tag "$GITHUB_REF_NAME" --github-output "$GITHUB_OUTPUT"

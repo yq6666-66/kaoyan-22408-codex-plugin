@@ -13,7 +13,12 @@ try:  # Support both unittest discovery and tests.test_* module execution.
     from .test_support import commit_all, copy_as_committed_repo  # type: ignore[import-not-found]
 except ImportError:
     from test_support import commit_all, copy_as_committed_repo  # type: ignore[no-redef]
-from validate_repository import ValidationError, check_git_history, validate_repo  # noqa: E402
+from validate_repository import (  # noqa: E402
+    ValidationError,
+    check_forward_evidence,
+    check_git_history,
+    validate_repo,
+)
 
 
 class RepositoryMutationTests(unittest.TestCase):
@@ -95,6 +100,12 @@ class RepositoryMutationTests(unittest.TestCase):
         marker = "local" + "Storage"
         path.write_text(path.read_text(encoding="utf-8") + marker + "\n", encoding="utf-8", newline="\n")
         self.assert_invalid()
+
+    def test_partial_forward_evidence_bundle_is_rejected(self) -> None:
+        evidence = self.repo / "tests/forward-eval-evidence.json"
+        evidence.write_text("{}\n", encoding="utf-8", newline="\n")
+        with self.assertRaisesRegex(ValidationError, "bundle is incomplete"):
+            check_forward_evidence(self.repo)
 
     def test_deleted_secret_is_still_rejected_from_git_history(self) -> None:
         path = self.repo / "private-note.txt"

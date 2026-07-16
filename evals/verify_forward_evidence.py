@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify dynamic evaluation evidence without calling a model."""
+"""Verify internal consistency of forward evidence without authenticating its origin."""
 
 from __future__ import annotations
 
@@ -170,12 +170,16 @@ def main() -> int:
     except (EvidenceError, OSError, ValueError) as exc:
         print(f"[FAIL] {exc}", file=sys.stderr)
         return 1
-    print(f"[OK] route evaluation: {evidence['route_summary']['passed']}/36")
-    print(f"[OK] behavior evaluation: {evidence['behavior_summary']['passed']}/12")
-    print(f"[OK] runtime: {evidence['codex_version']} / {evidence['model']} / {evidence['service_tier']}")
-    print(f"[OK] plugin tree: {evidence['plugin_tree_sha256']}")
-    print(f"[OK] cases: {evidence['cases_sha256']}")
-    print(f"[OK] evaluator: {evidence['evaluator_sha256']}")
+    print("[NOTICE] consistency only; this command does not authenticate the model run")
+    print(f"[CONSISTENT] route claims: {evidence['route_summary']['passed']}/36")
+    print(f"[CONSISTENT] behavior claims: {evidence['behavior_summary']['passed']}/12")
+    print(
+        "[CONSISTENT] runtime claim: "
+        f"{evidence['codex_version']} / {evidence['model']} / {evidence['service_tier']}"
+    )
+    print(f"[CONSISTENT] plugin tree: {evidence['plugin_tree_sha256']}")
+    print(f"[CONSISTENT] cases: {evidence['cases_sha256']}")
+    print(f"[CONSISTENT] evaluator: {evidence['evaluator_sha256']}")
     return 0
 
 

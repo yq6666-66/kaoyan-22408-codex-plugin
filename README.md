@@ -108,6 +108,22 @@ python scripts/build_release.py
 
 `check.py` 运行仓库静态检查、结构校验和测试。`build_release.py` 从 `plugin.json.version` 派生 ZIP 文件名，同时生成对应的 `.zip.sha256`，并只打包完整路径允许列表中的插件文件。正式发布还要求官方插件校验、12 个 Skill 校验、动态前向评测证据，以及 Windows 与 Ubuntu 构建得到完全相同的 SHA-256。
 
+动态评测在已提交且输入树干净的版本上运行。评测器会生成证据和逐响应摘要清单：
+
+```text
+python evals/run_forward_eval.py --model <可用的-Codex-模型>
+python evals/forward_attestation.py prepare --repo .
+ssh-keygen -Y sign -f <离线签名私钥路径> -n kaoyan-forward-eval tests/forward-eval-attestation.json
+```
+
+私钥不得进入仓库、CI 变量或评测工作区。仓库只提交评测证据、响应摘要清单、规范化声明和 OpenSSH 分离签名。受保护工作流从基分支运行可信验证器，并从仓库变量 `KAOYAN_FORWARD_EVAL_ALLOWED_SIGNERS` 将维护者公钥固定到候选 checkout 之外：
+
+```text
+python evals/forward_attestation.py verify --repo . --allowed-signers <仓库外-allowed_signers-路径>
+```
+
+`evals/verify_forward_evidence.py` 只检查仓库内证据的一致性，不能证明模型运行来源；它不替代上述分离签名门禁。签名有效期最多 30 天，且签名锁定源提交、插件树、测试集、评测器、完整证据字节和 60 份结构化响应摘要。评测证据提交可以晚于被评测源提交，但二者之间的插件、用例和评测器必须零差异。
+
 版本记录见 [CHANGELOG.md](CHANGELOG.md)。
 
 ## 支持与许可

@@ -673,9 +673,24 @@ def check_git_history(repo: Path) -> None:
 
 
 def check_forward_evidence(repo: Path) -> None:
-    evidence = repo / "tests" / "forward-eval-evidence.json"
-    if not evidence.exists():
+    bundle = {
+        "evidence": repo / "tests" / "forward-eval-evidence.json",
+        "response manifest": repo / "tests/forward-eval-response-manifest.json",
+        "attestation statement": repo / "tests/forward-eval-attestation.json",
+        "attestation signature": repo / "tests/forward-eval-attestation.json.sig",
+    }
+    existing = {label for label, path in bundle.items() if path.exists()}
+    if not existing:
         return
+    require(
+        existing == set(bundle),
+        "forward-eval evidence bundle is incomplete: "
+        f"present={sorted(existing)}",
+    )
+    for label, path in bundle.items():
+        require(path.is_file(), f"forward-eval {label} must be a regular file")
+        require(not path.is_symlink(), f"forward-eval {label} must not be a symlink")
+    evidence = bundle["evidence"]
     verifier = repo / "evals" / "verify_forward_evidence.py"
     require(verifier.is_file(), "forward-eval evidence exists but its verifier is missing")
     result = subprocess.run(

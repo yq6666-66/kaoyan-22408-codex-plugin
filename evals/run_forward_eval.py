@@ -26,12 +26,14 @@ from common import (
     EVIDENCE,
     PLUGIN,
     REPO,
+    RESPONSE_MANIFEST,
     ROUTE_CASES,
     cases_sha256,
     evaluator_sha256,
     load_json,
     plugin_tree_sha256,
 )
+from forward_attestation import canonical_json_bytes, structured_response_manifest
 
 
 SCHEMAS = REPO / "evals" / "schemas"
@@ -499,7 +501,7 @@ def render_report(evidence: dict[str, Any]) -> str:
 | 主路由 | {evidence['route_summary']['passed']} | {evidence['route_summary']['total']} | {route_failures} |
 | 多轮行为 | {evidence['behavior_summary']['passed']} | {evidence['behavior_summary']['total']} | {behavior_failures} |
 
-评测代理只读取临时只读工作区中的最终插件树；36 个路由场景直接比较主责 Skill，12 个行为场景由独立新上下文逐条按 rubric 复核。CI 不调用模型，只验证机器证据、当前插件树和测试集哈希一致，且证据未超过 30 天。
+评测代理只读取临时只读工作区中的最终插件树；36 个路由场景直接比较主责 Skill，12 个行为场景由独立新上下文逐条按 rubric 复核。仓库内一致性检查不认证模型运行来源；正式 PR 与 Release 门禁还要求维护者离线签名，并由受保护基分支中的可信验证器使用候选 checkout 之外固定的公钥验证。签名有效期最长 30 天。
 """
 
 
@@ -521,6 +523,7 @@ def main() -> int:
     parser.add_argument("--allow-dirty", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--evidence", type=Path, default=EVIDENCE)
+    parser.add_argument("--response-manifest", type=Path, default=RESPONSE_MANIFEST)
     parser.add_argument("--report", type=Path, default=REPORT)
     args = parser.parse_args()
 
@@ -611,15 +614,20 @@ def main() -> int:
         "behavior_results": behavior_results,
     }
     args.evidence.parent.mkdir(parents=True, exist_ok=True)
+    args.response_manifest.parent.mkdir(parents=True, exist_ok=True)
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.evidence.write_text(
         json.dumps(evidence, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
         newline="\n",
     )
+    args.response_manifest.write_bytes(
+        canonical_json_bytes(structured_response_manifest(evidence))
+    )
     args.report.write_text(render_report(evidence), encoding="utf-8", newline="\n")
     print(f"[RESULT] route={route_passed}/36 behavior={behavior_passed}/12")
     print(f"[RESULT] evidence={args.evidence}")
+    print(f"[RESULT] structured_response_manifest={args.response_manifest}")
     if route_passed != 36 or behavior_passed != 12:
         return 1
     return 0
