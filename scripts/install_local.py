@@ -37,10 +37,17 @@ def run_command(command: list[str], cwd: Path) -> subprocess.CompletedProcess[st
 
 
 def _relay(result: subprocess.CompletedProcess[str], stream: TextIO) -> None:
+    encoding = getattr(stream, "encoding", None)
+
+    def write(value: str) -> None:
+        if encoding:
+            value = value.encode(encoding, errors="backslashreplace").decode(encoding)
+        print(value.rstrip(), file=stream)
+
     if result.stdout:
-        print(result.stdout.rstrip(), file=stream)
+        write(result.stdout)
     if result.stderr:
-        print(result.stderr.rstrip(), file=stream)
+        write(result.stderr)
 
 
 def _marketplace_sources(output: str) -> list[str]:

@@ -10,7 +10,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "scripts"))
 
-from install_local import install_local  # noqa: E402
+from install_local import _relay, install_local  # noqa: E402
 
 
 def completed(command: list[str], code: int = 0, stdout: str = "", stderr: str = "") -> subprocess.CompletedProcess[str]:
@@ -30,6 +30,13 @@ class ScriptedRunner:
 
 
 class LocalInstallerTests(unittest.TestCase):
+    def test_relay_escapes_characters_unsupported_by_console_encoding(self) -> None:
+        raw = io.BytesIO()
+        stream = io.TextIOWrapper(raw, encoding="ascii", newline="\n")
+        _relay(completed(["check"], stdout="✅ checks passed"), stream)
+        stream.flush()
+        self.assertIn(b"\\u2705 checks passed", raw.getvalue())
+
     def run_installer(
         self,
         results: list[subprocess.CompletedProcess[str]],
