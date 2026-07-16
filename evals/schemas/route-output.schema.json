@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Route evaluation output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["primarySkill", "rationale", "responsePreview"],
+  "properties": {
+    "primarySkill": {
+      "type": "string",
+      "enum": [
+        "kaoyan-22408-planner",
+        "kaoyan-review-executor",
+        "kaoyan-progress-diagnostician",
+        "kaoyan-error-loop-coach",
+        "kaoyan-mock-exam-coach",
+        "kaoyan-408-tutor",
+        "kaoyan-math2-coach",
+        "kaoyan-english2-coach",
+        "kaoyan-politics-coach",
+        "kaoyan-past-paper-analyst",
+        "kaoyan-material-study-assistant",
+        "kaoyan-official-info-researcher"
+      ]
+    },
+    "rationale": {
+      "type": "string",
+      "minLength": 1
+    },
+    "responsePreview": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

@@ -1,0 +1,4 @@
+# Exact direct-development dependencies for validation, evaluation, and security scanning.
+PyYAML==6.0.3
+jsonschema==4.25.1
+semgrep==1.162.0

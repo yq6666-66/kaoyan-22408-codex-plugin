@@ -1,0 +1,51 @@
+name: Authenticated forward evidence
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+
+permissions:
+  contents: read
+
+jobs:
+  authenticated-forward-evidence:
+    name: authenticated-forward-evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout trusted verifier from the protected base
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: trusted
+          persist-credentials: false
+      - name: Checkout exact candidate revision as untrusted data
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          path: candidate
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Install trusted verifier dependency
+        run: python -m pip install --disable-pip-version-check jsonschema==4.25.1
+      - name: Verify detached signature with externally pinned signer
+        env:
+          ALLOWED_SIGNERS: ${{ vars.KAOYAN_FORWARD_EVAL_ALLOWED_SIGNERS }}
+        run: |
+          if [ -z "$ALLOWED_SIGNERS" ]; then
+            echo "KAOYAN_FORWARD_EVAL_ALLOWED_SIGNERS is not configured" >&2
+            exit 1
+          fi
+          printf '%s\n' "$ALLOWED_SIGNERS" > "$RUNNER_TEMP/kaoyan-forward-eval.allowed_signers"
+          python trusted/evals/forward_attestation.py verify \
+            --repo candidate \
+            --allowed-signers "$RUNNER_TEMP/kaoyan-forward-eval.allowed_signers"

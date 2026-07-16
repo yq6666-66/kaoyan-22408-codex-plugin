@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.0",
+  "schemaVersion": "1.1",
   "cases": [
     {
       "id": "planner-P1",
@@ -38,9 +38,9 @@
       "id": "executor-P2",
       "skillUnderTest": "kaoyan-review-executor",
       "kind": "positive",
-      "prompt": "按我刚才确认的计划，接下来 90 分钟具体做什么？",
+      "prompt": "今晚有 3 小时，我要完成数学二极限专项和 408 数据结构复习，请排成本次学习时段。",
       "expectedPrimary": "kaoyan-review-executor",
-      "expectedBehavior": ["只展开下一学习时段", "给出可验证结束条件"]
+      "expectedBehavior": ["无需长期计划即可展开本次时段", "给出可验证结束条件并附 ProgressSnapshot 1.1"]
     },
     {
       "id": "executor-C1",
@@ -271,10 +271,10 @@
       "id": "material-C1",
       "skillUnderTest": "kaoyan-material-study-assistant",
       "kind": "conflict",
-      "prompt": "这是我上传且有权使用的 2024 数学二真题，请分析命题结构和考点分布。",
-      "expectedPrimary": "kaoyan-past-paper-analyst",
+      "prompt": "这是我上传的 408 讲义片段，请把其中的页面置换概念讲清楚并解答附题。",
+      "expectedPrimary": "kaoyan-408-tutor",
       "expectedNotPrimary": "kaoyan-material-study-assistant",
-      "expectedBehavior": ["按真题结构分析", "不只做普通材料摘要"]
+      "expectedBehavior": ["按讲解意图转交 408 学科辅导", "不因载体是讲义而强制做摘要"]
     },
     {
       "id": "official-P1",

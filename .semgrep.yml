@@ -21,13 +21,45 @@ rules:
     pattern-regex: '(?i)(?:[a-z]:\\users\\|/users/|/home/[^/\s]+/)'
 
   - id: likely-plaintext-secret
-    message: A value resembles a plaintext service credential.
+    message: A value resembles a plaintext service or cloud credential.
     severity: ERROR
     languages: [generic]
     paths:
       exclude:
         - /.semgrep.yml
-    pattern-regex: '\b(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,}|figd_[A-Za-z0-9_-]{20,})\b'
+        - /scripts/validate_repository.py
+    pattern-regex: '\b(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,}|figd_[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{30,}|xox[baprs]-[0-9A-Za-z-]{20,}|npm_[A-Za-z0-9]{20,}|glpat-[A-Za-z0-9_-]{20,})\b'
+
+  - id: likely-jwt
+    message: A three-segment value resembles a plaintext JWT.
+    severity: ERROR
+    languages: [generic]
+    paths:
+      exclude:
+        - /.semgrep.yml
+        - /scripts/validate_repository.py
+    pattern-regex: '\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b'
+
+  - id: private-key-material
+    message: Private key material must never be committed.
+    severity: ERROR
+    languages: [generic]
+    paths:
+      exclude:
+        - /.semgrep.yml
+        - /scripts/validate_repository.py
+    pattern-regex: '-----BEGIN (?:(?:RSA |EC |OPENSSH |DSA |ENCRYPTED )?PRIVATE KEY|PGP PRIVATE KEY BLOCK)-----'
+
+  - id: assigned-cloud-secret
+    message: A cloud secret appears to be assigned in plaintext.
+    severity: ERROR
+    languages: [generic]
+    paths:
+      exclude:
+        - /.semgrep.yml
+        - /scripts/validate_repository.py
+    pattern-regex: >-
+      (?i)\b(?:aws_secret_access_key|accountkey|client_secret)\s*[:=]\s*["']?[A-Za-z0-9+/=_-]{16,}
 
   - id: forbidden-force-push
     message: Release automation must not force-push Git history.
