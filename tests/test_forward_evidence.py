@@ -22,6 +22,10 @@ from common import (  # noqa: E402
 )
 from verify_forward_evidence import EvidenceError, verify_evidence  # noqa: E402
 from run_forward_eval import (  # noqa: E402
+    ABORT_EVENT,
+    NonRetryableEvaluationError,
+    cached_call,
+    is_non_retryable_runtime_failure,
     isolated_config_arguments,
     judge_prompt,
     plugin_prompt_context,
@@ -82,6 +86,9 @@ def valid_evidence() -> dict:
 
 
 class ForwardEvidenceTests(unittest.TestCase):
+    def tearDown(self) -> None:
+        ABORT_EVENT.clear()
+
     def verify(self, evidence: dict, *, max_age_days: int = 30) -> dict:
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / "evidence.json"
@@ -145,6 +152,29 @@ class ForwardEvidenceTests(unittest.TestCase):
             resolved = resolve_codex("codex", platform="nt")
         self.assertEqual(resolved, r"C:\tools\codex.cmd")
         self.assertEqual(which.call_args_list[0].args, ("codex.cmd",))
+
+    def test_usage_limit_is_non_retryable_and_stops_after_one_attempt(self) -> None:
+        self.assertTrue(
+            is_non_retryable_runtime_failure(
+                "You've hit your usage limit. Try again at Jul 25th."
+            )
+        )
+        self.assertFalse(is_non_retryable_runtime_failure("temporary transport error"))
+        with tempfile.TemporaryDirectory() as temporary:
+            cache = Path(temporary) / "result.json"
+            with patch(
+                "run_forward_eval.structured_call",
+                side_effect=NonRetryableEvaluationError("usage limit"),
+            ) as call:
+                with self.assertRaisesRegex(NonRetryableEvaluationError, "usage limit"):
+                    cached_call(
+                        cache_path=cache,
+                        no_cache=True,
+                        schema=REPO / "evals/schemas/route-output.schema.json",
+                        retries=5,
+                    )
+        self.assertEqual(call.call_count, 1)
+        self.assertTrue(ABORT_EVENT.is_set())
 
     def test_eval_isolation_uses_minimal_temporary_codex_home(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

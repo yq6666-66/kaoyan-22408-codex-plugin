@@ -39,10 +39,28 @@ from forward_attestation import canonical_json_bytes, structured_response_manife
 SCHEMAS = REPO / "evals" / "schemas"
 REPORT = REPO / "tests" / "forward-eval-report.md"
 PRINT_LOCK = threading.Lock()
+ABORT_EVENT = threading.Event()
 
 
 class EvaluationError(RuntimeError):
     pass
+
+
+class NonRetryableEvaluationError(EvaluationError):
+    pass
+
+
+def is_non_retryable_runtime_failure(detail: str) -> bool:
+    normalized = detail.casefold()
+    return any(
+        marker in normalized
+        for marker in (
+            "you've hit your usage limit",
+            "insufficient_quota",
+            "billing_hard_limit_reached",
+            "insufficient credits",
+        )
+    )
 
 
 def log(message: str) -> None:
@@ -220,6 +238,8 @@ def structured_call(
     result_path: Path,
     timeout: int,
 ) -> dict[str, Any]:
+    if ABORT_EVENT.is_set():
+        raise NonRetryableEvaluationError("evaluation aborted after a non-retryable runtime failure")
     result_path.parent.mkdir(parents=True, exist_ok=True)
     if result_path.exists():
         result_path.unlink()
@@ -270,6 +290,11 @@ def structured_call(
             for part in (completed.stdout, completed.stderr)
             if part and part.strip()
         )
+        if is_non_retryable_runtime_failure(detail):
+            ABORT_EVENT.set()
+            raise NonRetryableEvaluationError(
+                f"Codex runtime reported a non-retryable account limit: {detail[-2000:]}"
+            )
         raise EvaluationError(f"Codex call failed ({completed.returncode}): {detail[-6000:]}")
     if not result_path.is_file():
         raise EvaluationError("Codex did not write --output-last-message")
@@ -299,11 +324,20 @@ def cached_call(
             return cached
     last_error: Exception | None = None
     for attempt in range(retries + 1):
+        if ABORT_EVENT.is_set():
+            raise NonRetryableEvaluationError("evaluation aborted after a non-retryable runtime failure")
         try:
             result = structured_call(schema=schema, **kwargs)
             break
+        except NonRetryableEvaluationError:
+            ABORT_EVENT.set()
+            raise
         except (EvaluationError, subprocess.TimeoutExpired) as exc:
             last_error = exc
+            if ABORT_EVENT.is_set():
+                raise NonRetryableEvaluationError(
+                    "evaluation aborted after a non-retryable runtime failure"
+                ) from exc
             if attempt >= retries:
                 raise
             log(f"[RETRY] structured call attempt {attempt + 1} failed: {exc}")
@@ -513,6 +547,7 @@ def render_report(evidence: dict[str, Any]) -> str:
 
 
 def main() -> int:
+    ABORT_EVENT.clear()
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", help="Codex model identifier; required for a full run")
     parser.add_argument(
