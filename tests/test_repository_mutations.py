@@ -101,6 +101,52 @@ class RepositoryMutationTests(unittest.TestCase):
         path.write_text(path.read_text(encoding="utf-8") + marker + "\n", encoding="utf-8", newline="\n")
         self.assert_invalid()
 
+    def test_readme_version_drift_is_rejected(self) -> None:
+        path = self.repo / "README.md"
+        path.write_text(
+            path.read_text(encoding="utf-8").replace(
+                "当前版本：`1.2.0`", "当前版本：`9.9.9`"
+            ),
+            encoding="utf-8",
+            newline="\n",
+        )
+        with self.assertRaisesRegex(ValidationError, "README current version"):
+            validate_repo(self.repo, verify_evidence=False, scan_history=False)
+
+    def test_readme_install_ref_drift_is_rejected(self) -> None:
+        path = self.repo / "README.md"
+        path.write_text(
+            path.read_text(encoding="utf-8").replace("--ref v1.2.0", "--ref v9.9.9"),
+            encoding="utf-8",
+            newline="\n",
+        )
+        with self.assertRaisesRegex(ValidationError, "README marketplace ref"):
+            validate_repo(self.repo, verify_evidence=False, scan_history=False)
+
+    def test_readme_clone_tag_drift_is_rejected(self) -> None:
+        path = self.repo / "README.md"
+        path.write_text(
+            path.read_text(encoding="utf-8").replace(
+                "--branch v1.2.0", "--branch v9.9.9"
+            ),
+            encoding="utf-8",
+            newline="\n",
+        )
+        with self.assertRaisesRegex(ValidationError, "README clone tag"):
+            validate_repo(self.repo, verify_evidence=False, scan_history=False)
+
+    def test_changelog_version_drift_is_rejected(self) -> None:
+        path = self.repo / "CHANGELOG.md"
+        path.write_text(
+            path.read_text(encoding="utf-8").replace(
+                "## [1.2.0] - Unreleased", "## [9.9.9] - Unreleased"
+            ),
+            encoding="utf-8",
+            newline="\n",
+        )
+        with self.assertRaisesRegex(ValidationError, "CHANGELOG current version"):
+            validate_repo(self.repo, verify_evidence=False, scan_history=False)
+
     def test_partial_forward_evidence_bundle_is_rejected(self) -> None:
         evidence = self.repo / "tests/forward-eval-evidence.json"
         evidence.write_text("{}\n", encoding="utf-8", newline="\n")

@@ -614,6 +614,39 @@ def check_repository_docs(repo: Path) -> None:
         require((repo / relative).is_file(), f"required repository file is missing: {relative}")
     require(not (repo / "submission").exists(), "obsolete submission directory must be absent")
 
+    manifest = load_json(
+        repo / Path(*PLUGIN_RELATIVE_PATH.parts) / ".codex-plugin" / "plugin.json"
+    )
+    version = manifest.get("version") if isinstance(manifest, dict) else None
+    require(
+        isinstance(version, str) and SEMVER.fullmatch(version) is not None,
+        "manifest version is unavailable for documentation checks",
+    )
+    readme = read_utf8_text(repo / "README.md")
+    require(
+        f"当前版本：`{version}`" in readme,
+        "README current version must match plugin.json.version",
+    )
+    require(
+        f"--ref v{version}" in readme,
+        "README marketplace ref must match plugin.json.version",
+    )
+    require(
+        f"--branch v{version}" in readme,
+        "README clone tag must match plugin.json.version",
+    )
+    changelog = read_utf8_text(repo / "CHANGELOG.md")
+    current_release = re.search(
+        r"^## \[([^\]]+)\] - (Unreleased|\d{4}-\d{2}-\d{2})$",
+        changelog,
+        re.MULTILINE,
+    )
+    require(current_release is not None, "CHANGELOG must start with a versioned release heading")
+    require(
+        current_release.group(1) == version,
+        "CHANGELOG current version must match plugin.json.version",
+    )
+
     marketplace = load_json(repo / ".agents" / "plugins" / "marketplace.json")
     require(isinstance(marketplace, dict) and marketplace.get("name") == "kaoyan-22408", "marketplace name is invalid")
     plugins = marketplace.get("plugins")
