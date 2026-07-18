@@ -59,10 +59,20 @@ class RepositoryContractTests(unittest.TestCase):
         material = (
             skills / "kaoyan-material-study-assistant/SKILL.md"
         ).read_text(encoding="utf-8")
+        tutor_408 = (skills / "kaoyan-408-tutor/SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        diagnostician = (
+            skills / "kaoyan-progress-diagnostician/SKILL.md"
+        ).read_text(encoding="utf-8")
         self.assertIn("交卷时回报实际用时", mock)
         self.assertIn("不得写成“可附用时”", mock)
         self.assertIn("不下载、补齐、搜索或重建", material)
         self.assertIn("没有跨会话长期记忆，也没有后台学习状态", material)
+        self.assertIn("必须另起“模型讲解”段落", tutor_408)
+        self.assertIn("不得放在 `[用户材料]` 标签之下", tutor_408)
+        self.assertIn("相对周期不是已提供的绝对日期", diagnostician)
+        self.assertIn("不得根据当前系统日期自行推定", diagnostician)
 
     def test_accuracy_semantics_reject_impossible_or_inconsistent_values(self) -> None:
         base = {
