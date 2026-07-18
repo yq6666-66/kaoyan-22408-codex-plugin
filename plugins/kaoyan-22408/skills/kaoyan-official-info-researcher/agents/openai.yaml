@@ -1,4 +1,4 @@
 interface:
   display_name: "考研官方信息核验员"
-  short_description: "核验当年招考信息与当前时政政策并标注一手来源和日期"
-  default_prompt: "使用 $kaoyan-official-info-researcher 从一手官网核验这项当前信息。"
+  short_description: "核验今年最新招考与政策，比较机构、年度、日期、效力和直接链接"
+  default_prompt: "使用 $kaoyan-official-info-researcher 从一手官网核验今年信息并比较文件效力。"

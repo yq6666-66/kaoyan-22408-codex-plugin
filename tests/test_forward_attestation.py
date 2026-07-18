@@ -40,7 +40,7 @@ def build_evidence(repo: Path, generated_at: datetime) -> dict:
         (repo / "tests/behavior-cases.json").read_text(encoding="utf-8")
     )["cases"]
     return {
-        "schema_version": "1.1",
+        "schema_version": "1.2",
         "complete": True,
         "generated_at": generated_at.isoformat().replace("+00:00", "Z"),
         "source_revision": run_git(repo, "rev-parse", "HEAD").stdout.strip(),
@@ -50,8 +50,8 @@ def build_evidence(repo: Path, generated_at: datetime) -> dict:
         "codex_version": "codex-cli attestation-test",
         "model": "test-model",
         "service_tier": "fast",
-        "route_summary": {"passed": 36, "total": 36},
-        "behavior_summary": {"passed": 12, "total": 12},
+        "route_summary": {"passed": len(route_cases), "total": len(route_cases)},
+        "behavior_summary": {"passed": len(behavior_cases), "total": len(behavior_cases)},
         "route_results": [
             {
                 "id": case["id"],
@@ -179,7 +179,7 @@ class ForwardAttestationTests(unittest.TestCase):
     def test_accepts_external_pinned_signature(self) -> None:
         self.sign()
         evidence = self.verify()
-        self.assertEqual(evidence["route_summary"], {"passed": 36, "total": 36})
+        self.assertEqual(evidence["route_summary"], {"passed": 60, "total": 60})
 
     def test_rejects_unsigned_bundle(self) -> None:
         with self.assertRaisesRegex(AuthenticationError, "signature is missing"):

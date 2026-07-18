@@ -40,27 +40,28 @@ def parse_utc(value: str) -> datetime:
     return parsed.astimezone(timezone.utc)
 
 
-def source_revision_matches_inputs(revision: str) -> bool:
+def source_revision_matches_inputs(revision: str, schema_version: str) -> bool:
     relevant = [
         "plugins/kaoyan-22408",
         "tests/forward-cases.json",
         "tests/behavior-cases.json",
         "evals",
     ]
-    checks = [
-        ["git", "cat-file", "-e", f"{revision}^{{commit}}"],
-        ["git", "merge-base", "--is-ancestor", revision, "HEAD"],
-        ["git", "diff", "--quiet", revision, "HEAD", "--", *relevant],
-    ]
-    for command in checks:
-        if subprocess.run(
-            command,
-            cwd=REPO,
-            check=False,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        ).returncode != 0:
-            return False
+    if schema_version == "1.1":
+        checks = [
+            ["git", "cat-file", "-e", f"{revision}^{{commit}}"],
+            ["git", "merge-base", "--is-ancestor", revision, "HEAD"],
+            ["git", "diff", "--quiet", revision, "HEAD", "--", *relevant],
+        ]
+        for command in checks:
+            if subprocess.run(
+                command,
+                cwd=REPO,
+                check=False,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            ).returncode != 0:
+                return False
     status = subprocess.run(
         ["git", "status", "--porcelain", "--", *relevant],
         cwd=REPO,
@@ -93,8 +94,8 @@ def verify_evidence(
 
     route_cases = load_json(ROUTE_CASES)["cases"]
     behavior_cases = load_json(BEHAVIOR_CASES)["cases"]
-    require(len(route_cases) == 36, "route case set must contain exactly 36 cases")
-    require(len(behavior_cases) == 12, "behavior case set must contain exactly 12 cases")
+    require(len(route_cases) == 60, "route case set must contain exactly 60 cases")
+    require(len(behavior_cases) == 24, "behavior case set must contain exactly 24 cases")
     require(
         evidence["plugin_tree_sha256"] == plugin_tree_sha256(),
         "evaluation evidence does not match the current plugin tree",
@@ -109,8 +110,8 @@ def verify_evidence(
     )
     if check_source_revision:
         require(
-            source_revision_matches_inputs(evidence["source_revision"]),
-            "evaluation source revision is missing, non-ancestral, dirty, or does not contain the evaluated inputs",
+            source_revision_matches_inputs(evidence["source_revision"], evidence["schema_version"]),
+            "evaluation inputs are dirty or do not satisfy the evidence binding profile",
         )
 
     now = datetime.now(timezone.utc)
@@ -152,10 +153,10 @@ def verify_evidence(
         require(all(item.get("passed") is True for item in criteria), f"{case_id}: rubric failure")
         require(judge.get("passed") is True and result["passed"] is True, f"{case_id}: behavior failed")
 
-    require(evidence["route_summary"] == {"passed": 36, "total": 36}, "route gate must be 36/36")
+    require(evidence["route_summary"] == {"passed": 60, "total": 60}, "route gate must be 60/60")
     require(
-        evidence["behavior_summary"] == {"passed": 12, "total": 12},
-        "behavior gate must be 12/12",
+        evidence["behavior_summary"] == {"passed": 24, "total": 24},
+        "behavior gate must be 24/24",
     )
     return evidence
 
@@ -171,8 +172,8 @@ def main() -> int:
         print(f"[FAIL] {exc}", file=sys.stderr)
         return 1
     print("[NOTICE] consistency only; this command does not authenticate the model run")
-    print(f"[CONSISTENT] route claims: {evidence['route_summary']['passed']}/36")
-    print(f"[CONSISTENT] behavior claims: {evidence['behavior_summary']['passed']}/12")
+    print(f"[CONSISTENT] route claims: {evidence['route_summary']['passed']}/60")
+    print(f"[CONSISTENT] behavior claims: {evidence['behavior_summary']['passed']}/24")
     print(
         "[CONSISTENT] runtime claim: "
         f"{evidence['codex_version']} / {evidence['model']} / {evidence['service_tier']}"

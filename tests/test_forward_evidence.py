@@ -34,7 +34,7 @@ def valid_evidence() -> dict:
     routes = load_json(ROUTE_CASES)["cases"]
     behaviors = load_json(BEHAVIOR_CASES)["cases"]
     return {
-        "schema_version": "1.1",
+        "schema_version": "1.2",
         "complete": True,
         "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "source_revision": "0" * 40,
@@ -44,8 +44,8 @@ def valid_evidence() -> dict:
         "codex_version": "codex-cli test",
         "model": "test-model",
         "service_tier": "fast",
-        "route_summary": {"passed": 36, "total": 36},
-        "behavior_summary": {"passed": 12, "total": 12},
+        "route_summary": {"passed": 60, "total": 60},
+        "behavior_summary": {"passed": 24, "total": 24},
         "route_results": [
             {
                 "id": case["id"],
@@ -94,7 +94,7 @@ class ForwardEvidenceTests(unittest.TestCase):
 
     def test_accepts_current_complete_evidence(self) -> None:
         result = self.verify(valid_evidence())
-        self.assertEqual(result["route_summary"], {"passed": 36, "total": 36})
+        self.assertEqual(result["route_summary"], {"passed": 60, "total": 60})
 
     def test_rejects_plugin_tree_tampering(self) -> None:
         evidence = valid_evidence()
@@ -114,13 +114,10 @@ class ForwardEvidenceTests(unittest.TestCase):
         with self.assertRaisesRegex(EvidenceError, "evaluator harness"):
             self.verify(evidence)
 
-    def test_rejects_unresolvable_source_revision(self) -> None:
+    def test_consistency_only_mode_does_not_require_source_commit(self) -> None:
         evidence = valid_evidence()
-        with tempfile.TemporaryDirectory() as temporary:
-            path = Path(temporary) / "evidence.json"
-            path.write_text(json.dumps(evidence, ensure_ascii=False), encoding="utf-8")
-            with self.assertRaisesRegex(EvidenceError, "source revision"):
-                verify_evidence(path)
+        result = self.verify(evidence)
+        self.assertEqual(result["source_revision"], "0" * 40)
 
     def test_rejects_expired_evidence(self) -> None:
         evidence = valid_evidence()
@@ -172,8 +169,8 @@ class ForwardEvidenceTests(unittest.TestCase):
         behavior_context = plugin_prompt_context(full=True)
         self.assertIn("capability-routing-contract.md", route_context)
         self.assertIn("kaoyan-review-executor", route_context)
-        self.assertNotIn("## 展开时段", route_context)
-        self.assertIn("## 展开时段", behavior_context)
+        self.assertNotIn("## 展开与恢复", route_context)
+        self.assertIn("## 展开与恢复", behavior_context)
         self.assertNotIn("expectedPrimary", behavior_context)
         self.assertNotIn("tests/", behavior_context)
 

@@ -524,18 +524,18 @@ def check_release_tree(plugin: Path) -> None:
 
 def check_forward_cases(repo: Path) -> None:
     forward = load_json(repo / "tests" / "forward-cases.json")
-    require(isinstance(forward, dict) and forward.get("schemaVersion") == "1.1", "forward cases must use schemaVersion 1.1")
+    require(isinstance(forward, dict) and forward.get("schemaVersion") == "1.2", "forward cases must use schemaVersion 1.2")
     cases = forward.get("cases")
-    require(isinstance(cases, list) and len(cases) == 36, "forward cases must contain exactly 36 cases")
+    require(isinstance(cases, list) and len(cases) == 60, "forward cases must contain exactly 60 cases")
     ids = [case.get("id") for case in cases if isinstance(case, dict)]
-    require(len(ids) == 36 and len(set(ids)) == 36 and all(isinstance(item, str) and item for item in ids), "forward case IDs must be unique non-empty strings")
+    require(len(ids) == 60 and len(set(ids)) == 60 and all(isinstance(item, str) and item for item in ids), "forward case IDs must be unique non-empty strings")
     counts: dict[str, Counter[str]] = defaultdict(Counter)
     for case in cases:
         require(isinstance(case, dict), "each forward case must be an object")
         skill = case.get("skillUnderTest")
         kind = case.get("kind")
         require(skill in EXPECTED_SKILLS, f"forward case contains an unknown Skill: {case.get('id')}")
-        require(kind in {"positive", "conflict"}, f"forward case kind is invalid: {case.get('id')}")
+        require(kind in {"positive", "colloquial", "conflict", "compound"}, f"forward case kind is invalid: {case.get('id')}")
         require(case.get("expectedPrimary") in EXPECTED_SKILLS, f"forward case route is invalid: {case.get('id')}")
         require(isinstance(case.get("prompt"), str) and case["prompt"].strip(), f"forward case has no prompt: {case.get('id')}")
         require(isinstance(case.get("expectedBehavior"), list) and case["expectedBehavior"], f"forward case has no behavior assertions: {case.get('id')}")
@@ -543,27 +543,29 @@ def check_forward_cases(repo: Path) -> None:
             all(isinstance(item, str) and item.strip() for item in case["expectedBehavior"]),
             f"forward behavior assertions must be non-empty strings: {case.get('id')}",
         )
-        if kind == "positive":
-            require(case["expectedPrimary"] == skill, f"positive case does not route to the Skill under test: {case.get('id')}")
-        else:
+        if kind in {"positive", "colloquial"}:
+            require(case["expectedPrimary"] == skill, f"{kind} case does not route to the Skill under test: {case.get('id')}")
+        elif kind == "conflict":
             require(case.get("expectedNotPrimary") == skill, f"conflict case does not exclude the Skill under test: {case.get('id')}")
             require(case["expectedPrimary"] != skill, f"conflict case still routes to the excluded Skill: {case.get('id')}")
         counts[skill][kind] += 1
     for skill in EXPECTED_SKILLS:
-        require(counts[skill] == Counter({"positive": 2, "conflict": 1}), f"{skill} must have 2 positive and 1 conflict cases")
+        expected = Counter({"positive": 2, "colloquial": 1, "conflict": 1, "compound": 1})
+        require(counts[skill] == expected, f"{skill} must have 2 positive, 1 colloquial, 1 conflict, and 1 compound case")
 
 
 def check_behavior_cases(repo: Path) -> None:
     behavior = load_json(repo / "tests" / "behavior-cases.json")
-    require(isinstance(behavior, dict) and behavior.get("schemaVersion") == "1.1", "behavior cases must use schemaVersion 1.1")
+    require(isinstance(behavior, dict) and behavior.get("schemaVersion") == "1.2", "behavior cases must use schemaVersion 1.2")
     cases = behavior.get("cases")
-    require(isinstance(cases, list) and len(cases) == 12, "behavior cases must contain exactly 12 cases")
+    require(isinstance(cases, list) and len(cases) == 24, "behavior cases must contain exactly 24 cases")
     ids: list[str] = []
     for case in cases:
         require(isinstance(case, dict), "each behavior case must be an object")
         case_id = case.get("id")
         require(isinstance(case_id, str) and case_id.strip(), "behavior case ID must be a non-empty string")
         ids.append(case_id)
+        require(case.get("expectedPrimary") in EXPECTED_SKILLS, f"behavior case route is invalid: {case_id}")
         has_prompt = isinstance(case.get("prompt"), str) and bool(case["prompt"].strip())
         has_turns = isinstance(case.get("turns"), list) and bool(case["turns"])
         has_transcript = isinstance(case.get("transcript"), list) and bool(case["transcript"])
@@ -571,13 +573,12 @@ def check_behavior_cases(repo: Path) -> None:
             has_prompt or has_turns or has_transcript,
             f"behavior case must contain prompt, turns, or transcript: {case_id}",
         )
-        rubric = case.get("rubric", case.get("expectedBehavior"))
-        require(isinstance(rubric, (list, dict)) and bool(rubric), f"behavior case must contain a non-empty rubric: {case_id}")
-        if isinstance(rubric, list):
-            require(
-                all(isinstance(item, str) and item.strip() for item in rubric),
-                f"behavior rubric entries must be non-empty strings: {case_id}",
-            )
+        rubric = case.get("rubric")
+        require(isinstance(rubric, list) and bool(rubric), f"behavior case must contain a non-empty rubric list: {case_id}")
+        require(
+            all(isinstance(item, str) and item.strip() for item in rubric),
+            f"behavior rubric entries must be non-empty strings: {case_id}",
+        )
         if has_transcript:
             for turn in case["transcript"]:
                 require(isinstance(turn, dict), f"behavior transcript turn must be an object: {case_id}")
@@ -587,6 +588,12 @@ def check_behavior_cases(repo: Path) -> None:
                     f"behavior transcript content is empty: {case_id}",
                 )
     require(len(ids) == len(set(ids)), "behavior case IDs must be unique")
+    numbers = {
+        int(match.group(1))
+        for case_id in ids
+        if (match := re.fullmatch(r"behavior-(\d{2})-[a-z0-9-]+", case_id))
+    }
+    require(numbers == set(range(1, 25)), "behavior case IDs must cover behavior-01 through behavior-24 exactly")
 
 
 def check_repository_docs(repo: Path) -> None:
@@ -739,7 +746,7 @@ def validate_repo(
         "12 Skills and openai.yaml files",
         "shared contracts and portable-record JSON Schema",
         "exact release allowlist, UTF-8/LF, and sensitive-content scan",
-        "36 routing cases and 12 behavior cases",
+        "60 routing cases and 24 behavior cases",
         "Git-history and forward-evidence gates",
     ]
 

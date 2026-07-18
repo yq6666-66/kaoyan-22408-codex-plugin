@@ -21,9 +21,10 @@ SIGNER_IDENTITY = "yq6666-66"
 SIGNATURE_NAMESPACE = "kaoyan-forward-eval"
 STATEMENT_SCHEMA_VERSION = "1.0"
 RESPONSE_MANIFEST_SCHEMA_VERSION = "1.0"
-TRUSTED_EVIDENCE_SCHEMA = (
-    Path(__file__).resolve().parent / "schemas" / "evidence.schema.json"
-)
+EVIDENCE_PROFILES = {
+    "1.1": (36, 12, Path(__file__).resolve().parent / "schemas" / "evidence-1.1.schema.json"),
+    "1.2": (60, 24, Path(__file__).resolve().parent / "schemas" / "evidence.schema.json"),
+}
 
 
 class AuthenticationError(RuntimeError):
@@ -198,8 +199,11 @@ def structured_response_manifest(evidence: dict[str, Any]) -> dict[str, Any]:
 
 
 def validate_evidence(repo: Path, evidence: dict[str, Any]) -> None:
+    profile = EVIDENCE_PROFILES.get(evidence.get("schema_version"))
+    require(profile is not None, "unsupported forward-evidence schema version")
+    route_count, behavior_count, schema_path = profile
     schema, _ = load_json_file(
-        TRUSTED_EVIDENCE_SCHEMA,
+        schema_path,
         "trusted forward-evidence schema",
     )
     Draft202012Validator.check_schema(schema)
@@ -226,12 +230,16 @@ def validate_evidence(repo: Path, evidence: dict[str, Any]) -> None:
         "behavior cases",
     )
     require(
-        isinstance(route_cases, dict) and len(route_cases.get("cases", [])) == 36,
-        "route case set must contain exactly 36 cases",
+        isinstance(route_cases, dict)
+        and route_cases.get("schemaVersion") == evidence["schema_version"]
+        and len(route_cases.get("cases", [])) == route_count,
+        f"route case set must use schemaVersion {evidence['schema_version']} and contain exactly {route_count} cases",
     )
     require(
-        isinstance(behavior_cases, dict) and len(behavior_cases.get("cases", [])) == 12,
-        "behavior case set must contain exactly 12 cases",
+        isinstance(behavior_cases, dict)
+        and behavior_cases.get("schemaVersion") == evidence["schema_version"]
+        and len(behavior_cases.get("cases", [])) == behavior_count,
+        f"behavior case set must use schemaVersion {evidence['schema_version']} and contain exactly {behavior_count} cases",
     )
 
     expected_routes = {
@@ -287,12 +295,12 @@ def validate_evidence(repo: Path, evidence: dict[str, Any]) -> None:
         )
 
     require(
-        evidence["route_summary"] == {"passed": 36, "total": 36},
-        "route summary must be 36/36",
+        evidence["route_summary"] == {"passed": route_count, "total": route_count},
+        f"route summary must be {route_count}/{route_count}",
     )
     require(
-        evidence["behavior_summary"] == {"passed": 12, "total": 12},
-        "behavior summary must be 12/12",
+        evidence["behavior_summary"] == {"passed": behavior_count, "total": behavior_count},
+        f"behavior summary must be {behavior_count}/{behavior_count}",
     )
 
 
@@ -310,36 +318,37 @@ def validate_candidate_binding(repo: Path, evidence: dict[str, Any]) -> None:
         evidence["evaluator_sha256"] == evaluator_sha256(repo),
         "evidence does not match the candidate evaluator",
     )
-    source_revision = evidence["source_revision"]
-    run_git(repo, "cat-file", "-e", f"{source_revision}^{{commit}}")
-    require(
-        subprocess.run(
-            ["git", "merge-base", "--is-ancestor", source_revision, "HEAD"],
-            cwd=repo,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            check=False,
-        ).returncode
-        == 0,
-        "evidence source revision must be an ancestor of the candidate HEAD",
-    )
     relevant = [
         "plugins/kaoyan-22408",
         "tests/forward-cases.json",
         "tests/behavior-cases.json",
         "evals",
     ]
-    require(
-        subprocess.run(
-            ["git", "diff", "--quiet", source_revision, "HEAD", "--", *relevant],
-            cwd=repo,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            check=False,
-        ).returncode
-        == 0,
-        "candidate evaluation inputs differ from the evaluated source revision",
-    )
+    if evidence["schema_version"] == "1.1":
+        source_revision = evidence["source_revision"]
+        run_git(repo, "cat-file", "-e", f"{source_revision}^{{commit}}")
+        require(
+            subprocess.run(
+                ["git", "merge-base", "--is-ancestor", source_revision, "HEAD"],
+                cwd=repo,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=False,
+            ).returncode
+            == 0,
+            "evidence source revision must be an ancestor of the candidate HEAD",
+        )
+        require(
+            subprocess.run(
+                ["git", "diff", "--quiet", source_revision, "HEAD", "--", *relevant],
+                cwd=repo,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=False,
+            ).returncode
+            == 0,
+            "candidate evaluation inputs differ from the evaluated source revision",
+        )
     status = run_git(
         repo,
         "status",
@@ -354,9 +363,14 @@ def validate_response_manifest(
     evidence: dict[str, Any],
     manifest: Any,
 ) -> None:
+    route_count, behavior_count, _ = EVIDENCE_PROFILES[evidence["schema_version"]]
     require(
         manifest == structured_response_manifest(evidence),
         "structured-response manifest does not match the exact evidence outputs",
+    )
+    require(
+        len(manifest["entries"]) == route_count + (2 * behavior_count),
+        "structured-response manifest does not contain the required response summaries",
     )
 
 
@@ -604,8 +618,8 @@ def main() -> int:
             )
             print(
                 "[OK] authenticated forward evidence: "
-                f"{verified['route_summary']['passed']}/36 routes, "
-                f"{verified['behavior_summary']['passed']}/12 behaviors"
+                f"{verified['route_summary']['passed']}/{verified['route_summary']['total']} routes, "
+                f"{verified['behavior_summary']['passed']}/{verified['behavior_summary']['total']} behaviors"
             )
     except (AuthenticationError, OSError, ValueError) as exc:
         print(f"[FAIL] {exc}", file=sys.stderr)

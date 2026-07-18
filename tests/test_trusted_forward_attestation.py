@@ -127,7 +127,8 @@ class TrustedForwardAttestationTests(unittest.TestCase):
         self.root = Path(self.temporary.name)
         self.repo = copy_as_committed_repo(self.root / "repo")
         expand_cases(self.repo)
-        commit_all(self.repo, "expand transition cases")
+        if run_git(self.repo, "status", "--porcelain").stdout.strip():
+            commit_all(self.repo, "expand transition cases")
         self.now = datetime.now(timezone.utc).replace(microsecond=0)
         self.evidence = build_evidence(self.repo, "1.2", self.now)
         self.evidence_path = self.repo / "tests/forward-eval-evidence.json"
