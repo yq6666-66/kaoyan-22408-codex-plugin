@@ -21,12 +21,12 @@ jobs:
       artifact: ${{ steps.meta.outputs.artifact }}
     steps:
       - name: Checkout complete history
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
           persist-credentials: false
       - name: Set up Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.12"
       - name: Install pinned development dependencies
@@ -42,7 +42,7 @@ jobs:
         id: meta
         run: python ci/release_metadata.py --artifact-suffix ubuntu --github-output "$GITHUB_OUTPUT"
       - name: Upload Ubuntu release archive
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ steps.meta.outputs.artifact }}
           path: |
@@ -59,12 +59,12 @@ jobs:
       artifact: ${{ steps.meta.outputs.artifact }}
     steps:
       - name: Checkout complete history
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
           persist-credentials: false
       - name: Set up Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.12"
       - name: Install pinned core dependencies
@@ -78,7 +78,7 @@ jobs:
         shell: pwsh
         run: python ci/release_metadata.py --artifact-suffix windows --github-output $env:GITHUB_OUTPUT
       - name: Upload Windows release archive
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ steps.meta.outputs.artifact }}
           path: |
@@ -96,21 +96,21 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
           persist-credentials: false
       - name: Set up Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.12"
       - name: Download Ubuntu artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: ${{ needs.validate.outputs.artifact }}
           path: artifacts/ubuntu
       - name: Download Windows artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: ${{ needs.windows.outputs.artifact }}
           path: artifacts/windows
@@ -130,12 +130,12 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
           persist-credentials: false
       - name: Set up Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.12"
       - name: Require tag commit to be on protected main
@@ -151,14 +151,15 @@ jobs:
             exit 1
           fi
           printf '%s\n' "$ALLOWED_SIGNERS" > "$RUNNER_TEMP/kaoyan-forward-eval.allowed_signers"
-          python evals/forward_attestation.py verify \
+          python ci/trusted_forward_attestation.py verify \
             --repo . \
+            --binding-mode protected-main \
             --allowed-signers "$RUNNER_TEMP/kaoyan-forward-eval.allowed_signers"
       - name: Require tag to match manifest version
         id: meta
         run: python ci/release_metadata.py --expect-tag "$GITHUB_REF_NAME" --github-output "$GITHUB_OUTPUT"
       - name: Download verified Ubuntu artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: ${{ needs.validate.outputs.artifact }}
           path: dist

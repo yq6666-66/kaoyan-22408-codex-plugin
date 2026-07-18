@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Kaoyan 22408 dynamic forward evaluation evidence 1.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "complete",
+    "generated_at",
+    "source_revision",
+    "plugin_tree_sha256",
+    "cases_sha256",
+    "evaluator_sha256",
+    "codex_version",
+    "model",
+    "service_tier",
+    "route_summary",
+    "behavior_summary",
+    "route_results",
+    "behavior_results"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.2"},
+    "complete": {"const": true},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "source_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "plugin_tree_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "cases_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "evaluator_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "codex_version": {"type": "string", "minLength": 1},
+    "model": {"type": "string", "minLength": 1},
+    "service_tier": {"enum": ["fast", "flex"]},
+    "route_summary": {"$ref": "#/$defs/summary"},
+    "behavior_summary": {"$ref": "#/$defs/summary"},
+    "route_results": {
+      "type": "array",
+      "minItems": 60,
+      "maxItems": 60,
+      "items": {"$ref": "#/$defs/routeResult"}
+    },
+    "behavior_results": {
+      "type": "array",
+      "minItems": 24,
+      "maxItems": 24,
+      "items": {"$ref": "#/$defs/behaviorResult"}
+    }
+  },
+  "$defs": {
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["passed", "total"],
+      "properties": {
+        "passed": {"type": "integer", "minimum": 0},
+        "total": {"type": "integer", "minimum": 0}
+      }
+    },
+    "routeResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "expected_primary", "actual_primary", "passed", "rationale", "response_preview"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "expected_primary": {"type": "string", "minLength": 1},
+        "actual_primary": {"type": "string", "minLength": 1},
+        "passed": {"type": "boolean"},
+        "rationale": {"type": "string", "minLength": 1},
+        "response_preview": {"type": "string", "minLength": 1}
+      }
+    },
+    "behaviorResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "expected_primary", "actual_primary", "actor_response", "record_types", "evidence_tags", "judge", "passed"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "expected_primary": {"type": "string", "minLength": 1},
+        "actual_primary": {"type": "string", "minLength": 1},
+        "actor_response": {"type": "string", "minLength": 1},
+        "record_types": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"enum": ["StudyProfile", "ProgressSnapshot", "ReviewQueue"]}
+        },
+        "evidence_tags": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"enum": ["[用户材料]", "[原创练习]", "[官方核验]", "[待核验]"]}
+        },
+        "judge": {"$ref": "#/$defs/judge"},
+        "passed": {"type": "boolean"}
+      }
+    },
+    "judge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["passed", "primarySkillPassed", "criteria", "summary"],
+      "properties": {
+        "passed": {"type": "boolean"},
+        "primarySkillPassed": {"type": "boolean"},
+        "criteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["criterion", "passed", "evidence"],
+            "properties": {
+              "criterion": {"type": "string", "minLength": 1},
+              "passed": {"type": "boolean"},
+              "evidence": {"type": "string", "minLength": 1}
+            }
+          }
+        },
+        "summary": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

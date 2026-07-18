@@ -18,13 +18,13 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout trusted verifier from the protected base
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           ref: ${{ github.event.pull_request.base.sha }}
           path: trusted
           persist-credentials: false
       - name: Checkout exact candidate revision as untrusted data
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.sha }}
@@ -32,7 +32,7 @@ jobs:
           path: candidate
           persist-credentials: false
       - name: Set up Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: "3.12"
       - name: Install trusted verifier dependency
@@ -46,6 +46,8 @@ jobs:
             exit 1
           fi
           printf '%s\n' "$ALLOWED_SIGNERS" > "$RUNNER_TEMP/kaoyan-forward-eval.allowed_signers"
-          python trusted/evals/forward_attestation.py verify \
+          python trusted/ci/trusted_forward_attestation.py verify \
             --repo candidate \
+            --binding-mode pr \
+            --expected-head "${{ github.event.pull_request.head.sha }}" \
             --allowed-signers "$RUNNER_TEMP/kaoyan-forward-eval.allowed_signers"
