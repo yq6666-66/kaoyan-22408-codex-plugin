@@ -113,7 +113,7 @@ python scripts/build_release.py
 动态评测在已提交且输入树干净的版本上运行。评测器会生成证据和逐响应摘要清单：
 
 ```text
-python evals/run_forward_eval.py --model <可用的-Codex-模型>
+python evals/run_forward_eval.py --model <固定的-Codex-模型> --service-tier <固定服务层> --no-cache
 python evals/forward_attestation.py prepare --repo .
 ssh-keygen -Y sign -f <离线签名私钥路径> -n kaoyan-forward-eval tests/forward-eval-attestation.json
 ```
