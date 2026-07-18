@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+import re
 import sys
 import tempfile
 import unittest
@@ -26,6 +28,9 @@ class RepositoryMutationTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.repo = copy_as_committed_repo(Path(self.temporary.name) / "repo")
         self.plugin = self.repo / "plugins/kaoyan-22408"
+        self.version = json.loads(
+            (self.plugin / ".codex-plugin/plugin.json").read_text(encoding="utf-8")
+        )["version"]
 
     def tearDown(self) -> None:
         self.temporary.cleanup()
@@ -105,7 +110,7 @@ class RepositoryMutationTests(unittest.TestCase):
         path = self.repo / "README.md"
         path.write_text(
             path.read_text(encoding="utf-8").replace(
-                "当前版本：`1.2.0`", "当前版本：`9.9.9`"
+                f"当前版本：`{self.version}`", "当前版本：`9.9.9`"
             ),
             encoding="utf-8",
             newline="\n",
@@ -116,7 +121,9 @@ class RepositoryMutationTests(unittest.TestCase):
     def test_readme_install_ref_drift_is_rejected(self) -> None:
         path = self.repo / "README.md"
         path.write_text(
-            path.read_text(encoding="utf-8").replace("--ref v1.2.0", "--ref v9.9.9"),
+            path.read_text(encoding="utf-8").replace(
+                f"--ref v{self.version}", "--ref v9.9.9"
+            ),
             encoding="utf-8",
             newline="\n",
         )
@@ -127,7 +134,7 @@ class RepositoryMutationTests(unittest.TestCase):
         path = self.repo / "README.md"
         path.write_text(
             path.read_text(encoding="utf-8").replace(
-                "--branch v1.2.0", "--branch v9.9.9"
+                f"--branch v{self.version}", "--branch v9.9.9"
             ),
             encoding="utf-8",
             newline="\n",
@@ -137,10 +144,15 @@ class RepositoryMutationTests(unittest.TestCase):
 
     def test_changelog_version_drift_is_rejected(self) -> None:
         path = self.repo / "CHANGELOG.md"
+        mutated = re.sub(
+            rf"^## \[{re.escape(self.version)}\] - (?:Unreleased|\d{{4}}-\d{{2}}-\d{{2}})$",
+            "## [9.9.9] - Unreleased",
+            path.read_text(encoding="utf-8"),
+            count=1,
+            flags=re.MULTILINE,
+        )
         path.write_text(
-            path.read_text(encoding="utf-8").replace(
-                "## [1.2.0] - Unreleased", "## [9.9.9] - Unreleased"
-            ),
+            mutated,
             encoding="utf-8",
             newline="\n",
         )
