@@ -50,6 +50,7 @@ def build_evidence(repo: Path, generated_at: datetime) -> dict:
         "codex_version": "codex-cli attestation-test",
         "model": "test-model",
         "service_tier": "fast",
+        "cache_mode": "disabled",
         "route_summary": {"passed": len(route_cases), "total": len(route_cases)},
         "behavior_summary": {"passed": len(behavior_cases), "total": len(behavior_cases)},
         "route_results": [
@@ -184,6 +185,23 @@ class ForwardAttestationTests(unittest.TestCase):
     def test_rejects_unsigned_bundle(self) -> None:
         with self.assertRaisesRegex(AuthenticationError, "signature is missing"):
             self.verify()
+
+    def test_v12_local_prepare_rejects_unrelated_source_revision(self) -> None:
+        evidence = json.loads(self.evidence_path.read_text(encoding="utf-8"))
+        evidence["source_revision"] = "0" * 40
+        self.evidence_path.write_text(
+            json.dumps(evidence, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+        with self.assertRaisesRegex(AuthenticationError, "cat-file"):
+            prepare_statement(
+                self.repo,
+                self.evidence_path,
+                self.manifest_path,
+                self.statement_path,
+                now=self.now,
+            )
 
     def test_rejects_evidence_tampering_after_signature(self) -> None:
         self.sign()

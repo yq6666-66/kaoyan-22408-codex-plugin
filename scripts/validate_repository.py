@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import io
 import json
 import math
@@ -712,7 +713,11 @@ def check_git_history(repo: Path) -> None:
                 require(pattern.search(payload) is None, f"Git history contains a removed-system marker in {path or requested_id}")
 
 
-def check_forward_evidence(repo: Path) -> None:
+def check_forward_evidence(repo: Path, *, binding_mode: str = "pr") -> None:
+    require(
+        binding_mode in {"pr", "protected-main"},
+        "forward-evidence binding mode is invalid",
+    )
     bundle = {
         "evidence": repo / "tests" / "forward-eval-evidence.json",
         "response manifest": repo / "tests/forward-eval-response-manifest.json",
@@ -734,7 +739,14 @@ def check_forward_evidence(repo: Path) -> None:
     verifier = repo / "evals" / "verify_forward_evidence.py"
     require(verifier.is_file(), "forward-eval evidence exists but its verifier is missing")
     result = subprocess.run(
-        [sys.executable, str(verifier), "--max-age-days", "30"],
+        [
+            sys.executable,
+            str(verifier),
+            "--max-age-days",
+            "30",
+            "--binding-mode",
+            binding_mode,
+        ],
         cwd=repo,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -752,6 +764,7 @@ def validate_repo(
     *,
     verify_evidence: bool = True,
     scan_history: bool = True,
+    evidence_binding_mode: str = "pr",
 ) -> list[str]:
     repo = (repo or Path(__file__).resolve().parents[1]).resolve()
     plugin = repo / Path(*PLUGIN_RELATIVE_PATH.parts)
@@ -773,7 +786,7 @@ def validate_repo(
     if scan_history:
         check_git_history(repo)
     if verify_evidence:
-        check_forward_evidence(repo)
+        check_forward_evidence(repo, binding_mode=evidence_binding_mode)
     return [
         "manifest and marketplace",
         "12 Skills and openai.yaml files",
@@ -785,8 +798,15 @@ def validate_repo(
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--evidence-binding-mode",
+        choices=("pr", "protected-main"),
+        default="pr",
+    )
+    args = parser.parse_args()
     try:
-        results = validate_repo()
+        results = validate_repo(evidence_binding_mode=args.evidence_binding_mode)
     except (OSError, UnicodeError, ValidationError) as exc:
         print(f"[FAIL] {exc}", file=sys.stderr)
         return 1

@@ -40,14 +40,18 @@ def parse_utc(value: str) -> datetime:
     return parsed.astimezone(timezone.utc)
 
 
-def source_revision_matches_inputs(revision: str, schema_version: str) -> bool:
+def source_revision_matches_inputs(
+    revision: str,
+    schema_version: str,
+    binding_mode: str = "pr",
+) -> bool:
     relevant = [
         "plugins/kaoyan-22408",
         "tests/forward-cases.json",
         "tests/behavior-cases.json",
         "evals",
     ]
-    if schema_version == "1.1":
+    if not (schema_version == "1.2" and binding_mode == "protected-main"):
         checks = [
             ["git", "cat-file", "-e", f"{revision}^{{commit}}"],
             ["git", "merge-base", "--is-ancestor", revision, "HEAD"],
@@ -79,7 +83,9 @@ def verify_evidence(
     max_age_days: int = 30,
     *,
     check_source_revision: bool = True,
+    binding_mode: str = "pr",
 ) -> dict:
+    require(binding_mode in {"pr", "protected-main"}, "invalid evidence binding mode")
     evidence = load_json(evidence_path)
     schema = load_json(EVIDENCE_SCHEMA)
     Draft202012Validator.check_schema(schema)
@@ -110,7 +116,11 @@ def verify_evidence(
     )
     if check_source_revision:
         require(
-            source_revision_matches_inputs(evidence["source_revision"], evidence["schema_version"]),
+            source_revision_matches_inputs(
+                evidence["source_revision"],
+                evidence["schema_version"],
+                binding_mode,
+            ),
             "evaluation inputs are dirty or do not satisfy the evidence binding profile",
         )
 
@@ -165,9 +175,18 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--evidence", type=Path, default=EVIDENCE)
     parser.add_argument("--max-age-days", type=int, default=30)
+    parser.add_argument(
+        "--binding-mode",
+        choices=("pr", "protected-main"),
+        default="pr",
+    )
     args = parser.parse_args()
     try:
-        evidence = verify_evidence(args.evidence.resolve(), args.max_age_days)
+        evidence = verify_evidence(
+            args.evidence.resolve(),
+            args.max_age_days,
+            binding_mode=args.binding_mode,
+        )
     except (EvidenceError, OSError, ValueError) as exc:
         print(f"[FAIL] {exc}", file=sys.stderr)
         return 1

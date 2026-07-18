@@ -324,31 +324,30 @@ def validate_candidate_binding(repo: Path, evidence: dict[str, Any]) -> None:
         "tests/behavior-cases.json",
         "evals",
     ]
-    if evidence["schema_version"] == "1.1":
-        source_revision = evidence["source_revision"]
-        run_git(repo, "cat-file", "-e", f"{source_revision}^{{commit}}")
-        require(
-            subprocess.run(
-                ["git", "merge-base", "--is-ancestor", source_revision, "HEAD"],
-                cwd=repo,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                check=False,
-            ).returncode
-            == 0,
-            "evidence source revision must be an ancestor of the candidate HEAD",
-        )
-        require(
-            subprocess.run(
-                ["git", "diff", "--quiet", source_revision, "HEAD", "--", *relevant],
-                cwd=repo,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                check=False,
-            ).returncode
-            == 0,
-            "candidate evaluation inputs differ from the evaluated source revision",
-        )
+    source_revision = evidence["source_revision"]
+    run_git(repo, "cat-file", "-e", f"{source_revision}^{{commit}}")
+    require(
+        subprocess.run(
+            ["git", "merge-base", "--is-ancestor", source_revision, "HEAD"],
+            cwd=repo,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False,
+        ).returncode
+        == 0,
+        "evidence source revision must be an ancestor of the candidate HEAD",
+    )
+    require(
+        subprocess.run(
+            ["git", "diff", "--quiet", source_revision, "HEAD", "--", *relevant],
+            cwd=repo,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=False,
+        ).returncode
+        == 0,
+        "candidate evaluation inputs differ from the evaluated source revision",
+    )
     status = run_git(
         repo,
         "status",

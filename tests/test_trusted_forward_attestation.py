@@ -213,6 +213,10 @@ class TrustedForwardAttestationTests(unittest.TestCase):
         self.assertEqual(len(identities), 108)
 
     def test_rejects_wrong_v12_counts_and_unknown_profile(self) -> None:
+        cached = json.loads(json.dumps(self.evidence))
+        cached["cache_mode"] = "enabled"
+        with self.assertRaisesRegex(trusted.legacy.AuthenticationError, "schema violation"):
+            trusted.validate_evidence(self.repo, cached)
         short = json.loads(json.dumps(self.evidence))
         short["route_results"].pop()
         with self.assertRaisesRegex(trusted.legacy.AuthenticationError, "schema violation"):

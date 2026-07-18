@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 import re
+import signal
 import shutil
 import subprocess
 import sys
@@ -16,14 +17,15 @@ import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
-from pathlib import Path
-from typing import Any
+from pathlib import Path, PurePosixPath
+from typing import Any, Callable
 
 from jsonschema import Draft202012Validator
 
 from common import (
     BEHAVIOR_CASES,
     EVIDENCE,
+    EVIDENCE_SCHEMA,
     PLUGIN,
     REPO,
     RESPONSE_MANIFEST,
@@ -33,13 +35,21 @@ from common import (
     load_json,
     plugin_tree_sha256,
 )
-from forward_attestation import canonical_json_bytes, structured_response_manifest
+from forward_attestation import (
+    AuthenticationError,
+    canonical_json_bytes,
+    structured_response_manifest,
+    validate_evidence,
+    validate_response_manifest,
+)
 
 
 SCHEMAS = REPO / "evals" / "schemas"
 REPORT = REPO / "tests" / "forward-eval-report.md"
 PRINT_LOCK = threading.Lock()
 ABORT_EVENT = threading.Event()
+PROCESS_LOCK = threading.Lock()
+ACTIVE_PROCESSES: set[subprocess.Popen[str]] = set()
 
 
 class EvaluationError(RuntimeError):
@@ -66,6 +76,90 @@ def is_non_retryable_runtime_failure(detail: str) -> bool:
 def log(message: str) -> None:
     with PRINT_LOCK:
         print(message, flush=True)
+
+
+def register_process(process: subprocess.Popen[str]) -> None:
+    with PROCESS_LOCK:
+        ACTIVE_PROCESSES.add(process)
+
+
+def unregister_process(process: subprocess.Popen[str]) -> None:
+    with PROCESS_LOCK:
+        ACTIVE_PROCESSES.discard(process)
+
+
+def terminate_process_tree(
+    process: subprocess.Popen[str],
+    *,
+    platform: str = os.name,
+    grace_seconds: float = 2.0,
+) -> None:
+    """Terminate one managed Codex process and all descendants."""
+    if process.poll() is not None:
+        return
+    if platform == "nt":
+        creationflags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+        subprocess.run(
+            ["taskkill", "/PID", str(process.pid), "/T", "/F"],
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            creationflags=creationflags,
+        )
+    else:
+        try:
+            os.killpg(process.pid, signal.SIGTERM)
+        except ProcessLookupError:
+            pass
+    try:
+        process.wait(timeout=grace_seconds)
+        return
+    except subprocess.TimeoutExpired:
+        pass
+    if platform == "nt":
+        process.kill()
+    else:
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+    try:
+        process.wait(timeout=grace_seconds)
+    except subprocess.TimeoutExpired:
+        process.kill()
+        try:
+            process.wait(timeout=grace_seconds)
+        except subprocess.TimeoutExpired:
+            pass
+
+
+def terminate_active_processes(
+    *,
+    exclude: subprocess.Popen[str] | None = None,
+) -> None:
+    with PROCESS_LOCK:
+        processes = [process for process in ACTIVE_PROCESSES if process is not exclude]
+    for process in processes:
+        try:
+            terminate_process_tree(process)
+        finally:
+            unregister_process(process)
+
+
+def managed_popen(
+    command: list[str],
+    **kwargs: Any,
+) -> subprocess.Popen[str]:
+    """Launch a process in its own tree so another worker can stop it."""
+    if os.name == "nt":
+        kwargs["creationflags"] = kwargs.get("creationflags", 0) | getattr(
+            subprocess, "CREATE_NEW_PROCESS_GROUP", 0
+        )
+    else:
+        kwargs["start_new_session"] = True
+    process = subprocess.Popen(command, **kwargs)
+    register_process(process)
+    return process
 
 
 def resolve_codex(command: str, *, platform: str = os.name) -> str:
@@ -176,6 +270,84 @@ def relevant_inputs_are_clean() -> bool:
     return not output
 
 
+def source_revision_matches_inputs(revision: str) -> bool:
+    """Require the evaluated commit to contain every current relevant input."""
+    relevant = [
+        "plugins/kaoyan-22408",
+        "tests/forward-cases.json",
+        "tests/behavior-cases.json",
+        "evals",
+    ]
+    checks = [
+        ["git", "cat-file", "-e", f"{revision}^{{commit}}"],
+        ["git", "merge-base", "--is-ancestor", revision, "HEAD"],
+        ["git", "diff", "--quiet", revision, "HEAD", "--", *relevant],
+    ]
+    for command in checks:
+        if subprocess.run(
+            command,
+            cwd=REPO,
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        ).returncode != 0:
+            return False
+    return relevant_inputs_are_clean()
+
+
+def prepare_input_snapshot(root: Path, revision: str) -> Path:
+    """Materialize committed evaluation inputs without rereading the live tree."""
+    snapshot = root / "input-snapshot"
+    prefixes = [
+        "plugins/kaoyan-22408",
+        "tests/forward-cases.json",
+        "tests/behavior-cases.json",
+        "evals",
+    ]
+    listing = subprocess.run(
+        ["git", "ls-tree", "-r", "-z", revision, "--", *prefixes],
+        cwd=REPO,
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    if listing.returncode != 0:
+        detail = listing.stderr.decode("utf-8", "replace").strip()
+        raise EvaluationError(f"cannot snapshot evaluation inputs: {detail}")
+    entries = [entry for entry in listing.stdout.split(b"\0") if entry]
+    if not entries:
+        raise EvaluationError("committed evaluation input snapshot is empty")
+    for entry in entries:
+        try:
+            metadata, raw_path = entry.split(b"\t", 1)
+            mode, object_type, object_id = metadata.decode("ascii").split()
+            relative_text = raw_path.decode("utf-8")
+        except (ValueError, UnicodeDecodeError) as exc:
+            raise EvaluationError("Git returned a malformed evaluation snapshot entry") from exc
+        relative = PurePosixPath(relative_text)
+        if (
+            object_type != "blob"
+            or mode not in {"100644", "100755"}
+            or relative.is_absolute()
+            or ".." in relative.parts
+        ):
+            raise EvaluationError(f"unsupported evaluation snapshot entry: {relative_text}")
+        blob = subprocess.run(
+            ["git", "cat-file", "blob", object_id],
+            cwd=REPO,
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        if blob.returncode != 0:
+            detail = blob.stderr.decode("utf-8", "replace").strip()
+            raise EvaluationError(f"cannot read evaluation snapshot blob {object_id}: {detail}")
+        target = snapshot / Path(*relative.parts)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(blob.stdout)
+    return snapshot
+
+
 def validate_case_sets(route_data: dict[str, Any], behavior_data: dict[str, Any]) -> None:
     if route_data.get("schemaVersion") != "1.2" or len(route_data.get("cases", [])) != 60:
         raise EvaluationError("route cases must use schemaVersion 1.2 and contain exactly 60 cases")
@@ -187,24 +359,24 @@ def validate_case_sets(route_data: dict[str, Any], behavior_data: dict[str, Any]
         raise EvaluationError("evaluation case IDs must be unique")
 
 
-def prepare_workspace(root: Path) -> Path:
+def prepare_workspace(root: Path, snapshot: Path) -> Path:
     workspace = root / "workspace"
-    shutil.copytree(PLUGIN, workspace / "plugin")
-    shutil.copytree(SCHEMAS, workspace / "schemas")
+    shutil.copytree(snapshot / "plugins" / "kaoyan-22408", workspace / "plugin")
+    shutil.copytree(snapshot / "evals" / "schemas", workspace / "schemas")
     return workspace
 
 
-def plugin_prompt_context(*, full: bool) -> str:
+def plugin_prompt_context(plugin: Path = PLUGIN, *, full: bool) -> str:
     """Embed only hash-bound plugin inputs so actors never need filesystem tools."""
     files: list[Path] = [
-        PLUGIN / ".codex-plugin" / "plugin.json",
-        PLUGIN / "references" / "capability-routing-contract.md",
+        plugin / ".codex-plugin" / "plugin.json",
+        plugin / "references" / "capability-routing-contract.md",
     ]
     if full:
-        files.extend(sorted((PLUGIN / "references").glob("*")))
-        files.extend(sorted((PLUGIN / "skills").glob("*/SKILL.md")))
+        files.extend(sorted((plugin / "references").glob("*")))
+        files.extend(sorted((plugin / "skills").glob("*/SKILL.md")))
     else:
-        for skill_file in sorted((PLUGIN / "skills").glob("*/SKILL.md")):
+        for skill_file in sorted((plugin / "skills").glob("*/SKILL.md")):
             text = skill_file.read_text(encoding="utf-8")
             parts = text.split("---", 2)
             if len(parts) != 3:
@@ -220,7 +392,7 @@ def plugin_prompt_context(*, full: bool) -> str:
         text = path.read_text(encoding="utf-8")
         if not full and path.name == "SKILL.md":
             text = f"---{text.split('---', 2)[1]}---"
-        relative = path.relative_to(PLUGIN).as_posix()
+        relative = path.relative_to(plugin).as_posix()
         sections.append(f"===== {relative} =====\n{text}")
     return "\n\n".join(sections)
 
@@ -272,30 +444,46 @@ def structured_call(
             "PYTHONIOENCODING": "utf-8",
         }
     )
-    completed = subprocess.run(
+    process = managed_popen(
         command,
-        input=prompt,
         cwd=workspace,
         env=env,
-        check=False,
-        capture_output=True,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
         text=True,
         encoding="utf-8",
         errors="replace",
-        timeout=timeout,
     )
-    if completed.returncode != 0:
+    try:
+        try:
+            stdout, stderr = process.communicate(input=prompt, timeout=timeout)
+        except subprocess.TimeoutExpired as exc:
+            terminate_process_tree(process)
+            stdout, stderr = process.communicate()
+            raise subprocess.TimeoutExpired(
+                command,
+                timeout,
+                output=stdout,
+                stderr=stderr,
+            ) from exc
         detail = "\n".join(
             part.strip()
-            for part in (completed.stdout, completed.stderr)
+            for part in (stdout, stderr)
             if part and part.strip()
         )
         if is_non_retryable_runtime_failure(detail):
             ABORT_EVENT.set()
+            terminate_active_processes(exclude=process)
             raise NonRetryableEvaluationError(
                 f"Codex runtime reported a non-retryable account limit: {detail[-2000:]}"
             )
-        raise EvaluationError(f"Codex call failed ({completed.returncode}): {detail[-6000:]}")
+        if process.returncode != 0:
+            raise EvaluationError(f"Codex call failed ({process.returncode}): {detail[-6000:]}")
+    finally:
+        if process.poll() is None:
+            terminate_process_tree(process)
+        unregister_process(process)
     if not result_path.is_file():
         raise EvaluationError("Codex did not write --output-last-message")
     try:
@@ -344,11 +532,129 @@ def cached_call(
             time.sleep(min(2 ** attempt, 4))
     else:  # pragma: no cover - the loop always breaks or raises
         raise EvaluationError(f"structured call failed: {last_error}")
-    cache_path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = cache_path.with_suffix(cache_path.suffix + ".tmp")
-    temporary.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
-    temporary.replace(cache_path)
+    if not no_cache:
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        temporary = cache_path.with_suffix(cache_path.suffix + ".tmp")
+        temporary.write_text(
+            json.dumps(result, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+        temporary.replace(cache_path)
     return result
+
+
+def stable_unique(values: list[str]) -> list[str]:
+    return list(dict.fromkeys(values))
+
+
+def evaluate_cases_parallel(
+    cases: list[dict[str, Any]],
+    evaluator: Callable[..., dict[str, Any]],
+    *,
+    workers: int,
+    common: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Run cases while cancelling pending work and process trees on failure."""
+    executor = ThreadPoolExecutor(max_workers=workers)
+    futures = {
+        executor.submit(evaluator, case, **common): case["id"]
+        for case in cases
+    }
+    results: list[dict[str, Any]] = []
+    try:
+        for future in as_completed(futures):
+            results.append(future.result())
+    except BaseException:
+        ABORT_EVENT.set()
+        for future in futures:
+            future.cancel()
+        terminate_active_processes()
+        executor.shutdown(wait=True, cancel_futures=True)
+        raise
+    executor.shutdown(wait=True, cancel_futures=True)
+    results.sort(key=lambda item: item["id"])
+    return results
+
+
+def atomic_write_bytes(path: Path, payload: bytes) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary_name = tempfile.mkstemp(
+        dir=path.parent,
+        prefix=f".{path.name}.",
+        suffix=".tmp",
+    )
+    temporary = Path(temporary_name)
+    try:
+        with os.fdopen(descriptor, "wb") as stream:
+            stream.write(payload)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+    finally:
+        if temporary.exists():
+            temporary.unlink()
+
+
+def publish_evidence_artifacts(
+    evidence: dict[str, Any],
+    *,
+    version: str,
+    evidence_path: Path,
+    response_manifest_path: Path,
+    report_path: Path,
+) -> None:
+    """Validate the complete bundle before atomically replacing any artifact."""
+    manifest = structured_response_manifest(evidence)
+    validate_evidence(REPO, evidence)
+    validate_response_manifest(evidence, manifest)
+    evidence_bytes = (json.dumps(evidence, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+    manifest_bytes = canonical_json_bytes(manifest)
+    report_bytes = render_report(evidence, version=version).encode("utf-8")
+    atomic_write_bytes(evidence_path, evidence_bytes)
+    atomic_write_bytes(response_manifest_path, manifest_bytes)
+    atomic_write_bytes(report_path, report_bytes)
+
+
+def write_failure_diagnostics(
+    evidence: dict[str, Any],
+    *,
+    version: str,
+    output_root: Path,
+) -> Path:
+    """Preserve a failed run for diagnosis without touching formal artifacts."""
+    schema = load_json(EVIDENCE_SCHEMA)
+    errors = sorted(
+        Draft202012Validator(schema).iter_errors(evidence),
+        key=lambda error: list(error.absolute_path),
+    )
+    if errors:
+        raise EvaluationError(f"failed-run evidence violates schema: {errors[0].message}")
+    manifest = structured_response_manifest(evidence)
+    validate_response_manifest(evidence, manifest)
+    output_root.mkdir(parents=True, exist_ok=True)
+    stamp = re.sub(r"[^0-9A-Za-z]+", "-", evidence["generated_at"]).strip("-")
+    directory = Path(
+        tempfile.mkdtemp(
+            prefix=f"{evidence['source_revision'][:12]}-{stamp}-",
+            dir=output_root,
+        )
+    )
+    report = (
+        "# 非正式失败诊断\n\n"
+        "此目录不会被签名、打包或作为缓存复用。\n\n"
+        + render_report(evidence, version=version)
+    )
+    atomic_write_bytes(
+        directory / "forward-eval-evidence.json",
+        (json.dumps(evidence, ensure_ascii=False, indent=2) + "\n").encode("utf-8"),
+    )
+    atomic_write_bytes(
+        directory / "forward-eval-response-manifest.json",
+        canonical_json_bytes(manifest),
+    )
+    atomic_write_bytes(directory / "forward-eval-report.md", report.encode("utf-8"))
+    return directory
 
 
 def route_prompt(case: dict[str, Any], plugin_context: str) -> str:
@@ -478,6 +784,11 @@ def evaluate_behavior_case(
         result_path=results_dir / "actors" / f"{case['id']}.json",
         timeout=timeout,
     )
+    actor = {
+        **actor,
+        "recordTypes": stable_unique(actor["recordTypes"]),
+        "evidenceTags": stable_unique(actor["evidenceTags"]),
+    }
     judge = cached_call(
         cache_path=cache_dir / "judges" / f"{case['id']}.json",
         no_cache=no_cache,
@@ -518,8 +829,8 @@ def evaluate_behavior_case(
     }
 
 
-def render_report(evidence: dict[str, Any]) -> str:
-    version = load_json(PLUGIN / ".codex-plugin" / "plugin.json")["version"]
+def render_report(evidence: dict[str, Any], *, version: str | None = None) -> str:
+    version = version or load_json(PLUGIN / ".codex-plugin" / "plugin.json")["version"]
     failed_routes = [item["id"] for item in evidence["route_results"] if not item["passed"]]
     failed_behaviors = [item["id"] for item in evidence["behavior_results"] if not item["passed"]]
     route_failures = "、".join(failed_routes) if failed_routes else "无"
@@ -530,6 +841,7 @@ def render_report(evidence: dict[str, Any]) -> str:
 - Codex：{evidence['codex_version']}
 - 模型：{evidence['model']}
 - 服务层级：{evidence['service_tier']}
+- 缓存模式：{evidence['cache_mode']}
 - 源提交：{evidence['source_revision']}
 - 插件树 SHA-256：`{evidence['plugin_tree_sha256']}`
 - 测试集 SHA-256：`{evidence['cases_sha256']}`
@@ -567,40 +879,62 @@ def main() -> int:
     parser.add_argument("--evidence", type=Path, default=EVIDENCE)
     parser.add_argument("--response-manifest", type=Path, default=RESPONSE_MANIFEST)
     parser.add_argument("--report", type=Path, default=REPORT)
+    parser.add_argument(
+        "--failure-output-dir",
+        type=Path,
+        default=REPO / ".cache" / "forward-eval-failures",
+    )
     args = parser.parse_args()
 
-    route_data = load_json(ROUTE_CASES)
-    behavior_data = load_json(BEHAVIOR_CASES)
-    validate_case_sets(route_data, behavior_data)
-    plugin_hash = plugin_tree_sha256()
-    case_hash = cases_sha256()
-    evaluator_hash = evaluator_sha256()
-    print(f"plugin_tree_sha256={plugin_hash}")
-    print(f"cases_sha256={case_hash}")
-    print(f"evaluator_sha256={evaluator_hash}")
     if args.dry_run:
+        route_data = load_json(ROUTE_CASES)
+        behavior_data = load_json(BEHAVIOR_CASES)
+        validate_case_sets(route_data, behavior_data)
+        print(f"plugin_tree_sha256={plugin_tree_sha256()}")
+        print(f"cases_sha256={cases_sha256()}")
+        print(f"evaluator_sha256={evaluator_sha256()}")
         print("[OK] dry run: 60 route cases and 24 behavior cases are structurally valid")
         return 0
     if not args.model:
         parser.error("--model is required unless --dry-run is used")
-    if not args.allow_dirty and not relevant_inputs_are_clean():
+    if not args.no_cache:
+        parser.error("--no-cache is required for every non-dry-run evaluation")
+    if args.allow_dirty:
+        raise EvaluationError("--allow-dirty cannot produce formal evidence")
+    if not relevant_inputs_are_clean():
         raise EvaluationError("plugin, cases, or eval harness is dirty; commit inputs before official evaluation")
 
     codex = resolve_codex(args.codex)
     isolated_config = isolated_config_arguments()
     codex_version = run_checked([codex, "--version"])
     source_revision = run_checked(["git", "rev-parse", "HEAD"])
-    runtime_hash = hashlib.sha256(
-        f"{codex_version}\0{args.model}\0{args.service_tier}".encode("utf-8")
-    ).hexdigest()[:16]
-    cache_key = f"{plugin_hash}-{case_hash}-{evaluator_hash}-{runtime_hash}"
-    cache_dir = args.cache_dir.resolve() / cache_key
+    if not source_revision_matches_inputs(source_revision):
+        raise EvaluationError("source revision does not contain the clean evaluation inputs")
 
     with tempfile.TemporaryDirectory(prefix="kaoyan-22408-forward-eval-") as temporary:
         root = Path(temporary)
+        snapshot = prepare_input_snapshot(root, source_revision)
+        snapshot_plugin = snapshot / "plugins" / "kaoyan-22408"
+        snapshot_routes = snapshot / "tests" / "forward-cases.json"
+        snapshot_behaviors = snapshot / "tests" / "behavior-cases.json"
+        snapshot_evals = snapshot / "evals"
+        route_data = load_json(snapshot_routes)
+        behavior_data = load_json(snapshot_behaviors)
+        validate_case_sets(route_data, behavior_data)
+        plugin_hash = plugin_tree_sha256(snapshot_plugin)
+        case_hash = cases_sha256(snapshot_routes, snapshot_behaviors)
+        evaluator_hash = evaluator_sha256(snapshot_evals, relative_to=snapshot)
+        print(f"plugin_tree_sha256={plugin_hash}")
+        print(f"cases_sha256={case_hash}")
+        print(f"evaluator_sha256={evaluator_hash}")
+        runtime_hash = hashlib.sha256(
+            f"{codex_version}\0{args.model}\0{args.service_tier}".encode("utf-8")
+        ).hexdigest()[:16]
+        cache_key = f"{plugin_hash}-{case_hash}-{evaluator_hash}-{runtime_hash}"
+        cache_dir = args.cache_dir.resolve() / cache_key
         codex_home = prepare_isolated_codex_home(root)
         verify_mcp_isolation(codex, isolated_config, args.service_tier, codex_home)
-        workspace = prepare_workspace(root)
+        workspace = prepare_workspace(root, snapshot)
         results_dir = root / "results"
         common = {
             "codex": codex,
@@ -615,27 +949,35 @@ def main() -> int:
             "timeout": args.timeout,
             "retries": args.retries,
         }
-        route_common = {**common, "plugin_context": plugin_prompt_context(full=False)}
-        behavior_common = {**common, "plugin_context": plugin_prompt_context(full=True)}
-        route_results: list[dict[str, Any]] = []
-        with ThreadPoolExecutor(max_workers=args.workers) as executor:
-            futures = {
-                executor.submit(evaluate_route_case, case, **route_common): case["id"]
-                for case in route_data["cases"]
-            }
-            for future in as_completed(futures):
-                route_results.append(future.result())
-        route_results.sort(key=lambda item: item["id"])
-
-        behavior_results: list[dict[str, Any]] = []
-        with ThreadPoolExecutor(max_workers=args.workers) as executor:
-            futures = {
-                executor.submit(evaluate_behavior_case, case, **behavior_common): case["id"]
-                for case in behavior_data["cases"]
-            }
-            for future in as_completed(futures):
-                behavior_results.append(future.result())
-        behavior_results.sort(key=lambda item: item["id"])
+        snapshot_workspace_plugin = workspace / "plugin"
+        route_common = {
+            **common,
+            "plugin_context": plugin_prompt_context(snapshot_workspace_plugin, full=False),
+        }
+        behavior_common = {
+            **common,
+            "plugin_context": plugin_prompt_context(snapshot_workspace_plugin, full=True),
+        }
+        route_results = evaluate_cases_parallel(
+            route_data["cases"],
+            evaluate_route_case,
+            workers=args.workers,
+            common=route_common,
+        )
+        behavior_results = evaluate_cases_parallel(
+            behavior_data["cases"],
+            evaluate_behavior_case,
+            workers=args.workers,
+            common=behavior_common,
+        )
+        if (
+            not source_revision_matches_inputs(source_revision)
+            or plugin_tree_sha256() != plugin_hash
+            or cases_sha256() != case_hash
+            or evaluator_sha256() != evaluator_hash
+        ):
+            raise EvaluationError("evaluation inputs changed while the immutable snapshot was running")
+        plugin_version = load_json(snapshot_plugin / ".codex-plugin" / "plugin.json")["version"]
 
     route_passed = sum(item["passed"] for item in route_results)
     behavior_passed = sum(item["passed"] for item in behavior_results)
@@ -650,34 +992,43 @@ def main() -> int:
         "codex_version": codex_version,
         "model": args.model,
         "service_tier": args.service_tier,
+        "cache_mode": "disabled",
         "route_summary": {"passed": route_passed, "total": 60},
         "behavior_summary": {"passed": behavior_passed, "total": 24},
         "route_results": route_results,
         "behavior_results": behavior_results,
     }
-    args.evidence.parent.mkdir(parents=True, exist_ok=True)
-    args.response_manifest.parent.mkdir(parents=True, exist_ok=True)
-    args.report.parent.mkdir(parents=True, exist_ok=True)
-    args.evidence.write_text(
-        json.dumps(evidence, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-        newline="\n",
-    )
-    args.response_manifest.write_bytes(
-        canonical_json_bytes(structured_response_manifest(evidence))
-    )
-    args.report.write_text(render_report(evidence), encoding="utf-8", newline="\n")
     print(f"[RESULT] route={route_passed}/60 behavior={behavior_passed}/24")
+    if route_passed != 60 or behavior_passed != 24:
+        failure_directory = write_failure_diagnostics(
+            evidence,
+            version=plugin_version,
+            output_root=args.failure_output_dir.resolve(),
+        )
+        print("[RESULT] formal evidence artifacts were not replaced")
+        print(f"[RESULT] failure diagnostics={failure_directory}")
+        return 1
+    publish_evidence_artifacts(
+        evidence,
+        version=plugin_version,
+        evidence_path=args.evidence,
+        response_manifest_path=args.response_manifest,
+        report_path=args.report,
+    )
     print(f"[RESULT] evidence={args.evidence}")
     print(f"[RESULT] structured_response_manifest={args.response_manifest}")
-    if route_passed != 60 or behavior_passed != 24:
-        return 1
     return 0
 
 
 if __name__ == "__main__":
     try:
         raise SystemExit(main())
-    except (EvaluationError, OSError, ValueError, subprocess.TimeoutExpired) as exc:
+    except (
+        AuthenticationError,
+        EvaluationError,
+        OSError,
+        ValueError,
+        subprocess.TimeoutExpired,
+    ) as exc:
         print(f"[FAIL] {exc}", file=sys.stderr)
         raise SystemExit(1)

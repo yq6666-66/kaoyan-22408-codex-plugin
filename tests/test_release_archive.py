@@ -9,6 +9,7 @@ import unittest
 import warnings
 import zipfile
 from pathlib import Path
+from unittest.mock import patch
 
 
 REPO = Path(__file__).resolve().parents[1]
@@ -66,6 +67,18 @@ class ReleaseArchiveTests(unittest.TestCase):
         self.assertEqual(artifact.version, manifest["version"])
         self.assertEqual(artifact.archive.name, f"kaoyan-22408-{artifact.version}.zip")
         self.assertEqual(artifact.checksum.name, f"kaoyan-22408-{artifact.version}.zip.sha256")
+
+    def test_release_builder_passes_explicit_evidence_binding_mode(self) -> None:
+        with patch("build_release.validate_repo") as validate:
+            build_archive(
+                self.repo,
+                self.root / "protected-main.zip",
+                evidence_binding_mode="protected-main",
+            )
+        validate.assert_called_once_with(
+            self.repo.resolve(),
+            evidence_binding_mode="protected-main",
+        )
 
     def test_dirty_plugin_tree_is_rejected(self) -> None:
         manifest = self.repo / "plugins/kaoyan-22408/.codex-plugin/plugin.json"

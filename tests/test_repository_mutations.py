@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 
 REPO = Path(__file__).resolve().parents[1]
@@ -164,6 +166,23 @@ class RepositoryMutationTests(unittest.TestCase):
         evidence.write_text("{}\n", encoding="utf-8", newline="\n")
         with self.assertRaisesRegex(ValidationError, "bundle is incomplete"):
             check_forward_evidence(self.repo)
+
+    def test_forward_evidence_binding_mode_is_passed_explicitly(self) -> None:
+        tests = self.repo / "tests"
+        for name in (
+            "forward-eval-evidence.json",
+            "forward-eval-response-manifest.json",
+            "forward-eval-attestation.json",
+            "forward-eval-attestation.json.sig",
+        ):
+            (tests / name).write_text("{}\n", encoding="utf-8", newline="\n")
+        completed = subprocess.CompletedProcess([], 0, stdout="[OK]", stderr="")
+        with patch("validate_repository.subprocess.run", return_value=completed) as run:
+            check_forward_evidence(self.repo, binding_mode="protected-main")
+        command = run.call_args.args[0]
+        self.assertEqual(command[-2:], ["--binding-mode", "protected-main"])
+        with self.assertRaisesRegex(ValidationError, "binding mode"):
+            check_forward_evidence(self.repo, binding_mode="unsafe")
 
     def test_deleted_secret_is_still_rejected_from_git_history(self) -> None:
         path = self.repo / "private-note.txt"

@@ -126,6 +126,8 @@ python evals/forward_attestation.py verify --repo . --allowed-signers <仓库外
 
 `evals/verify_forward_evidence.py` 只检查仓库内证据的一致性，不能证明模型运行来源；它不替代上述分离签名门禁。签名有效期最多 30 天，且签名锁定源提交、插件树、测试集、评测器、完整证据字节和 108 份结构化响应摘要（60 份路由响应、24 份行为响应与 24 份独立 judge 结果）。正式门禁要求路由 `60/60`、行为 `24/24`，并拒绝混用模型、服务层或失败缓存。
 
+非 dry-run 评测必须显式使用 `--no-cache`，证据同时记录 `cache_mode: disabled`。未达到完整门禁时不会覆盖仓库中的正式证据；仅把诊断副本写入被 Git 忽略的 `.cache/forward-eval-failures/`，且后续运行不会读取这些副本。
+
 版本记录见 [CHANGELOG.md](CHANGELOG.md)。
 
 ## 支持与许可
