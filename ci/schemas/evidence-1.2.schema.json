@@ -14,6 +14,7 @@
     "codex_version",
     "model",
     "service_tier",
+    "cache_mode",
     "route_summary",
     "behavior_summary",
     "route_results",
@@ -30,6 +31,7 @@
     "codex_version": {"type": "string", "minLength": 1},
     "model": {"type": "string", "minLength": 1},
     "service_tier": {"enum": ["fast", "flex"]},
+    "cache_mode": {"const": "disabled"},
     "route_summary": {"$ref": "#/$defs/summary"},
     "behavior_summary": {"$ref": "#/$defs/summary"},
     "route_results": {

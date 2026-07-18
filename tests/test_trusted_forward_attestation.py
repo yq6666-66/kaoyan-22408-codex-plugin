@@ -60,7 +60,7 @@ def build_evidence(repo: Path, schema_version: str, now: datetime) -> dict:
     behavior_cases = json.loads(
         (repo / "tests/behavior-cases.json").read_text(encoding="utf-8")
     )["cases"]
-    return {
+    evidence = {
         "schema_version": schema_version,
         "complete": True,
         "generated_at": now.isoformat().replace("+00:00", "Z"),
@@ -113,6 +113,9 @@ def build_evidence(repo: Path, schema_version: str, now: datetime) -> dict:
             for case in behavior_cases
         ],
     }
+    if schema_version == "1.2":
+        evidence["cache_mode"] = "disabled"
+    return evidence
 
 
 class TrustedForwardAttestationTests(unittest.TestCase):
@@ -225,6 +228,16 @@ class TrustedForwardAttestationTests(unittest.TestCase):
         unknown["schema_version"] = "9.9"
         with self.assertRaisesRegex(trusted.legacy.AuthenticationError, "unsupported"):
             trusted.validate_evidence(self.repo, unknown)
+
+    def test_v12_requires_disabled_cache_mode(self) -> None:
+        missing = json.loads(json.dumps(self.evidence))
+        missing.pop("cache_mode")
+        with self.assertRaisesRegex(trusted.legacy.AuthenticationError, "schema violation"):
+            trusted.validate_evidence(self.repo, missing)
+        enabled = json.loads(json.dumps(self.evidence))
+        enabled["cache_mode"] = "enabled"
+        with self.assertRaisesRegex(trusted.legacy.AuthenticationError, "schema violation"):
+            trusted.validate_evidence(self.repo, enabled)
 
     def test_pr_binding_rejects_wrong_event_head(self) -> None:
         self.sign()
