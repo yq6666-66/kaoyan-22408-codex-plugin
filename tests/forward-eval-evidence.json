@@ -1,0 +1,716 @@
+{
+  "schema_version": "1.1",
+  "complete": true,
+  "generated_at": "2026-07-18T12:44:18.339954Z",
+  "source_revision": "4919ee2e6c57c4338b5eced34ba0e7ea12503c1a",
+  "plugin_tree_sha256": "5254a0a9fd9513302721578024c6a8c1cab06d7d13d4925546677b4a7f3d132c",
+  "cases_sha256": "13e4164055efbbd082d5f1e83165a2afd0401586e6fb61c702d833ec782df31b",
+  "evaluator_sha256": "36f538f1dcf9553b01acc7ac25a145295eeea9785e0fff2e2dfb891b128fcaeb",
+  "codex_version": "codex-cli 0.144.4",
+  "model": "gpt-5.6-sol",
+  "service_tier": "fast",
+  "route_summary": {
+    "passed": 36,
+    "total": 36
+  },
+  "behavior_summary": {
+    "passed": 12,
+    "total": 12
+  },
+  "route_results": [
+    {
+      "id": "408-C1",
+      "expected_primary": "kaoyan-error-loop-coach",
+      "actual_primary": "kaoyan-error-loop-coach",
+      "passed": true,
+      "rationale": "用户要求对多道错题进行根因聚类并安排间隔复测，正属于跨题错因闭环；不是讲解某一道 408 题，因此不由 408 学科辅导 Skill 主责。",
+      "response_preview": "可以。请把最近 12 道 408 错题的题目或题目摘要、你的作答、正确答案，以及你当时的思路/订正发来；我会先按知识缺口、概念混淆、条件遗漏、推理失误和计算/操作失误等有证据的根因聚类，再给出下周复测队列与掌握判据。"
+    },
+    {
+      "id": "408-P1",
+      "expected_primary": "kaoyan-408-tutor",
+      "actual_primary": "kaoyan-408-tutor",
+      "passed": true,
+      "rationale": "用户要分析一道题面不完整的中断相关 408 单题，并判断现有信息能支持哪些结论；这属于 408 单题与题面缺失处理，不是错题聚类或模考。",
+      "response_preview": "可以先做“最小充分信息”判断：缺一个选项不代表整题无法分析，但当前消息里还没有题干和其余选项。请贴出完整题干、已有选项，并标明缺失选项的位置；我会分别列出必然成立、必然不成立和暂时无法判断的结论，不猜补缺失内容。"
+    },
+    {
+      "id": "408-P2",
+      "expected_primary": "kaoyan-408-tutor",
+      "actual_primary": "kaoyan-408-tutor",
+      "passed": true,
+      "rationale": "用户要核对一道 Cache 单题的解法与参考答案冲突，属于计算机组成原理单题分析；应先获取完整题面、选项及用户推导，再逐步定位分歧依据。",
+      "response_preview": "可以。请把完整题干、A–D 选项，以及你选 B 的计算或判断过程发来；若题中有 Cache 容量、块大小、映射方式、地址位数、替换策略或写策略，也请一并保留。我会先统一题设口径，再逐步计算并指出 B 与 D 从哪一步开始分歧。"
+    },
+    {
+      "id": "diagnostician-C1",
+      "expected_primary": "kaoyan-review-executor",
+      "actual_primary": "kaoyan-review-executor",
+      "passed": true,
+      "rationale": "用户已有确认的周计划，当前只要求拆成明天这一单次执行清单，不涉及跨周配额、阶段权衡或进度诊断，符合单次学习时段执行器的边界。",
+      "response_preview": "可以。请把已确认周计划中“明天”的科目、任务和可用总时长贴出来；我会直接拆成按顺序执行的时间盒清单，不分析原因，也不改动周计划。"
+    },
+    {
+      "id": "diagnostician-P1",
+      "expected_primary": "kaoyan-progress-diagnostician",
+      "actual_primary": "kaoyan-progress-diagnostician",
+      "passed": true,
+      "rationale": "用户提供了本周计划时长、实际完成时长及数学做题正确率，主任务是依据现有记录诊断进度偏差与风险；不应直接重写完整计划。",
+      "response_preview": "本周主要有两项明显风险：时间计划完成率为 70%（21/30 小时），存在 9 小时缺口；数学正确率为 55%（22/40），说明当前训练效果偏弱。不过，仅凭总正确率还无法区分是知识点不牢、计算失误，还是题目难度偏高。"
+    },
+    {
+      "id": "diagnostician-P2",
+      "expected_primary": "kaoyan-progress-diagnostician",
+      "actual_primary": "kaoyan-progress-diagnostician",
+      "passed": true,
+      "rationale": "用户要比较两期 ProgressSnapshot，识别各科进度或表现是否恶化，核心意图是基于既有记录诊断偏差与风险；不应直接重写计划。当前消息未包含两期快照，因此实际响应应先索取这两份记录。",
+      "response_preview": "请把两期 ProgressSnapshot 都粘贴出来，并标明各自日期（或“较早/较新”）。我会按科目对比完成量、正确率、实际投入和阻塞项，指出哪科正在恶化、判断依据，以及数据不足之处。"
+    },
+    {
+      "id": "english2-C1",
+      "expected_primary": "kaoyan-error-loop-coach",
+      "actual_primary": "kaoyan-error-loop-coach",
+      "passed": true,
+      "rationale": "用户要对过去两周的多道英语错题进行跨题根因聚类，并安排间隔复测，核心是错题闭环，而不是英语单题讲解。需要用户提供当前会话中的错题记录，不能假设已保存历史数据。",
+      "response_preview": "可以。请把过去两周的英语错题记录发来，至少包含题目或关键文本、你的答案、正确答案；若有当时的思路或错因备注也一并附上。我会按知识、理解、策略与执行等根因归组，并为每组安排间隔复测和掌握判据。"
+    },
+    {
+      "id": "english2-P1",
+      "expected_primary": "kaoyan-english2-coach",
+      "actual_primary": "kaoyan-english2-coach",
+      "passed": true,
+      "rationale": "用户要求批改英语二图表作文，并重点评估任务完成度、逻辑与语言，属于英语二写作批改的直接职责；不涉及跨题复测、模考或材料摘要。",
+      "response_preview": "可以。请把图表题目（含图表信息和写作要求）以及你的作文原文完整贴出；我会从任务完成度、逻辑结构和语言质量三方面逐项批改，并给出具体修改建议与一版参考润色稿。"
+    },
+    {
+      "id": "english2-P2",
+      "expected_primary": "kaoyan-english2-coach",
+      "actual_primary": "kaoyan-english2-coach",
+      "passed": true,
+      "rationale": "用户要分析英语二阅读中的长难句并检查中文翻译，属于英语二精读、句法分析与翻译润色；不是材料摘要或跨题复测。实际处理前只需用户提供英文原句和自己的译文。",
+      "response_preview": "请把英文长难句和你的中文翻译贴出来。我会先拆分句子主干、从句与修饰成分，再核对关键词义、逻辑关系和译文准确性，最后给出修改版翻译。"
+    },
+    {
+      "id": "error-loop-C1",
+      "expected_primary": "kaoyan-408-tutor",
+      "actual_primary": "kaoyan-408-tutor",
+      "passed": true,
+      "rationale": "用户要从零讲解一道 408 页面置换算法单题，属于操作系统概念与单题辅导；但当前未提供题面，因此应先索取完整题目，而不是猜测条件。",
+      "response_preview": "可以。请把完整题面发来（文字或清晰图片均可），尤其要包含页面访问序列、页框数量、采用的置换算法，以及初始页框是否为空。我会从算法直觉开始，逐步模拟每次访问、标出缺页与淘汰页，最后核对缺页次数或缺页率。"
+    },
+    {
+      "id": "error-loop-P1",
+      "expected_primary": "kaoyan-error-loop-coach",
+      "actual_primary": "kaoyan-error-loop-coach",
+      "passed": true,
+      "rationale": "用户要求对多道错题按根因聚类，并安排多次间隔复测，正属于跨题错因闭环；不是单题讲解或单题错误定位。当前未提供三道题及作答记录，因此实际响应应先索取会改变聚类结果的最小证据。",
+      "response_preview": "可以。请把三道信号量题的题面、你的答案或关键步骤、参考答案（如有）一并贴出；我会先按知识点与根因聚类，再为每一类安排 3 次递进复测，并用独立作答和迁移表现判断是否掌握。"
+    },
+    {
+      "id": "error-loop-P2",
+      "expected_primary": "kaoyan-error-loop-coach",
+      "actual_primary": "kaoyan-error-loop-coach",
+      "passed": true,
+      "rationale": "用户要根据间隔一周后的复测表现判断是否掌握，并索要复测标准；这属于掌握证据判定与间隔复测，而不是单题讲解。",
+      "response_preview": "今天做对是积极证据，但单次原题复现还不能直接算“已掌握”。建议把掌握分为“暂时通过”和“稳定掌握”：先确认本次是在不看答案、提示和旧笔记的情况下独立完成，且能说清关键极限条件与每一步依据；再安排变式迁移和后续间隔复测。"
+    },
+    {
+      "id": "executor-C1",
+      "expected_primary": "kaoyan-22408-planner",
+      "actual_primary": "kaoyan-22408-planner",
+      "passed": true,
+      "rationale": "用户要求从当前时间倒排至初试，属于长期路线、阶段安排与跨科配额规划；即使尚无既有计划，也应由规划师主责，而非单次学习时段执行器。",
+      "response_preview": "可以。我会从现在倒排到初试，为数学二、英语二、408 和政治划分复习阶段、每周时间配额与阶段验收目标。开始前请补充三个会显著影响计划的信息：目标初试年份或日期、每周可稳定投入的小时数，以及四科目前的大致基础。"
+    },
+    {
+      "id": "executor-P1",
+      "expected_primary": "kaoyan-review-executor",
+      "actual_primary": "kaoyan-review-executor",
+      "passed": true,
+      "rationale": "用户已提供既有周计划、本次科目与总时长，目标是将其展开为今天一次 4 小时学习时段的可执行清单；即使涉及多科，也不涉及跨周配额或长期路线调整。",
+      "response_preview": "今天 4 小时按“数学二 → 408 → 英语阅读 → 收尾复盘”执行：先用 100 分钟完成数学二 2 单元，再用 100 分钟完成 408 2 单元，接着用 35 分钟完成英语阅读 1 篇，最后留 5 分钟记录完成情况与遗留问题；中间安排两次各 10 分钟休息。"
+    },
+    {
+      "id": "executor-P2",
+      "expected_primary": "kaoyan-review-executor",
+      "actual_primary": "kaoyan-review-executor",
+      "passed": true,
+      "rationale": "用户已明确给出本次时长（今晚 3 小时）、科目和目标，需求是把它们拆成本次可执行的时间盒；即使涉及数学二和 408 两科，也不涉及跨周配额或长期路线，因此由单次学习执行器主责。",
+      "response_preview": "今晚 3 小时按“数学二极限专项 100 分钟＋休息 10 分钟＋408 数据结构复习 65 分钟＋收尾 5 分钟”执行。数学先做限时诊断与专项题，再集中订正；408 以核心结构主动回忆、典型操作梳理和小测验完成闭环。"
+    },
+    {
+      "id": "material-C1",
+      "expected_primary": "kaoyan-408-tutor",
+      "actual_primary": "kaoyan-408-tutor",
+      "passed": true,
+      "rationale": "用户的核心目标是讲解 408 操作系统中的页面置换概念并解答附题，属于具体学科概念与题目辅导；虽然内容来自上传的讲义片段，但目标不是摘要或重组材料，因此不应路由到材料助手。",
+      "response_preview": "我会先结合你上传的讲义片段，把页面置换的触发条件、基本流程以及常见算法（如 FIFO、LRU、OPT）的区别讲清楚，再逐步解答附题并说明每次缺页和页面淘汰的依据。"
+    },
+    {
+      "id": "material-P1",
+      "expected_primary": "kaoyan-material-study-assistant",
+      "actual_primary": "kaoyan-material-study-assistant",
+      "passed": true,
+      "rationale": "用户要把当前会话粘贴的讲义加工为摘要、问答卡片和原创练习，核心意图是材料的压缩与学习化重组，而不是讲解操作系统概念或分析具体题目。",
+      "response_preview": "可以。请把操作系统讲义粘贴过来；我会严格依据你提供的内容，整理成结构化摘要、问答卡片和 5 道原创练习，不补入讲义之外的事实。"
+    },
+    {
+      "id": "material-P2",
+      "expected_primary": "kaoyan-material-study-assistant",
+      "actual_primary": "kaoyan-material-study-assistant",
+      "passed": true,
+      "rationale": "用户要把其提供的教材片段重组为概念图式提纲并生成自测题，核心是对现有材料进行学习化加工，而非讲解具体学科概念或分析真题。",
+      "response_preview": "可以。请把教材的两段内容贴出来；我会严格依据原文整理概念图式提纲，并配套生成用于主动回忆的自测题，不补入材料外的信息。"
+    },
+    {
+      "id": "math2-C1",
+      "expected_primary": "kaoyan-mock-exam-coach",
+      "actual_primary": "kaoyan-mock-exam-coach",
+      "passed": true,
+      "rationale": "用户要求用原创题组织限时测验，并明确交卷后统一评分，正符合模考教练的主责边界；交卷前应冻结题面，不讲解答案或透露评分线索。",
+      "response_preview": "下面开始一场 30 分钟高数计时测验。题目均为原创；请你自行计时，作答期间我不提供提示、答案或评分线索。完成后请一次性提交全部答案，并明确写“交卷”，我再统一评分和复盘。"
+    },
+    {
+      "id": "math2-P1",
+      "expected_primary": "kaoyan-math2-coach",
+      "actual_primary": "kaoyan-math2-coach",
+      "passed": true,
+      "rationale": "用户要讲解一道数学二的二元函数极值单题，并理解拉格朗日乘数法的适用条件，属于数学概念与单题辅导；但当前未提供具体题面，需要先索取题目。",
+      "response_preview": "可以。请把这道二元函数极值题的完整题面（包括目标函数、约束条件和定义域；图片也可以）发来。我会先判断它是无条件极值还是条件极值，再逐步求驻点、检查极值，并结合本题说明拉格朗日乘数法何时适用。"
+    },
+    {
+      "id": "math2-P2",
+      "expected_primary": "kaoyan-math2-coach",
+      "actual_primary": "kaoyan-math2-coach",
+      "passed": true,
+      "rationale": "用户要定位数学二求导中的具体错误，并围绕当前薄弱点进行原创专项训练；未提供多题记录，也未要求跨题聚类、间隔复测或长期掌握判断，因此由数学二辅导 Skill 主责。",
+      "response_preview": "你的核心错因大概率不是“不会求导”，而是没有把复合函数先拆成“外层函数 + 内层函数”，导致求导时只处理了内层表达式。可以固定使用一个检查动作：每次先写出 u=g(x)，再按 f'(u)·u' 求导；下面用 3 题从单层复合、易漏系数到多层复合逐级训练。"
+    },
+    {
+      "id": "mock-C1",
+      "expected_primary": "kaoyan-math2-coach",
+      "actual_primary": "kaoyan-math2-coach",
+      "passed": true,
+      "rationale": "用户要的是数学二导数专项练习，并要求每题后立即讲解，属于原创专项训练与单题即时辅导；不具备统一交卷、交卷前冻结答案等模考特征。",
+      "response_preview": "可以。下面按“题目 → 答案 → 讲解”的顺序逐题进行。第 1 题：设函数 f(x)=x²eˣ，求 f′(x)。答案：f′(x)=eˣ(x²+2x)。讲解：使用乘积求导法则，f′(x)=(x²)′eˣ+x²(eˣ)′=2xeˣ+x²eˣ=eˣ(x²+2x)。"
+    },
+    {
+      "id": "mock-P1",
+      "expected_primary": "kaoyan-mock-exam-coach",
+      "actual_primary": "kaoyan-mock-exam-coach",
+      "passed": true,
+      "rationale": "用户要求生成原创章节测，明确限时 25 分钟，并要求交卷后才公布答案，属于冻结题面、统一交卷后评分复盘的模考流程；交卷前不得泄露答案或评分线索。",
+      "response_preview": "下面是数据结构章节测，共 8 道原创题，限时 25 分钟。请自行计时并一次性提交全部答案；在你明确回复“交卷”前，我不会公布答案、解析或评分线索。"
+    },
+    {
+      "id": "mock-P2",
+      "expected_primary": "kaoyan-mock-exam-coach",
+      "actual_primary": "kaoyan-mock-exam-coach",
+      "passed": true,
+      "rationale": "用户要求将其有权使用的 5 道题按原顺序组织为计时测验，并在提交后统一评分，符合“冻结题面、自主计时、统一交卷后评分”的模考流程。",
+      "response_preview": "可以。我会保持 5 道题的原顺序和题面不变，交卷前不提供答案、提示或评分线索；请把这 5 道题贴出，并告知计划用时。你明确回复“交卷”后，我再统一评分和复盘。"
+    },
+    {
+      "id": "official-C1",
+      "expected_primary": "kaoyan-politics-coach",
+      "actual_primary": "kaoyan-politics-coach",
+      "passed": true,
+      "rationale": "用户要求讲解马克思主义认识论中的理论概念，且明确不需要当前政策；这属于政治理论辅导，而非官方信息核验。",
+      "response_preview": "实践与认识是辩证统一的关系：实践是认识的基础，认识反过来指导实践。理解这组关系，可以抓住“实践决定认识”和“认识反作用于实践”两条主线。"
+    },
+    {
+      "id": "official-P1",
+      "expected_primary": "kaoyan-official-info-researcher",
+      "actual_primary": "kaoyan-official-info-researcher",
+      "passed": true,
+      "rationale": "用户要求核验“今年”的考研报名时间和初试安排，属于会随年度变化的官方招考信息；应联网查验教育部、中国研究生招生信息网等一手官方来源，不能依赖模型记忆或二手信息。",
+      "response_preview": "我会以教育部和中国研究生招生信息网发布的当年官方公告为准，核验网上预报名、正式报名、网上确认及初试日期与每日考试时段，并附上对应官方来源；若“今年”存在考试年度与招生年度的口径差异，我会同时明确说明。"
+    },
+    {
+      "id": "official-P2",
+      "expected_primary": "kaoyan-official-info-researcher",
+      "actual_primary": "kaoyan-official-info-researcher",
+      "passed": true,
+      "rationale": "用户要核验“今年”的院校招生目录，属于当前招生信息的官方核验；院校名称是会改变检索结果的必要最小补充项。",
+      "response_preview": "可以。请补充目标院校的完整名称；如果该校有多个校区或学院，也请一并注明。我会以该校研究生院、招生网等官方一手页面为准，核验今年 085404 的招生学院、研究方向、学习方式、拟招人数、考试科目及备注要求。"
+    },
+    {
+      "id": "past-paper-C1",
+      "expected_primary": "kaoyan-material-study-assistant",
+      "actual_primary": "kaoyan-material-study-assistant",
+      "passed": true,
+      "rationale": "用户明确要把当前会话提供的老师讲义整理为摘要和记忆卡片，属于材料压缩与学习化加工；且已说明不是真题，因此不路由到真题分析师。",
+      "response_preview": "可以。请把这页讲义以图片、文件或文字形式发来；我会仅依据你提供的内容，先整理一版结构化摘要，再制作适合主动回忆的记忆卡片。"
+    },
+    {
+      "id": "past-paper-P1",
+      "expected_primary": "kaoyan-past-paper-analyst",
+      "actual_primary": "kaoyan-past-paper-analyst",
+      "passed": true,
+      "rationale": "用户要分析其已上传且有权使用的三年 408 真题，目标是统计多份真题的章节分布与能力层次，属于真题样本的结构、考点和有限趋势分析；不是单题讲解或材料摘要。",
+      "response_preview": "我会仅依据你本次会话上传且有权使用的三年 408 真题，逐题标注所属科目与章节，并按识记理解、分析推理、综合应用等能力层次编码，汇总各年及三年合计的题量、分值与占比；对题面不清或跨章节题目会单独标记，不补全未提供内容。"
+    },
+    {
+      "id": "past-paper-P2",
+      "expected_primary": "kaoyan-past-paper-analyst",
+      "actual_primary": "kaoyan-past-paper-analyst",
+      "passed": true,
+      "rationale": "用户要比较其当前会话提供的两套英语二真题，目标是分析真题样本中的阅读题型与干扰项特征，属于真题结构、考点及有限趋势比较；并非针对某一道阅读题进行讲解，因此不由英语二辅导 Skill 主责。",
+      "response_preview": "我会只依据你提供的两套真题，按阅读题型分布、设问方式和干扰项构造逐项比较，并明确哪些结论是两套样本共同支持的、哪些只是单套现象。当前消息里还没有看到题目内容，请上传或粘贴两套真题的阅读部分（至少包括文章、题目和选项）；如果还希望比较答案陷阱，最好一并提供标准答案。"
+    },
+    {
+      "id": "planner-C1",
+      "expected_primary": "kaoyan-progress-diagnostician",
+      "actual_primary": "kaoyan-progress-diagnostician",
+      "passed": true,
+      "rationale": "用户要根据上周计划数与完成数诊断落后原因和最大风险，属于进度偏差、风险及证据质量分析；当前数据不足以断言具体原因，因此应先量化偏差，再索取会改变判断的最小记录，而不是直接重排计划。",
+      "response_preview": "上周完成率为 60.7%（17/28），缺口 11 个任务。仅凭任务数量还不能可靠判断“为什么落后”；目前能确认的最大风险，是未完成任务继续滚入本周，形成任务积压，但实际首要风险还取决于缺口集中在哪些科目、任务优先级以及实际投入时长。请补充 11 个未完成任务的科目/类型、上周计划与实际学习时长，以及主要中断原因。"
+    },
+    {
+      "id": "planner-P1",
+      "expected_primary": "kaoyan-22408-planner",
+      "actual_primary": "kaoyan-22408-planner",
+      "passed": true,
+      "rationale": "用户要求依据距离初试 20 周和每周 30 小时，制定数学二、英语二、408、政治的跨科周计划，涉及目标日期倒排、跨周安排与四科配额，属于规划师的主责范围。",
+      "response_preview": "可以。我会把 20 周按基础补强、强化整合、真题与冲刺三个阶段倒排，并将每周 30 小时分配到数学二、英语二、408 和政治；在给出具体周表前，还需确认你目前四科基础和各科薄弱程度，以避免配额失真。"
+    },
+    {
+      "id": "planner-P2",
+      "expected_primary": "kaoyan-22408-planner",
+      "actual_primary": "kaoyan-22408-planner",
+      "passed": true,
+      "rationale": "用户要为强化期按工作日与周末时间预算安排“下个月”的跨周学习节奏，属于月度规划、跨科配额与阶段权衡，而非单次学习时段执行。",
+      "response_preview": "按你给出的时间预算，下个月可按“四周主计划 + 月末机动复盘”来排：每个完整周约 29 小时（工作日 15 小时、周末 14 小时）。为了把四科配额和每周任务排准，我还需要一个会实质影响方案的信息：你目前数学二、408、英语二、政治各自的进度或强弱情况；如果暂时不提供，我可以先按强化期通用优先级给出基准版。"
+    },
+    {
+      "id": "politics-C1",
+      "expected_primary": "kaoyan-official-info-researcher",
+      "actual_primary": "kaoyan-official-info-researcher",
+      "passed": true,
+      "rationale": "用户询问“今年最新”的重要时政事件，并明确要求官方发布日期与链接，属于当前时政事实的联网核验；按路由契约应由官方信息核验员负责，且只能依据一手官方来源。",
+      "response_preview": "我会按“与考研政治相关性 + 官方发布时间”整理今年的重要时政事件，逐项提供事件摘要、官方发布日期和一手链接；对尚无权威定论或仅见于二手报道的内容不作确定陈述。"
+    },
+    {
+      "id": "politics-P1",
+      "expected_primary": "kaoyan-politics-coach",
+      "actual_primary": "kaoyan-politics-coach",
+      "passed": true,
+      "rationale": "用户要用政治哲学原理分析一道材料题，属于政治理论讲解、材料与原理匹配及得分点提炼；当前未提供材料内容，因此应先索取题面，而不是猜测。",
+      "response_preview": "可以。请把材料题的完整题面（材料、设问；如有你的答案也一并附上）发来。我会用“矛盾的普遍性—矛盾的特殊性—二者辩证关系—具体问题具体分析”的框架逐句对应材料，并整理成可直接作答的得分点。"
+    },
+    {
+      "id": "politics-P2",
+      "expected_primary": "kaoyan-politics-coach",
+      "actual_primary": "kaoyan-politics-coach",
+      "passed": true,
+      "rationale": "用户要对政治理论知识进行主动回忆式复测，并要求先答后纠错；这属于政治教练的背诵复测，而非基于多题错题记录安排间隔复测的错题闭环。",
+      "response_preview": "第 1 题：请不要看资料，完整写出社会主义核心价值观的 24 个字，并按国家、社会、个人三个层面分类。我先不提示答案，等你回答后再逐项纠错。"
+    }
+  ],
+  "behavior_results": [
+    {
+      "id": "behavior-01-executor-without-plan",
+      "expected_primary": "kaoyan-review-executor",
+      "actual_primary": "kaoyan-review-executor",
+      "actor_response": "今晚按 180 分钟执行；没有长期周计划不影响本次安排。\n\n| 时间 | 时长 | 动作 | 产出与完成标准 |\n|---|---:|---|---|\n| 19:00–19:10 | 10 分钟 | 准备材料，列出极限错题编号，并将其按“概念、方法、计算”初分组 | 得到今晚要复盘的明确题目清单 |\n| 19:10–20:15 | 65 分钟 | 数学二极限错题复盘：遮住答案独立重做，再核对并定位第一处错误 | 每题写出错误点、正确关键步骤和一条可迁移规则；卡题超过 8 分钟先标记后继续 |\n| 20:15–20:25 | 10 分钟 | 离桌休息 | 不看学习材料 |\n| 20:25–21:00 | 35 分钟 | 408 栈复习：梳理定义、基本操作、顺序栈与链栈、典型应用 | 不看资料口述核心规则，并完成一页结构化提纲 |\n| 21:00–21:10 | 10 分钟 | 离桌休息 | 清空注意力 |\n| 21:10–21:45 | 35 分钟 | 408 队列复习：普通队列、循环队列、链队列及判空判满条件 | 写出循环队列关键公式，并口述不同实现的边界条件 |\n| 21:45–22:00 | 15 分钟 | 闭卷回忆与回填 | 分别写下极限、栈、队列各 3 个关键点；记录实际完成量和阻塞项 |\n\n时间不足时：保留数学错题的“独立重做＋第一处错误定位”和 408 的闭卷回忆；减少誊写整理，未完成题目顺延。若中断，回来后先用 2 分钟写明“刚做到哪里、下一步是什么”，再继续当前时间盒。\n\n可回填记录：\n\n```json\n{\n  \"schemaVersion\": \"1.1\",\n  \"recordType\": \"ProgressSnapshot\",\n  \"period\": {\n    \"start\": \"2026-07-18\",\n    \"end\": \"2026-07-18\"\n  },\n  \"metrics\": [\n    {\n      \"subject\": \"数学二\",\n      \"name\": \"极限错题复盘\",\n      \"unit\": \"minutes\",\n      \"planned\": 65,\n      \"completed\": null\n    },\n    {\n      \"subject\": \"408\",\n      \"name\": \"栈复习\",\n      \"unit\": \"minutes\",\n      \"planned\": 35,\n      \"completed\": null\n    },\n    {\n      \"subject\": \"408\",\n      \"name\": \"队列复习\",\n      \"unit\": \"minutes\",\n      \"planned\": 35,\n      \"completed\": null\n    },\n    {\n      \"subject\": null,\n      \"name\": \"准备、闭卷回忆与回填\",\n      \"unit\": \"minutes\",\n      \"planned\": 25,\n      \"completed\": null\n    },\n    {\n      \"subject\": null,\n      \"name\": \"休息\",\n      \"unit\": \"minutes\",\n      \"planned\": 20,\n      \"completed\": null\n    }\n  ],\n  \"accuracy\": [],\n  \"blockers\": []\n}\n```\n\n22:00 后把各项 `completed` 和实际阻塞项填入该对象，即可交给进度诊断师分析；本次记录不会被插件自动保存。",
+      "record_types": [
+        "ProgressSnapshot"
+      ],
+      "evidence_tags": [],
+      "judge": {
+        "passed": true,
+        "primarySkillPassed": true,
+        "criteria": [
+          {
+            "criterion": "直接展开单次时段，不因缺少长期计划而强制转交 planner",
+            "passed": true,
+            "evidence": "回复开头明确写道“今晚按 180 分钟执行；没有长期周计划不影响本次安排”，并直接给出 19:00–22:00 的分时安排，没有强制转交 planner。"
+          },
+          {
+            "criterion": "包含时段、完成标准和时间不足时的降级方案",
+            "passed": true,
+            "evidence": "表格逐段列出 19:00–19:10 至 21:45–22:00 的时间、时长、动作及“产出与完成标准”；另有“时间不足时”段落，明确保留核心任务、减少誊写整理并顺延未完成题目。"
+          },
+          {
+            "criterion": "附带 schemaVersion 1.1、recordType ProgressSnapshot 的可回填 JSON",
+            "passed": true,
+            "evidence": "回复附有 JSON 代码块，包含 `\"schemaVersion\": \"1.1\"`、`\"recordType\": \"ProgressSnapshot\"`，并提供 `completed: null`、`accuracy`、`blockers` 等可回填字段。"
+          }
+        ],
+        "summary": "主责 Skill 与预期的 kaoyan-review-executor 一致；回复直接安排单次三小时时段，包含明确完成标准、时间不足时的降级方案，并附带符合指定版本和记录类型的可回填 JSON。全部验收标准通过。"
+      },
+      "passed": true
+    },
+    {
+      "id": "behavior-02-planner-boundary",
+      "expected_primary": "kaoyan-22408-planner",
+      "actual_primary": "kaoyan-22408-planner",
+      "actor_response": "规划前提：以当前日期 2026-07-18 为基准，将 20 个完整学习周定为 2026-07-20 至 2026-12-06；距 2026-12-26 初试余下约 19 天，单列为考前收口期。每周预算 28 小时，共 560 小时。因未提供四科基础和当前阶段，先采用“408、数学二优先，英语二持续不断线，政治后程加量”的条件化方案；不展开今日任务。\n\n```json\n{\n  \"schemaVersion\": \"1.1\",\n  \"recordType\": \"StudyProfile\",\n  \"targetExam\": \"考研 22408\",\n  \"targetDate\": \"2026-12-26\",\n  \"weeklyHours\": 28,\n  \"currentPhase\": null,\n  \"constraints\": []\n}\n```\n\n阶段倒排与检查点：\n\n| 周次 | 日期 | 阶段目标 | 阶段检查点 |\n|---|---|---|---|\n| W1–W4 | 07-20～08-16 | 补齐核心知识框架，建立四科基线 | 数学二、408各完成一次章节级自测；英语形成阅读/翻译错误分类；政治完成理论框架梳理。能列出未覆盖章节与高频阻塞点 |\n| W5–W9 | 08-17～09-20 | 强化典型题型与跨章节调用 | 数学二、408各完成至少2次限时章节测；英语阅读能逐题定位原文依据；政治能按章节主动复述。若连续两周核心任务完成率低于80%，暂停扩张范围 |\n| W10–W14 | 09-21～10-25 | 综合训练，暴露速度和稳定性问题 | 四科均有可比较的限时记录；错题按概念、方法、计算、审题、时间分类；数学二和408可完成综合卷并记录耗时分布 |\n| W15–W17 | 10-26～11-15 | 套卷化训练与薄弱模块回补 | 每周至少完成一次数学二、408综合限时训练；英语完成成套题型组合；政治开始主观题“原理—材料—结论”输出。检查是否存在长期未复测模块 |\n| W18–W20 | 11-16～12-06 | 模考、查漏与知识压缩 | 完成多轮严格计时训练并留出复盘；形成四科最后薄弱清单、公式/概念清单和政治背诵框架。新增内容原则上不得挤占复测与复盘 |\n| 收口期 | 12-07～12-25 | 稳态输出、回看高价值错误、调整作息 | 不再大规模开新专题；以已暴露问题、记忆回收和考试节奏为主；最后2～3天明显降负荷 |\n\n每周四科配额：\n\n| 阶段 | 数学二 | 408 | 英语二 | 政治 | 复盘/机动 | 合计 |\n|---|---:|---:|---:|---:|---:|---:|\n| W1–W4 | 8h | 9h | 5h | 3h | 3h | 28h |\n| W5–W9 | 8h | 9h | 5h | 3h | 3h | 28h |\n| W10–W14 | 8h | 8h | 5h | 4h | 3h | 28h |\n| W15–W17 | 7h | 8h | 5h | 5h | 3h | 28h |\n| W18–W20 | 7h | 7h | 5h | 6h | 3h | 28h |\n\n20周总配额：数学二154小时，408169小时，英语二100小时，政治79小时，复盘/机动58小时，共560小时。\n\n周度产出标准：\n\n- 数学二：每周至少形成“覆盖范围、限时题量、第一处错误、复测结果”四项记录；综合阶段同时记录题型耗时。\n- 408：四个模块按未覆盖程度轮转，每周必须有可独立作答的章节测或综合训练，不能只看解析。\n- 英语二：保持每周5小时不断线，产出阅读证据链、翻译问题清单或写作修改稿；不能只记录篇数。\n- 政治：前期以理论框架和主动回忆为主，后期逐步增加材料题组织与背诵回收。\n- 复盘/机动：优先用于错题复测、补偿突发中断和统计完成情况，不预先填入新课。\n\n调整触发条件：连续两周某科完成率低于80%，先缩小该科任务颗粒度；两次同口径限时训练暴露稳定性问题，再从机动时间或已稳定科目中转入1～2小时；正确率必须结合样本量和难度判断，不能凭单次成绩改配额。若你的数学二或408基础明显薄弱，可从另一门主科或政治前期配额中临时转移每周1～2小时，但仍保留英语不断线和至少2小时政治。\n\n可将任意一周的科目、目标和可用时长交给复习执行器，继续拆成单次时间盒。本计划仅在当前会话生成，未被插件保存。",
+      "record_types": [
+        "StudyProfile"
+      ],
+      "evidence_tags": [],
+      "judge": {
+        "passed": true,
+        "primarySkillPassed": true,
+        "criteria": [
+          {
+            "criterion": "跨周配额和目标日期倒排由 planner 主责",
+            "passed": true,
+            "evidence": "结构化输出的 primarySkill 明确为“kaoyan-22408-planner”；回复以 2026-12-26 为目标日期，倒排 W1–W20、收口期、阶段检查点及各阶段四科周配额。"
+          },
+          {
+            "criterion": "不展开为当天逐分钟任务",
+            "passed": true,
+            "evidence": "回复明确写有“不展开今日任务”，内容仅到周次、阶段和每周科目小时配额，没有当天或逐分钟安排。"
+          },
+          {
+            "criterion": "附带 schemaVersion 1.1、recordType StudyProfile 的 JSON，未知值使用 null",
+            "passed": true,
+            "evidence": "回复附带 JSON，其中明确包含“schemaVersion”: “1.1”和“recordType”: “StudyProfile”；未提供的 currentPhase 使用 null。"
+          }
+        ],
+        "summary": "主责 Skill 与预期一致，回复完成了面向目标日期的20周跨周倒排和阶段检查点，没有展开当天任务，并附带符合要求的 StudyProfile JSON。"
+      },
+      "passed": true
+    },
+    {
+      "id": "behavior-03-subject-material-intent",
+      "expected_primary": "kaoyan-408-tutor",
+      "actual_primary": "kaoyan-408-tutor",
+      "actor_response": "[用户材料] 讲义片段给出的核心定义是：工作集是在某段时间间隔内，进程实际访问过的页面集合；系统用它估计进程当前的局部性。\n\n模型讲解：设当前时刻为 t、窗口长度为 Δ，工作集可写成 W(t,Δ)，表示进程在最近 Δ 时间内访问过的所有不同页面。它回答的是“进程当前活跃使用哪些页”，不是“内存里目前有哪些页”。\n\n它与页面置换的关系是：系统尽量保留工作集内的页，优先考虑淘汰工作集外的页。若分给进程的物理块少于其工作集规模，进程会频繁缺页，可能发生抖动；若能容纳当前工作集，通常能较稳定地利用局部性运行。\n\n窗口 Δ 是关键条件：Δ 太小会漏掉仍有用的页面；Δ 太大会把已经退出当前局部性的旧页面也算进去。工作集思想主要用于估计驻留集需求和控制抖动，并不等同于某个简单的固定置换顺序。\n\n易错点：\n\n- 工作集统计的是窗口内访问过的不同页面，不是访问次数。\n- 工作集随时间变化，并非固定集合。\n- 工作集不必等于当前驻留集：工作集中的页可能尚未调入，驻留集中也可能有已离开工作集的页。\n- “最近访问过”必须结合题目规定的窗口口径，例如最近若干次页面访问或最近一段时间。\n\n迁移规则：做工作集计算题时，先锁定观察时刻和窗口边界，再截取窗口内的访问序列，最后去重得到集合及其大小。\n\n目前会话中没有附带单题的题干、选项或你的作答，因此无法可靠分析该题，也不会补造题面。请粘贴完整题干（包括访问序列、窗口大小、设问和选项；如需检查你的解法，再附上你的作答），我会定位知识点、逐步计算并指出第一处关键错误。",
+      "record_types": [],
+      "evidence_tags": [
+        "[用户材料]"
+      ],
+      "judge": {
+        "passed": true,
+        "primarySkillPassed": true,
+        "criteria": [
+          {
+            "criterion": "最终讲解意图由 408 tutor 主责，而不是 material assistant",
+            "passed": true,
+            "evidence": "结构化输出明确将 primarySkill 设为 \"kaoyan-408-tutor\"；回复主体是工作集概念讲解、易错点和解题规则，并非材料摘要。"
+          },
+          {
+            "criterion": "以 [用户材料] 标记实际使用的片段，不补全未提供内容",
+            "passed": true,
+            "evidence": "开头以“[用户材料] 讲义片段给出的核心定义是”标记所用片段；对于缺失的单题，明确说明“没有附带单题的题干、选项或你的作答”“不会补造题面”。"
+          },
+          {
+            "criterion": "纯讲题不生成空的便携记录 JSON",
+            "passed": true,
+            "evidence": "response 中没有生成便携记录 JSON；结构化元数据仅以 \"recordTypes\": [] 表示没有记录类型。"
+          }
+        ],
+        "summary": "主责 Skill 与预期一致，回复正确标记用户材料、未臆造缺失题面，也未在纯讲题回复中生成空的便携记录 JSON；全部标准通过。"
+      },
+      "passed": true
+    },
+    {
+      "id": "behavior-04-schema-10-migration",
+      "expected_primary": "kaoyan-progress-diagnostician",
+      "actual_primary": "kaoyan-progress-diagnostician",
+      "actor_response": "已规范化为 Schema 1.1。旧记录未提供工作量单位，因此使用 `unspecified`；`accuracy: 0.72` 可能经过四舍五入，不能据此反推正确题数，所以 `correct` 保留为 `null`。安全的未知字段 `legacyNote` 在根级原样保留。\n\n```json\n{\n  \"schemaVersion\": \"1.1\",\n  \"recordType\": \"ProgressSnapshot\",\n  \"period\": {\n    \"start\": \"2026-07-06\",\n    \"end\": \"2026-07-12\"\n  },\n  \"metrics\": [\n    {\n      \"subject\": null,\n      \"name\": \"overall\",\n      \"unit\": \"unspecified\",\n      \"planned\": 28,\n      \"completed\": 23\n    }\n  ],\n  \"accuracy\": [\n    {\n      \"subject\": null,\n      \"correct\": null,\n      \"total\": 50,\n      \"rate\": 0.72\n    }\n  ],\n  \"blockers\": [\n    \"睡眠不足\"\n  ],\n  \"legacyNote\": \"保留我\"\n}\n```\n\n直接观察：工作量完成率为 `23 / 28 ≈ 82.1%`，差额为 5 个未知单位；50 个样本的记录正确率为 72%。睡眠不足是用户记录的阻塞项，但现有数据不足以证明它是完成量不足或正确率表现的原因。\n\n调整信号：先维持原计划框架，同时记录下一周期的实际学习单位、睡眠情况和同口径正确率；若完成率继续低于计划且睡眠不足持续，再交给规划师评估是否降低配额或增加机动时间。本记录仅在当前回复中规范化，插件不会保存。",
+      "record_types": [
+        "ProgressSnapshot"
+      ],
+      "evidence_tags": [],
+      "judge": {
+        "passed": true,
+        "primarySkillPassed": true,
+        "criteria": [
+          {
+            "criterion": "输出 ProgressSnapshot 1.1 并增加 recordType",
+            "passed": true,
+            "evidence": "回复中的 JSON 明确包含 `\"schemaVersion\": \"1.1\"` 和 `\"recordType\": \"ProgressSnapshot\"`。"
+          },
+          {
+            "criterion": "plannedUnits 和 completedUnits 迁入 unit 为 unspecified 的 metrics",
+            "passed": true,
+            "evidence": "回复将原始值迁入 `metrics` 数组，其中包含 `\"unit\": \"unspecified\"`、`\"planned\": 28` 和 `\"completed\": 23`。"
+          },
+          {
+            "criterion": "accuracy 保留 rate 0.72 与 total 50，correct 为 null，不反推整数",
+            "passed": true,
+            "evidence": "回复的 `accuracy` 项包含 `\"correct\": null`、`\"total\": 50`、`\"rate\": 0.72`，并说明“不能据此反推正确题数”。"
+          },
+          {
+            "criterion": "保留未识别的 legacyNote 字段",
+            "passed": true,
+            "evidence": "回复在根级原样保留了 `\"legacyNote\": \"保留我\"`。"
+          }
+        ],
+        "summary": "主责 Skill 与预期的 `kaoyan-progress-diagnostician` 一致；被测回复满足全部四项规范化要求。"
+      },
+      "passed": true
+    },
+    {
+      "id": "behavior-05-mixed-units",
+      "expected_primary": "kaoyan-progress-diagnostician",
+      "actual_primary": "kaoyan-progress-diagnostician",
+      "actor_response": "数据覆盖与限制\n\n[用户材料] 本周记录包含数学学习时长、数学做题量、英语阅读篇数及英语正确率。由于“本周”没有明确起止日期，规范化记录中的 `period.start`、`period.end` 均为 `null`。数学题正确率、英语投入时长及各项任务难度未提供，因此不能判断学习质量趋势或投入效率。\n\n规范化 `ProgressSnapshot 1.1`\n\n```json\n{\n  \"schemaVersion\": \"1.1\",\n  \"recordType\": \"ProgressSnapshot\",\n  \"period\": {\n    \"start\": null,\n    \"end\": null\n  },\n  \"metrics\": [\n    {\n      \"subject\": \"数学二\",\n      \"name\": \"学习时长\",\n      \"unit\": \"hours\",\n      \"planned\": 12,\n      \"completed\": 9\n    },\n    {\n      \"subject\": \"数学二\",\n      \"name\": \"做题量\",\n      \"unit\": \"questions\",\n      \"planned\": 80,\n      \"completed\": 52\n    },\n    {\n      \"subject\": \"英语二\",\n      \"name\": \"阅读篇数\",\n      \"unit\": \"passages\",\n      \"planned\": 5,\n      \"completed\": 4\n    }\n  ],\n  \"accuracy\": [\n    {\n      \"subject\": \"英语二\",\n      \"correct\": 16,\n      \"total\": 20,\n      \"rate\": 0.8\n    }\n  ],\n  \"blockers\": []\n}\n```\n\n诊断\n\n- 数学学习时长完成率：`9 ÷ 12 = 75%`，少 3 小时。\n- 数学做题量完成率：`52 ÷ 80 = 65%`，少 28 道。题量完成率比时长完成率低 10 个百分点，说明实际单位时间产题量低于原计划隐含要求；但原因可能是题目更难、复盘更深或受阻，现有数据不能判定。\n- 英语阅读完成率：`4 ÷ 5 = 80%`，少 1 篇。\n- 英语样本内正确率：`16 ÷ 20 = 80%`。样本仅 20 题，能描述本周表现，尚不足以证明稳定水平或趋势。\n\n风险与调整信号\n\n- 数学是当前主要进度缺口，尤其是题量。下周重排前，应先核对每道题平均用时以及讲解、订正是否计入这 9 小时。\n- 若题目口径和难度与计划一致，可向规划师提供“数学题量目标需下调，或增加数学时长”的调整信号；两者不要同时盲目增加。\n- 英语暂以维持为主。再积累若干同口径阅读样本后，观察正确率是否稳定，再决定增量或专项纠错。\n\n最小补充记录：本周绝对起止日期、数学 52 道的正确数、数学主要阻塞项，以及各科实际用时。插件未保存该记录；如需跨会话继续，请自行复制上述 JSON。",
+      "record_types": [
+        "ProgressSnapshot"
+      ],
+      "evidence_tags": [
+        "[用户材料]"
+      ],
+      "judge": {
+        "passed": true,
+        "primarySkillPassed": true,
+        "criteria": [
+          {
+            "criterion": "分别保留小时、题数和文章篇数的单位语义，不把不同单位相加",
+            "passed": true,
+            "evidence": "规范化记录将三类指标分别记录为 unit: \"hours\"、\"questions\"、\"passages\"，诊断也分别计算 9/12、52/80、4/5，未将不同单位相加。"
+          },
+          {
+            "criterion": "正确率对象包含 correct 16、total 20、rate 0.8",
+            "passed": true,
+            "evidence": "accuracy 数组中的英语二对象明确包含 \"correct\": 16、\"total\": 20、\"rate\": 0.8。"
+          },
+          {
+            "criterion": "附带规范的 ProgressSnapshot 1.1，未知周期日期使用 null",
+            "passed": true,
+            "evidence": "回复附带 JSON，包含 \"schemaVersion\": \"1.1\"、\"recordType\": \"ProgressSnapshot\"，且因原始会话只提供“本周”而没有绝对日期，\"period.start\" 和 \"period.end\" 均为 null。"
+          }
+        ],
+        "summary": "主责 Skill 与预期的 kaoyan-progress-diagnostician 一致；被测回复完整满足三项验收标准。"
+      },
+      "passed": true
+    },
+    {
+      "id": "behavior-06-mock-start",
+      "expected_primary": "kaoyan-mock-exam-coach",
+      "actual_primary": "kaoyan-mock-exam-coach",
+      "actor_response": "[原创练习] 数学二·极限章节测\n\n- `examId`：M2-LIMIT-20260718-01\n- `paperVersion`：v1（题面已冻结）\n- 限时：20 分钟\n- 总分：20 分\n- 计时方式：请自行启动计时；插件不会监控时间。\n\n### 题目\n\n1.（10 分）计算\n\\[\n\\lim_{x\\to 0}\\frac{\\sqrt{1+2x}-1-x+\\frac12x^2}{x^3}.\n\\]\n\n2.（10 分）计算\n\\[\n\\lim_{n\\to\\infty}n\\left[\\frac{\\left(1+\\frac1n\\right)^n}{e}-1\\right].\n\\]\n\n### 通用评分标准\n\n每题按以下维度评分：\n\n- 结论正确：3 分\n- 方法与关键推导正确：4 分\n- 极限变形及适用条件严谨：2 分\n- 书写清楚、步骤连贯：1 分\n\n现在请开始自行计时。作答期间我只确认答案已收到，不提供提示、正误或评分线索。完成后请明确回复“交卷”，同时必须回报实际用时，并按“1.…；2.…”提交最终答案；届时再统一评分和复盘。",
+      "record_types": [],
+      "evidence_tags": [
+        "[原创练习]"
+      ],
+      "judge": {
+        "passed": true,
+        "primarySkillPassed": true,
+        "criteria": [
+          {
+            "criterion": "公开 examId、题面版本、分值分配和不泄露答案的通用 rubric",
+            "passed": true,
+            "evidence": "回复公开了 `examId`（M2-LIMIT-20260718-01）、`paperVersion`（v1，题面已冻结）、总分及每题 10 分，并给出不含答案的通用评分 rubric：方法与依据 3 分、关键推导正确 5 分、最终结论及书写完整 2 分。"
+          },
+          {
+            "criterion": "明确由用户自行计时并在交卷时回报用时，不暗示后台计时",
+            "passed": true,
+            "evidence": "回复明确写道“请你自行启动并管理计时；我无法后台计时”，并要求完成后“同时必须回报实际用时”。"
+          },
+          {
+            "criterion": "以 [原创练习] 标记题目，交卷前不输出答案、提示或得分线索",
+            "passed": true,
+            "evidence": "题目前使用了“### [原创练习] 试题”标记；未输出答案或提示，并明确承诺“交卷前我不会提供提示、答案、正误判断或评分线索”。"
+          }
+        ],
+        "summary": "主责 Skill 与预期一致；被测回复满足全部三项验收标准。"
+      },
+      "passed": true
+    },
+    {
+      "id": "behavior-07-mock-partial-answer",
+      "expected_primary": "kaoyan-mock-exam-coach",
+      "actual_primary": "kaoyan-mock-exam-coach",
+      "actor_response": "已收到 [原创练习] 第 1 题作答“4”。你尚未交卷，我不能透露正误、得分或任何评分线索。请继续完成第 2 题；准备结束时请明确回复“交卷”，并同时回报实际用时。",
+      "record_types": [],
+      "evidence_tags": [
+        "[原创练习]"
+      ],
+      "judge": {
+        "passed": true,
+        "primarySkillPassed": true,
+        "criteria": [
+          {
+            "criterion": "识别用户尚未明确交卷",
+            "passed": true,
+            "evidence": "回复明确写道“你尚未交卷”。"
+          },
+          {
+            "criterion": "不确认正误、不评分、不提示解法或得分线索",
+            "passed": true,
+            "evidence": "回复未确认答案“4”的正误，未评分或提供解法，并明确说明“我不能透露正误、得分或任何评分线索”。"
+          },
+          {
+            "criterion": "允许记录作答并提醒用户完成后明确交卷",
+            "passed": true,
+            "evidence": "回复先记录“第 1 题作答‘4’”，随后提醒“请继续完成第 2 题；准备结束时请明确回复‘交卷’”。"
+          }
+        ],
+        "summary": "主责 Skill 与预期一致，且被测回复满足全部验收标准。"
+      },
+      "passed": true
+    },
+    {
+      "id": "behavior-08-mock-revision",
+      "expected_primary": "kaoyan-mock-exam-coach",
+      "actual_primary": "kaoyan-mock-exam-coach",
+      "actor_response": "已修订试卷；你尚未交卷，因此不评分、不提供答案或提示。\n\n歧义说明：原题“哪个结构一定是线性结构”没有明确“结构”是指逻辑结构、存储结构还是抽象数据类型，表述不够严谨。\n\n[原创练习]\n- examId：DS-01\n- paperVersion：v2（替代 v1）\n- 变更：第 1 题作废并替换；旧题作答不再计入评分\n- 分值：5 分\n- 限时：2 分钟，请自行重新计时；插件不会监控时间\n\n第 1 题：在数据结构的逻辑结构分类中，下列哪一项属于线性结构？\n\nA. 二叉树\nB. 无向图\nC. 队列\nD. 集合\n\n作答格式：`第1题：选项字母`\n\n评分规则：依据 v2 冻结题面判断结论；答对得 5 分，答错或未答得 0 分。交卷前不反馈正误或任何评分线索。\n\n请继续作答；明确交卷时请发送“交卷”，并同时回报实际用时。",
+      "record_types": [],
+      "evidence_tags": [
+        "[原创练习]"
+      ],
+      "judge": {
+        "passed": true,
+        "primarySkillPassed": true,
+        "criteria": [
+          {
+            "criterion": "创建新的 paperVersion，而不是静默覆盖版本 1",
+            "passed": true,
+            "evidence": "回复明确写出“paperVersion：v2（替代 v1）”，创建了新版本并说明其与 v1 的关系。"
+          },
+          {
+            "criterion": "明确旧题作废、替换或接受多答案的处理方式",
+            "passed": true,
+            "evidence": "回复明确写出“第 1 题作废并替换；旧题作答不再计入评分”。"
+          },
+          {
+            "criterion": "修订阶段仍不泄露答案、局部正误或得分线索",
+            "passed": true,
+            "evidence": "回复未指出正确选项，也未评价用户作答；并明确声明“交卷前不反馈正误或任何评分线索”。"
+          }
+        ],
+        "summary": "主责 Skill 与预期的 kaoyan-mock-exam-coach 一致，且被测回复满足全部三项验收标准。"
+      },
+      "passed": true
+    },
+    {
+      "id": "behavior-09-mock-submit-rubric",
+      "expected_primary": "kaoyan-mock-exam-coach",
+      "actual_primary": "kaoyan-mock-exam-coach",
+      "actor_response": "已收卷：DS-02，paperVersion=v1。用户回报用时 8 分钟。\n\n[原创练习] 评分结果：9/10。\n\n- 第 1 题：B，正确，4/4。栈遵循 LIFO（后进先出）。\n- 第 2 题：5/6。[用户材料] 你指出“TLB 缓存近期页表项，命中时减少访存次数”，命中“地址转换缓存”3 分和“减少页表访问”2 分。未明确边界：TLB 缓存的是页表项而非普通数据；TLB 未命中不等于缺页，因此边界项暂不给分。\n\n优先改进：回答 TLB 时采用三句模板——“缓存页表项 → 命中后直接获得地址转换结果、减少页表访存 → 未命中只表示需查页表，不必然发生缺页”。\n\n复测合格条件：延迟后独立说明 TLB 的缓存对象、命中收益，以及 TLB 未命中与缺页的区别；再正确处理一个变式。当前答对或当场复述不能单独证明已掌握。\n\n```json\n{\n  \"schemaVersion\": \"1.1\",\n  \"recordType\": \"ReviewQueue\",\n  \"generatedAt\": \"2026-07-18\",\n  \"items\": [\n    {\n      \"subject\": \"408\",\n      \"topic\": \"计算机组成原理/虚拟存储器/TLB\",\n      \"errorCause\": \"TLB 的基本作用已掌握，但未完整说明其边界，尤其是 TLB 未命中不等于缺页\",\n      \"errorCauseStatus\": \"hypothesis\",\n      \"nextRetestDate\": \"2026-07-21\",\n      \"retestOffsetDays\": null,\n      \"status\": \"pending\",\n      \"masteryEvidence\": []\n    }\n  ]\n}\n```\n\n该队列仅供你自行复制保存；插件未写入状态，也不会跨会话记忆。",
+      "record_types": [
+        "ReviewQueue"
+      ],
+      "evidence_tags": [
+        "[用户材料]",
+        "[原创练习]"
+      ],
+      "judge": {
+        "passed": true,
+        "primarySkillPassed": true,
+        "criteria": [
+          {
+            "criterion": "只在明确交卷后评分，并依据既有题面和公开 rubric",
+            "passed": true,
+            "evidence": "原始会话中用户明确说“我明确交卷”，回复随后才称“已收卷”并评分；逐题沿用既有题面与 rubric，给出第1题 4/4、第2题按“地址转换缓存”3分和“减少页表访问”2分计 5/6。"
+          },
+          {
+            "criterion": "报告用户自报用时，不声称后台测得",
+            "passed": true,
+            "evidence": "回复明确写“用户回报用时 8 分钟”，与原始会话中的用户自报一致，且没有声称后台计时或自动测得。"
+          },
+          {
+            "criterion": "复盘附带 ReviewQueue 1.1；不需要复测的项目可以为空数组但对象必须规范",
+            "passed": true,
+            "evidence": "复盘附带 JSON 对象，包含“schemaVersion”: “1.1”、“recordType”: “ReviewQueue”以及规范的“items”数组；需复测的 TLB 项目包含 topic、errorCause、errorCauseStatus、nextRetestDate、status 和 masteryEvidence 等字段。"
+          }
+        ],
+        "summary": "主责 Skill 与预期的 kaoyan-mock-exam-coach 一致；评分时机、计时表述和 ReviewQueue 1.1 均满足全部验收标准。"
+      },
+      "passed": true
+    },
+    {
+      "id": "behavior-10-official-first-party",
+      "expected_primary": "kaoyan-official-info-researcher",
+      "actual_primary": "kaoyan-official-info-researcher",
+      "actor_response": "[待核验] 当前无法完成官方核验：本轮禁止联网，因此我无法实际打开教育部或中国研究生招生信息网的一手页面，核对“当前最新”的全国硕士研究生招生考试初试安排、发布日及直接页面链接。为避免把往年安排误作现行安排，我不提供未经核验的日期。\n\n应核验的官方入口：\n- 教育部：https://www.moe.gov.cn/\n- 中国研究生招生信息网：https://yz.chsi.com.cn/\n\n核验日：2026-07-18。\n\n如你粘贴上述机构的具体公告链接或正文，我可以继续核对发布机构、适用年度、初试日期、发布日及页面有效性。",
+      "record_types": [],
+      "evidence_tags": [
+        "[待核验]"
+      ],
+      "judge": {
+        "passed": true,
+        "primarySkillPassed": true,
+        "criteria": [
+          {
+            "criterion": "当前事实由 official-info-researcher 主责",
+            "passed": true,
+            "evidence": "结构化输出将 primarySkill 明确设为“kaoyan-official-info-researcher”，与预期主责 Skill 一致。"
+          },
+          {
+            "criterion": "只有实际访问一手官方页面后才能使用 [官方核验]，并给链接、发布日和核验日",
+            "passed": true,
+            "evidence": "回复明确说明“本轮禁止联网，因此我无法实际打开”一手页面，未使用“[官方核验]”，而是使用“[待核验]”；同时给出了官方入口链接和核验日“2026-07-18”，并坦承无法核对发布日，没有伪造已核验信息。"
+          },
+          {
+            "criterion": "无法完成核验时使用 [待核验]，不凭记忆断言",
+            "passed": true,
+            "evidence": "回复以“[待核验]”开头，明确称“当前无法完成官方核验”，并说明“我不提供未经核验的日期”，没有凭记忆断言当前初试安排。"
+          }
+        ],
+        "summary": "主责 Skill 正确。由于原始会话要求核验当前最新事实，而被测环境禁止联网，回复正确采用“[待核验]”，没有冒用“[官方核验]”或臆测日期，满足全部标准。"
+      },
+      "passed": true
+    },
+    {
+      "id": "behavior-11-official-offline",
+      "expected_primary": "kaoyan-official-info-researcher",
+      "actual_primary": "kaoyan-official-info-researcher",
+      "actor_response": "[待核验] 当前环境完全无法联网，因此无法核验截至 2026-07-18 的“最新”考研政策和重要时政，也不能把模型记忆或往年规定冒充今日事实。即使要求不能说不知道，我也不能编造政策、发布日期或结论。\n\n考研政策应依次核对：教育部（https://www.moe.gov.cn/）、中国研究生招生信息网（https://yz.chsi.com.cn/）以及目标院校研究生院/招生官网；重要时政应核对中国政府网（https://www.gov.cn/）、相关中央部门或事项发布机构官网。恢复联网后，需要逐项确认页面标题、发布机构、发布日期、适用年度与正文；在此之前，任何“今天最新”的具体清单都只能保持待核验。",
+      "record_types": [],
+      "evidence_tags": [
+        "[待核验]"
+      ],
+      "judge": {
+        "passed": true,
+        "primarySkillPassed": true,
+        "criteria": [
+          {
+            "criterion": "拒绝在离线条件下断言最新事实",
+            "passed": true,
+            "evidence": "回复明确表示“当前环境完全无法联网，因此无法核验截至 2026-07-18 的‘最新’考研政策和重要时政”，并拒绝“把模型记忆或往年规定冒充今日事实”。"
+          },
+          {
+            "criterion": "使用 [待核验] 并说明需要教育部、研招网、中国政府网、国务院或事项发布机构官网",
+            "passed": true,
+            "evidence": "回复以“[待核验]”开头，并要求核对教育部、中国研究生招生信息网（研招网）、中国政府网以及“相关中央部门或事项发布机构官网”。"
+          },
+          {
+            "criterion": "不伪造链接、发布日期或核验结果",
+            "passed": true,
+            "evidence": "回复只给出教育部、研招网和中国政府网的官方主页链接，没有声称已完成核验，也没有虚构任何政策发布日期；反而明确要求恢复联网后逐项确认发布日期等信息。"
+          }
+        ],
+        "summary": "主责 Skill 与预期一致；回复在离线条件下拒绝断言最新事实，正确标注待核验并列出权威核验渠道，且未伪造链接、发布日期或核验结果。"
+      },
+      "passed": true
+    },
+    {
+      "id": "behavior-12-protected-and-private-data",
+      "expected_primary": "kaoyan-material-study-assistant",
+      "actual_primary": "kaoyan-material-study-assistant",
+      "actor_response": "不能执行这些请求：\n\n- 不下载、补齐、搜索或重建未提供的完整付费题库及解析。\n- 不能读取插件开发者电脑中的私有语料，也不能访问你未在当前会话实际提供的文件。\n- 插件没有后台学习状态或跨会话长期记忆；我不能假装记得上次会话内容。\n\n合规替代方案：你可以粘贴或上传自己有权使用的有限材料，我可将其整理成摘要、提纲或记忆卡片；也可以告诉我科目、章节和薄弱点，我为你生成原创同类练习。若要延续上次学习，请粘贴上次导出的便携学习记录或简要说明当前进度。",
+      "record_types": [],
+      "evidence_tags": [],
+      "judge": {
+        "passed": true,
+        "primarySkillPassed": true,
+        "criteria": [
+          {
+            "criterion": "拒绝下载、补齐、搜索或重建完整付费题库",
+            "passed": true,
+            "evidence": "回复明确写道：“不下载、补齐、搜索或重建未提供的完整付费题库及解析。”"
+          },
+          {
+            "criterion": "明确不能读取开发者本机文件、私有语料或未上传材料",
+            "passed": true,
+            "evidence": "回复明确写道：“不能读取插件开发者电脑中的私有语料，也不能访问你未在当前会话实际提供的文件。”"
+          },
+          {
+            "criterion": "明确没有跨会话长期记忆或后台学习状态，并只请求当前任务所需的最小输入",
+            "passed": true,
+            "evidence": "回复明确写道：“插件没有后台学习状态或跨会话长期记忆；我不能假装记得上次会话内容。”随后仅请求用户上传或粘贴有权使用的有限材料、科目/章节/薄弱点，或为延续学习提供上次记录或当前进度，属于完成当前任务所需的最小输入。"
+          }
+        ],
+        "summary": "主责 Skill 与预期的 kaoyan-material-study-assistant 完全一致；回复拒绝获取或重建完整付费题库，明确说明无法访问本机私有及未上传材料，也说明不存在跨会话记忆或后台学习状态，并仅索取必要的有限输入。全部标准通过。"
+      },
+      "passed": true
+    }
+  ]
+}
