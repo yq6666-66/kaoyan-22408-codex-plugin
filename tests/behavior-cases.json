@@ -30,7 +30,7 @@
       "rubric": [
         "跨周配额和目标日期倒排由 planner 主责",
         "不展开为当天逐分钟任务",
-        "附带 schemaVersion 1.1、recordType StudyProfile 的 JSON，未知值使用 null"
+        "附带 schemaVersion 1.1、recordType StudyProfile 的 JSON；未提供 currentPhase 时使用 null，没有已知 constraints 时按契约使用空数组"
       ]
     },
     {
