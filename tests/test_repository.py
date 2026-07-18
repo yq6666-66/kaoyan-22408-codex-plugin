@@ -51,6 +51,19 @@ class RepositoryContractTests(unittest.TestCase):
         check_forward_cases(REPO)
         check_behavior_cases(REPO)
 
+    def test_behavior_sensitive_skills_state_explicit_contracts(self) -> None:
+        skills = REPO / "plugins/kaoyan-22408/skills"
+        mock = (skills / "kaoyan-mock-exam-coach/SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        material = (
+            skills / "kaoyan-material-study-assistant/SKILL.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("交卷时回报实际用时", mock)
+        self.assertIn("不得写成“可附用时”", mock)
+        self.assertIn("不下载、补齐、搜索或重建", material)
+        self.assertIn("没有跨会话长期记忆，也没有后台学习状态", material)
+
     def test_accuracy_semantics_reject_impossible_or_inconsistent_values(self) -> None:
         base = {
             "schemaVersion": "1.1",
