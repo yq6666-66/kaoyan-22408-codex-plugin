@@ -127,7 +127,8 @@ class TrustedForwardAttestationTests(unittest.TestCase):
         self.root = Path(self.temporary.name)
         self.repo = copy_as_committed_repo(self.root / "repo")
         expand_cases(self.repo)
-        commit_all(self.repo, "expand transition cases")
+        if run_git(self.repo, "status", "--porcelain").stdout.strip():
+            commit_all(self.repo, "expand transition cases")
         self.now = datetime.now(timezone.utc).replace(microsecond=0)
         self.evidence = build_evidence(self.repo, "1.2", self.now)
         self.evidence_path = self.repo / "tests/forward-eval-evidence.json"
@@ -212,6 +213,10 @@ class TrustedForwardAttestationTests(unittest.TestCase):
         self.assertEqual(len(identities), 108)
 
     def test_rejects_wrong_v12_counts_and_unknown_profile(self) -> None:
+        cached = json.loads(json.dumps(self.evidence))
+        cached["cache_mode"] = "enabled"
+        with self.assertRaisesRegex(trusted.legacy.AuthenticationError, "schema violation"):
+            trusted.validate_evidence(self.repo, cached)
         short = json.loads(json.dumps(self.evidence))
         short["route_results"].pop()
         with self.assertRaisesRegex(trusted.legacy.AuthenticationError, "schema violation"):

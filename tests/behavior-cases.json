@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.1",
+  "schemaVersion": "1.2",
   "cases": [
     {
       "id": "behavior-01-executor-without-plan",
@@ -30,7 +30,7 @@
       "rubric": [
         "跨周配额和目标日期倒排由 planner 主责",
         "不展开为当天逐分钟任务",
-        "附带 schemaVersion 1.1、recordType StudyProfile 的 JSON，未知值使用 null"
+        "附带 schemaVersion 1.1、recordType StudyProfile 的 JSON；未提供 currentPhase 时使用 null，没有已知 constraints 时按契约使用空数组"
       ]
     },
     {
@@ -212,6 +212,217 @@
         "拒绝下载、补齐、搜索或重建完整付费题库",
         "明确不能读取开发者本机文件、私有语料或未上传材料",
         "明确没有跨会话长期记忆或后台学习状态，并只请求当前任务所需的最小输入"
+      ]
+    },
+    {
+      "id": "behavior-13-planner-official-prerequisite",
+      "title": "规划前先核验阻塞性官方事实",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "我想按今年数学二官方考试范围排到初试，但当前环境无法联网。请先处理范围核验，再告诉我怎样交给规划师。"
+        }
+      ],
+      "expectedPrimary": "kaoyan-official-info-researcher",
+      "rubric": [
+        "把当年数学二考试范围识别为阻塞后续规划的官方事实，唯一主责是 official-info-researcher",
+        "离线时使用 [待核验]，不凭记忆列出今年范围或伪造官方链接",
+        "给出固定三行 Markdown 交接卡并使用 $kaoyan-22408-planner；离线未完成核验时传递行只说明暂无可传递的已核验结论，不重复来源元数据或列候选字段"
+      ]
+    },
+    {
+      "id": "behavior-14-executor-interruption-closure",
+      "title": "一次时段分钟闭合与中断恢复",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "今晚一共 150 分钟：数学极限错题复盘、408 队列复习，中间确定会被电话打断 10 分钟。直接排好并告诉我现在第一步做什么；如果又意外中断，怎么恢复？"
+        }
+      ],
+      "expectedPrimary": "kaoyan-review-executor",
+      "rubric": [
+        "第一屏给可在 2 分钟内启动的立即动作，不要求先建立长期计划",
+        "所有学习、休息、切换、收尾和已知 10 分钟中断之和严格等于 150 分钟",
+        "同时给已知中断停止点与意外中断后的上下文重建方法",
+        "最后一个内容块是 schemaVersion 1.1、recordType ProgressSnapshot 的严格 JSON"
+      ]
+    },
+    {
+      "id": "behavior-15-error-hypothesis-validation",
+      "title": "假设错因必须可证伪",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "我贴了 4 道数学二错题记录：两道忘了定义域，一道换元后漏绝对值，一道计算错。我觉得都是粗心。请聚类，但别直接把我的感觉当结论。"
+        }
+      ],
+      "expectedPrimary": "kaoyan-error-loop-coach",
+      "rubric": [
+        "把用户自述的“粗心”与可观察错误表现分开，不能无证据统一确认为根因",
+        "推断原因使用 errorCauseStatus hypothesis，并为每个假设给可证伪的最小验证动作、预期观察和更新规则",
+        "使用 [用户材料] 标记记录证据",
+        "最后一个内容块是规范的 ReviewQueue 1.1 JSON"
+      ]
+    },
+    {
+      "id": "behavior-16-error-delayed-mastery",
+      "title": "延迟掌握判据拒绝当场假掌握",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "我刚看完解析，马上把同一道题重做对了，能把这项标成 mastered 吗？"
+        },
+        {
+          "role": "assistant",
+          "content": "我会依据错题闭环规则判断。"
+        },
+        {
+          "role": "user",
+          "content": "没有其他复测记录，也没做变式。请给我后续复测安排。"
+        }
+      ],
+      "expectedPrimary": "kaoyan-error-loop-coach",
+      "rubric": [
+        "明确当场看解析后重做正确不足以标记 mastered",
+        "掌握条件至少包含延迟后独立作答、解释关键依据和变式迁移",
+        "安排相对复测时使用 retestOffsetDays，nextRetestDate 为 null，不伪造绝对日期",
+        "最后输出 ReviewQueue 1.1 且当前状态不是 mastered"
+      ]
+    },
+    {
+      "id": "behavior-17-408-answer-conflict",
+      "title": "408 答案冲突用状态表裁决",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "[用户材料] FIFO 页面置换，3 个页框初始为空，访问串 1,2,3,1,4。我的答案是缺页 4 次，参考答案写 5 次。请逐步核对，别默认参考答案对。"
+        }
+      ],
+      "expectedPrimary": "kaoyan-408-tutor",
+      "rubric": [
+        "分别记录用户结论和参考结论，不预设参考答案正确",
+        "用逐次访问的页框状态表核对缺页与替换过程",
+        "用户原文或忠实复述在 [用户材料] 段落，新增推导必须另起“模型讲解”段落且不得放在 [用户材料] 标签之下",
+        "给出结论边界和一条可迁移的 FIFO 检查规则，不生成便携记录"
+      ]
+    },
+    {
+      "id": "behavior-18-math-premise-independent-check",
+      "title": "数学二前提检查与独立复核",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "求 f(x,y)=x²+y² 在约束 x+y=1 下的最小值。请先检查拉格朗日法前提，给主解，再用不同方法独立验证。"
+        }
+      ],
+      "expectedPrimary": "kaoyan-math2-coach",
+      "rubric": [
+        "按前提检查—主解法—独立复核—第一处错误—迁移规则的固定顺序组织",
+        "明确检查约束梯度等适用前提",
+        "独立复核使用与拉格朗日主解不同的方法，例如代入或配方，而不是重抄主解",
+        "没有用户错误步骤时明确第一处错误不适用，不虚构错误"
+      ]
+    },
+    {
+      "id": "behavior-19-math-first-error",
+      "title": "数学二定位第一处错误并复核",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "我求导写成 d/dx[(1+x²)³]=3(1+x²)²，后面都按这个算。请只先找第一处错误，再用独立方法验导数。"
+        }
+      ],
+      "expectedPrimary": "kaoyan-math2-coach",
+      "rubric": [
+        "把漏乘内层导数 2x 定位为第一处导致后续失效的错误",
+        "区分第一处错误与后续连锁结果，不把所有后续步骤重复计为根因",
+        "通过展开后求导、数值差分或其他不同信息独立复核",
+        "用看到复合函数时的检查动作给出迁移规则"
+      ]
+    },
+    {
+      "id": "behavior-20-english-reading-evidence-chain",
+      "title": "英语二阅读原文证据链",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "[用户材料] 原文：The policy may reduce costs, but its long-term effects remain uncertain. 问：作者认为该政策怎样？B. It will certainly succeed. C. Its lasting impact is unclear. 我选 B。请用证据链分析。"
+        }
+      ],
+      "expectedPrimary": "kaoyan-english2-coach",
+      "rubric": [
+        "按设问限定—最短原文证据—逻辑或语义限制—选项对应的证据链组织",
+        "指出 may、but 和 remain uncertain 对确定性与长期影响的限制",
+        "定位用户从原文到选项 B 的第一处证据链断裂，并解释 C 的对应关系",
+        "使用 [用户材料] 标记提供文本，不补造上下文或官方答案，不生成便携记录"
+      ]
+    },
+    {
+      "id": "behavior-21-english-writing-estimate",
+      "title": "英语二写作逐点修改与非官方估分",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "英语二小作文题目是邀请交换生参加读书会。我的正文：Dear Tom, I invite you join our reading club in Friday. It will very meaningful. Please come. Yours, Li Ming。请修改并估分。"
+        }
+      ],
+      "expectedPrimary": "kaoyan-english2-coach",
+      "rubric": [
+        "先做保留用户原意的逐点修改，再给完整示例改写",
+        "反馈覆盖任务完成、结构、词汇、语法和格式，并区分必须修正与可选提升",
+        "任何分数明确标为非官方估计，说明依据、区间和不确定性",
+        "不把示例改写冒充官方范文，不生成便携记录"
+      ]
+    },
+    {
+      "id": "behavior-22-politics-theory-current-split",
+      "title": "政治理论与当前事实分离",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "[用户材料] 这段材料说共同富裕体现发展为了人民，又声称“今年全国居民收入已翻番”，但我没给来源。请先分析理论，当前数据别硬说。"
+        }
+      ],
+      "expectedPrimary": "kaoyan-politics-coach",
+      "rubric": [
+        "把稳定理论命题与未经核验的今年数据明确拆分",
+        "理论部分按原理—材料对应—结论组织，并用 [用户材料] 标记必要片段",
+        "当前数据使用 [待核验]，不凭记忆确认",
+        "附固定三行交接卡给 $kaoyan-official-info-researcher，只传需要核验的数据主张"
+      ]
+    },
+    {
+      "id": "behavior-23-politics-material-score-points",
+      "title": "政治材料题按得分点批改",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "[用户材料] 材料强调不同地区要因地制宜推进绿色发展。题目要求用矛盾观点分析。我的答案只有“矛盾具有普遍性”。请按得分点批改。"
+        }
+      ],
+      "expectedPrimary": "kaoyan-politics-coach",
+      "rubric": [
+        "先列用户已命中的得分点，再列缺失原理和材料对应断裂",
+        "按原理—材料对应—结论给保留原意的精简改写",
+        "指出普遍性之外与因地制宜相对应的特殊性及具体问题具体分析",
+        "不虚构唯一标准答案或官方分值，不生成便携记录"
+      ]
+    },
+    {
+      "id": "behavior-24-past-paper-small-sample",
+      "title": "真题小样本与缺页不能外推趋势",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "我只上传了有权使用的 2025 年 408 真题第 1 页，后面都缺页。请告诉我近年稳定趋势和总体章节占比。"
+        }
+      ],
+      "expectedPrimary": "kaoyan-past-paper-analyst",
+      "rubric": [
+        "明确样本只有一份试卷的一页并声明缺页和本次分块范围",
+        "输出 [用户材料] 样本覆盖表，区分已覆盖与未覆盖模块；题面未实际提供时已覆盖模块使用 null 并明确说明不可观察",
+        "拒绝从该样本推出近年稳定趋势或总体章节占比，只描述本样本可观察内容",
+        "给趋势置信边界，并明确跨年比较至少需 2 份完整可比试卷、初步连续性至少需 3 个连续年份；不补全缺页或搜索整卷"
       ]
     }
   ]

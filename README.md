@@ -2,7 +2,9 @@
 
 `kaoyan-22408` 是面向数学二、英语二、408 与政治的中文学习插件，可在支持 Skills 插件的 ChatGPT 与 Codex 环境中使用。项目只包含 12 个 Skills、共享契约与品牌图标，不提供独立应用、App、MCP、后台服务、账号、内置题库或学习状态持久化。
 
-当前版本：`1.1.0`
+当前版本：`1.2.0`
+
+默认采用自适应简洁输出：先给可执行结论或立即行动，复杂问题再展开必要依据；需要连续学习时使用三行 Markdown 交接卡，必须生成的 Schema 1.1 JSON 永远放在回答末尾。
 
 ## 能力
 
@@ -50,7 +52,7 @@ GitHub 仓库是 repo marketplace 的安装源。GitHub Release 中的 ZIP 与 S
 以下命令要求当前 CLI 的 `codex plugin` 帮助中存在相应子命令：
 
 ```text
-codex plugin marketplace add yq6666-66/kaoyan-22408-codex-plugin --ref v1.1.0
+codex plugin marketplace add yq6666-66/kaoyan-22408-codex-plugin --ref v1.2.0
 codex plugin add kaoyan-22408@kaoyan-22408
 ```
 
@@ -59,7 +61,7 @@ codex plugin add kaoyan-22408@kaoyan-22408
 ### 桌面端安装
 
 ```text
-git clone --branch v1.1.0 --depth 1 https://github.com/yq6666-66/kaoyan-22408-codex-plugin.git
+git clone --branch v1.2.0 --depth 1 https://github.com/yq6666-66/kaoyan-22408-codex-plugin.git
 ```
 
 在 ChatGPT Desktop 或 Codex Desktop 中打开克隆后的仓库，重启桌面端，然后从仓库提供的 marketplace 安装 `kaoyan-22408`。桌面端菜单名称可能随版本变化。
@@ -111,7 +113,7 @@ python scripts/build_release.py
 动态评测在已提交且输入树干净的版本上运行。评测器会生成证据和逐响应摘要清单：
 
 ```text
-python evals/run_forward_eval.py --model <可用的-Codex-模型>
+python evals/trusted_forward_eval.py --model <固定的-Codex-模型> --service-tier <固定服务层> --no-cache
 python evals/forward_attestation.py prepare --repo .
 ssh-keygen -Y sign -f <离线签名私钥路径> -n kaoyan-forward-eval tests/forward-eval-attestation.json
 ```
@@ -122,7 +124,9 @@ ssh-keygen -Y sign -f <离线签名私钥路径> -n kaoyan-forward-eval tests/fo
 python evals/forward_attestation.py verify --repo . --allowed-signers <仓库外-allowed_signers-路径>
 ```
 
-`evals/verify_forward_evidence.py` 只检查仓库内证据的一致性，不能证明模型运行来源；它不替代上述分离签名门禁。签名有效期最多 30 天，且签名锁定源提交、插件树、测试集、评测器、完整证据字节和 60 份结构化响应摘要。评测证据提交可以晚于被评测源提交，但二者之间的插件、用例和评测器必须零差异。
+`evals/verify_forward_evidence.py` 只检查仓库内证据的一致性，不能证明模型运行来源；它不替代上述分离签名门禁。签名有效期最多 30 天，且签名锁定源提交、插件树、测试集、评测器、完整证据字节和 108 份结构化响应摘要（60 份路由响应、24 份行为响应与 24 份独立 judge 结果）。正式门禁要求路由 `60/60`、行为 `24/24`，并拒绝混用模型、服务层或失败缓存。
+
+非 dry-run 评测必须显式使用 `--no-cache`，证据同时记录 `cache_mode: disabled`。未达到完整门禁时不会覆盖仓库中的正式证据；仅把诊断副本写入被 Git 忽略的 `.cache/forward-eval-failures/`，且后续运行不会读取这些副本。
 
 版本记录见 [CHANGELOG.md](CHANGELOG.md)。
 

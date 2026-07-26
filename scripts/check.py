@@ -74,6 +74,11 @@ def main() -> int:
         type=Path,
         default=Path("tests/system-validator-evidence.json"),
     )
+    parser.add_argument(
+        "--evidence-binding-mode",
+        choices=("pr", "protected-main"),
+        default="pr",
+    )
     args = parser.parse_args()
 
     repo = Path(__file__).resolve().parents[1]
@@ -89,7 +94,16 @@ def main() -> int:
         print(f"[FAIL] {exc}", file=sys.stderr)
         return 1
 
-    run([sys.executable, "scripts/validate_repository.py"], repo, env)
+    run(
+        [
+            sys.executable,
+            "scripts/validate_repository.py",
+            "--evidence-binding-mode",
+            args.evidence_binding_mode,
+        ],
+        repo,
+        env,
+    )
     run([sys.executable, "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py", "-v"], repo, env)
 
     semgrep = shutil.which("semgrep")

@@ -38,6 +38,9 @@ class ReleaseCiTests(unittest.TestCase):
         workflow = (REPO / ".github/workflows/ci.yml").read_text(encoding="utf-8")
         self.assertIn("Check forward-evidence consistency (non-authoritative)", workflow)
         self.assertIn("hashFiles('tests/forward-eval-evidence.json')", workflow)
+        self.assertIn("EVIDENCE_BINDING_MODE", workflow)
+        self.assertIn("--evidence-binding-mode", workflow)
+        self.assertIn("--binding-mode \"$EVIDENCE_BINDING_MODE\"", workflow)
         self.assertIn("forward_attestation.py verify", workflow)
         self.assertIn("KAOYAN_FORWARD_EVAL_ALLOWED_SIGNERS", workflow)
         self.assertIn(

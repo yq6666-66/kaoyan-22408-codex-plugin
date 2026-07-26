@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-07-18T12:38:35Z",
+  "generatedAt": "2026-07-26T16:20:40Z",
   "plugin": {
     "name": "kaoyan-22408",
-    "treeSha256": "5254a0a9fd9513302721578024c6a8c1cab06d7d13d4925546677b4a7f3d132c",
-    "version": "1.1.0"
+    "treeSha256": "5d3f1a77367993b1efea835161bda9132618f61a4979290ca39b9c86feafdf8e",
+    "version": "1.2.0"
   },
   "results": {
     "plugin": {

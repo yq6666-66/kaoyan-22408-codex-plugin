@@ -65,6 +65,21 @@ class RepositoryContractTests(unittest.TestCase):
         diagnostician = (
             skills / "kaoyan-progress-diagnostician/SKILL.md"
         ).read_text(encoding="utf-8")
+        planner = (skills / "kaoyan-22408-planner/SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        error_loop = (skills / "kaoyan-error-loop-coach/SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        english = (skills / "kaoyan-english2-coach/SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        official = (
+            skills / "kaoyan-official-info-researcher/SKILL.md"
+        ).read_text(encoding="utf-8")
+        past_paper = (
+            skills / "kaoyan-past-paper-analyst/SKILL.md"
+        ).read_text(encoding="utf-8")
         self.assertIn("交卷时回报实际用时", mock)
         self.assertIn("不得写成“可附用时”", mock)
         self.assertIn("不下载、补齐、搜索或重建", material)
@@ -73,6 +88,13 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn("不得放在 `[用户材料]` 标签之下", tutor_408)
         self.assertIn("相对周期不是已提供的绝对日期", diagnostician)
         self.assertIn("不得根据当前系统日期自行推定", diagnostician)
+        self.assertIn("用户未说明当前阶段时写 `null`", planner)
+        self.assertIn("支持/证伪后的双向更新规则", error_loop)
+        self.assertIn("不能因此把另一端自动称为“短期”", english)
+        self.assertIn("标题为“必须修正”和“可选提升”的两个清单", english)
+        self.assertIn("传递：[待核验] 暂无可传递的已核验结论", official)
+        self.assertIn("必须建立 Markdown 样本覆盖表", past_paper)
+        self.assertIn("每条趋势同时写支持样本数", past_paper)
 
     def test_accuracy_semantics_reject_impossible_or_inconsistent_values(self) -> None:
         base = {

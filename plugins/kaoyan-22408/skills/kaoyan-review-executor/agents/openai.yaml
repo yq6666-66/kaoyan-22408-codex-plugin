@@ -1,4 +1,4 @@
 interface:
   display_name: "考研复习执行器"
-  short_description: "把既有计划或本次目标拆成可直接执行并回填的单次学习时段"
-  default_prompt: "使用 $kaoyan-review-executor 按我的本次目标、科目和时长安排学习时段。"
+  short_description: "把今晚、现在或中断后的一次学习目标展开为分钟闭合的立即行动"
+  default_prompt: "使用 $kaoyan-review-executor 把我现在的目标、科目和时长排成可执行时间盒。"

@@ -5,11 +5,17 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 from pathlib import Path
 from typing import Any, Iterable
 
 
-REPO = Path(__file__).resolve().parents[1]
+# The trusted bootstrap sets this to the checkout whose Git metadata and output
+# files are being evaluated while importing the evaluator from an immutable
+# blob snapshot.  Normal imports retain the historical path-based default.
+REPO = Path(
+    os.environ.get("K22408_FORWARD_EVAL_REPO", str(Path(__file__).resolve().parents[1]))
+).resolve()
 PLUGIN = REPO / "plugins" / "kaoyan-22408"
 ROUTE_CASES = REPO / "tests" / "forward-cases.json"
 BEHAVIOR_CASES = REPO / "tests" / "behavior-cases.json"
@@ -63,10 +69,10 @@ def cases_sha256(
     )
 
 
-def evaluator_sha256(evals: Path = EVALS) -> str:
+def evaluator_sha256(evals: Path = EVALS, *, relative_to: Path = REPO) -> str:
     """Bind evidence and caches to every evaluator source file and output schema."""
     files = [
-        (path.relative_to(REPO).as_posix(), path)
+        (path.relative_to(relative_to).as_posix(), path)
         for path in evals.rglob("*")
         if path.is_file()
         and "__pycache__" not in path.parts

@@ -1,4 +1,4 @@
 interface:
   display_name: "考研政治教练"
-  short_description: "辅导政治理论、材料题与背诵复测并转交最新时政事实核验"
-  default_prompt: "使用 $kaoyan-politics-coach 讲解这道政治材料题并安排背诵复测。"
+  short_description: "按原理、材料对应、结论讲政治题，并把今年最新事实交给官方核验"
+  default_prompt: "使用 $kaoyan-politics-coach 按原理、材料对应和结论批改这道政治题。"

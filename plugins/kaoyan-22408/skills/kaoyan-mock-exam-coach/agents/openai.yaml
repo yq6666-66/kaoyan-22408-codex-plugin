@@ -1,4 +1,4 @@
 interface:
   display_name: "考研模考教练"
-  short_description: "用原创或用户提供的授权题目组织限时规则并在交卷后评分复盘"
-  default_prompt: "使用 $kaoyan-mock-exam-coach 生成原创章节测，我会自行计时并明确交卷。"
+  short_description: "组织原创或授权套卷、自主计时、冻结题面并在明确交卷后统一评分"
+  default_prompt: "使用 $kaoyan-mock-exam-coach 生成原创套卷；我自行计时并明确交卷。"

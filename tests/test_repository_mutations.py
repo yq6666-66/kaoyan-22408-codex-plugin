@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import json
+import re
+import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 
 REPO = Path(__file__).resolve().parents[1]
@@ -26,6 +30,9 @@ class RepositoryMutationTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.repo = copy_as_committed_repo(Path(self.temporary.name) / "repo")
         self.plugin = self.repo / "plugins/kaoyan-22408"
+        self.version = json.loads(
+            (self.plugin / ".codex-plugin/plugin.json").read_text(encoding="utf-8")
+        )["version"]
 
     def tearDown(self) -> None:
         self.temporary.cleanup()
@@ -101,11 +108,81 @@ class RepositoryMutationTests(unittest.TestCase):
         path.write_text(path.read_text(encoding="utf-8") + marker + "\n", encoding="utf-8", newline="\n")
         self.assert_invalid()
 
+    def test_readme_version_drift_is_rejected(self) -> None:
+        path = self.repo / "README.md"
+        path.write_text(
+            path.read_text(encoding="utf-8").replace(
+                f"当前版本：`{self.version}`", "当前版本：`9.9.9`"
+            ),
+            encoding="utf-8",
+            newline="\n",
+        )
+        with self.assertRaisesRegex(ValidationError, "README current version"):
+            validate_repo(self.repo, verify_evidence=False, scan_history=False)
+
+    def test_readme_install_ref_drift_is_rejected(self) -> None:
+        path = self.repo / "README.md"
+        path.write_text(
+            path.read_text(encoding="utf-8").replace(
+                f"--ref v{self.version}", "--ref v9.9.9"
+            ),
+            encoding="utf-8",
+            newline="\n",
+        )
+        with self.assertRaisesRegex(ValidationError, "README marketplace ref"):
+            validate_repo(self.repo, verify_evidence=False, scan_history=False)
+
+    def test_readme_clone_tag_drift_is_rejected(self) -> None:
+        path = self.repo / "README.md"
+        path.write_text(
+            path.read_text(encoding="utf-8").replace(
+                f"--branch v{self.version}", "--branch v9.9.9"
+            ),
+            encoding="utf-8",
+            newline="\n",
+        )
+        with self.assertRaisesRegex(ValidationError, "README clone tag"):
+            validate_repo(self.repo, verify_evidence=False, scan_history=False)
+
+    def test_changelog_version_drift_is_rejected(self) -> None:
+        path = self.repo / "CHANGELOG.md"
+        mutated = re.sub(
+            rf"^## \[{re.escape(self.version)}\] - (?:Unreleased|\d{{4}}-\d{{2}}-\d{{2}})$",
+            "## [9.9.9] - Unreleased",
+            path.read_text(encoding="utf-8"),
+            count=1,
+            flags=re.MULTILINE,
+        )
+        path.write_text(
+            mutated,
+            encoding="utf-8",
+            newline="\n",
+        )
+        with self.assertRaisesRegex(ValidationError, "CHANGELOG current version"):
+            validate_repo(self.repo, verify_evidence=False, scan_history=False)
+
     def test_partial_forward_evidence_bundle_is_rejected(self) -> None:
         evidence = self.repo / "tests/forward-eval-evidence.json"
         evidence.write_text("{}\n", encoding="utf-8", newline="\n")
         with self.assertRaisesRegex(ValidationError, "bundle is incomplete"):
             check_forward_evidence(self.repo)
+
+    def test_forward_evidence_binding_mode_is_passed_explicitly(self) -> None:
+        tests = self.repo / "tests"
+        for name in (
+            "forward-eval-evidence.json",
+            "forward-eval-response-manifest.json",
+            "forward-eval-attestation.json",
+            "forward-eval-attestation.json.sig",
+        ):
+            (tests / name).write_text("{}\n", encoding="utf-8", newline="\n")
+        completed = subprocess.CompletedProcess([], 0, stdout="[OK]", stderr="")
+        with patch("validate_repository.subprocess.run", return_value=completed) as run:
+            check_forward_evidence(self.repo, binding_mode="protected-main")
+        command = run.call_args.args[0]
+        self.assertEqual(command[-2:], ["--binding-mode", "protected-main"])
+        with self.assertRaisesRegex(ValidationError, "binding mode"):
+            check_forward_evidence(self.repo, binding_mode="unsafe")
 
     def test_deleted_secret_is_still_rejected_from_git_history(self) -> None:
         path = self.repo / "private-note.txt"

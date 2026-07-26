@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.1",
+  "schemaVersion": "1.2",
   "cases": [
     {
       "id": "planner-P1",
@@ -7,7 +7,10 @@
       "kind": "positive",
       "prompt": "距离初试还有 20 周，每周 30 小时，帮我制定四科周计划。",
       "expectedPrimary": "kaoyan-22408-planner",
-      "expectedBehavior": ["请求当前阶段这一最小缺口", "输出跨科时间分配与检查点"]
+      "expectedBehavior": [
+        "按目标日期倒排跨周配额",
+        "附 StudyProfile 且 JSON 位于末尾"
+      ]
     },
     {
       "id": "planner-P2",
@@ -15,7 +18,21 @@
       "kind": "positive",
       "prompt": "我进入强化期，工作日每天 3 小时、周末每天 7 小时，请排下个月节奏。",
       "expectedPrimary": "kaoyan-22408-planner",
-      "expectedBehavior": ["按可用时间计算预算", "保留缓冲并输出 StudyProfile"]
+      "expectedBehavior": [
+        "形成阶段与月度里程碑",
+        "每周预算严格闭合"
+      ]
+    },
+    {
+      "id": "planner-L1",
+      "skillUnderTest": "kaoyan-22408-planner",
+      "kind": "colloquial",
+      "prompt": "我今年考研，每周能挤 25 小时，四科这几个月咋分？",
+      "expectedPrimary": "kaoyan-22408-planner",
+      "expectedBehavior": [
+        "个人今年目标不是官方事实触发",
+        "输出跨科倒排和立即动作"
+      ]
     },
     {
       "id": "planner-C1",
@@ -23,8 +40,22 @@
       "kind": "conflict",
       "prompt": "我上周计划 28 个任务只完成 17 个，为什么落后，最大风险是什么？",
       "expectedPrimary": "kaoyan-progress-diagnostician",
-      "expectedNotPrimary": "kaoyan-22408-planner",
-      "expectedBehavior": ["先诊断完成差距", "不直接重做完整计划"]
+      "expectedBehavior": [
+        "先诊断既有偏差",
+        "不由规划师抢答"
+      ],
+      "expectedNotPrimary": "kaoyan-22408-planner"
+    },
+    {
+      "id": "planner-M1",
+      "skillUnderTest": "kaoyan-22408-planner",
+      "kind": "compound",
+      "prompt": "先确认今年数学二考试范围，再按每周 25 小时给我排到初试。",
+      "expectedPrimary": "kaoyan-official-info-researcher",
+      "expectedBehavior": [
+        "当年考试范围是阻塞性官方事实",
+        "核验后交接规划师"
+      ]
     },
     {
       "id": "executor-P1",
@@ -32,7 +63,10 @@
       "kind": "positive",
       "prompt": "这是我的周计划，请展开成今天 4 小时的任务清单：数学二 2 单元、408 2 单元、英语阅读 1 篇。",
       "expectedPrimary": "kaoyan-review-executor",
-      "expectedBehavior": ["保留既有优先级", "输出时段、完成标准和降级方案"]
+      "expectedBehavior": [
+        "展开一次时段",
+        "分钟总量严格闭合"
+      ]
     },
     {
       "id": "executor-P2",
@@ -40,7 +74,21 @@
       "kind": "positive",
       "prompt": "今晚有 3 小时，我要完成数学二极限专项和 408 数据结构复习，请排成本次学习时段。",
       "expectedPrimary": "kaoyan-review-executor",
-      "expectedBehavior": ["无需长期计划即可展开本次时段", "给出可验证结束条件并附 ProgressSnapshot 1.1"]
+      "expectedBehavior": [
+        "无需长期计划即可执行",
+        "附末尾 ProgressSnapshot"
+      ]
+    },
+    {
+      "id": "executor-L1",
+      "skillUnderTest": "kaoyan-review-executor",
+      "kind": "colloquial",
+      "prompt": "今晚就 150 分钟，数学极限和 408 队列怎么安排？现在先干啥？",
+      "expectedPrimary": "kaoyan-review-executor",
+      "expectedBehavior": [
+        "第一行给立即动作",
+        "休息切换与收尾计入 150 分钟"
+      ]
     },
     {
       "id": "executor-C1",
@@ -48,8 +96,22 @@
       "kind": "conflict",
       "prompt": "我还没有复习计划，帮我从现在规划到初试。",
       "expectedPrimary": "kaoyan-22408-planner",
-      "expectedNotPrimary": "kaoyan-review-executor",
-      "expectedBehavior": ["先建立长期计划", "不伪装成当日展开"]
+      "expectedBehavior": [
+        "目标日倒排属于规划",
+        "不把长期路线当一次时段"
+      ],
+      "expectedNotPrimary": "kaoyan-review-executor"
+    },
+    {
+      "id": "executor-M1",
+      "skillUnderTest": "kaoyan-review-executor",
+      "kind": "compound",
+      "prompt": "先把今晚 120 分钟排好，结束后我再拿完成记录诊断风险。",
+      "expectedPrimary": "kaoyan-review-executor",
+      "expectedBehavior": [
+        "当前主要产物是单次时间盒",
+        "用交接卡传递给诊断师"
+      ]
     },
     {
       "id": "diagnostician-P1",
@@ -57,7 +119,10 @@
       "kind": "positive",
       "prompt": "我本周计划 30 小时，完成 21 小时；做了 40 道数学题，正确 22 道。请诊断风险。",
       "expectedPrimary": "kaoyan-progress-diagnostician",
-      "expectedBehavior": ["同时考虑完成率和样本量", "区分事实、推断和调整信号"]
+      "expectedBehavior": [
+        "区分观察与推断",
+        "不重写完整计划"
+      ]
     },
     {
       "id": "diagnostician-P2",
@@ -65,7 +130,21 @@
       "kind": "positive",
       "prompt": "比较我粘贴的两期 ProgressSnapshot，告诉我哪科在恶化。",
       "expectedPrimary": "kaoyan-progress-diagnostician",
-      "expectedBehavior": ["先校验周期和口径", "指出变化幅度与置信限制"]
+      "expectedBehavior": [
+        "先核对口径和样本",
+        "规范化快照放末尾"
+      ]
+    },
+    {
+      "id": "diagnostician-L1",
+      "skillUnderTest": "kaoyan-progress-diagnostician",
+      "kind": "colloquial",
+      "prompt": "最近总完不成：数学 10 小时只做 6 小时，408 也卡住了，帮我看看咋回事。",
+      "expectedPrimary": "kaoyan-progress-diagnostician",
+      "expectedBehavior": [
+        "根据已给记录诊断",
+        "说明未知和置信度"
+      ]
     },
     {
       "id": "diagnostician-C1",
@@ -73,8 +152,22 @@
       "kind": "conflict",
       "prompt": "不用分析原因，把我已经确认的周计划拆成明天的清单。",
       "expectedPrimary": "kaoyan-review-executor",
-      "expectedNotPrimary": "kaoyan-progress-diagnostician",
-      "expectedBehavior": ["直接展开既有计划", "不增加诊断步骤"]
+      "expectedBehavior": [
+        "已确认计划的一次展开归执行器",
+        "不由诊断师安排"
+      ],
+      "expectedNotPrimary": "kaoyan-progress-diagnostician"
+    },
+    {
+      "id": "diagnostician-M1",
+      "skillUnderTest": "kaoyan-progress-diagnostician",
+      "kind": "compound",
+      "prompt": "先根据这两周快照判断为什么落后，再告诉我该把哪些信号交给规划师重排。",
+      "expectedPrimary": "kaoyan-progress-diagnostician",
+      "expectedBehavior": [
+        "先完成诊断主产物",
+        "交接最小调整信号而不代替规划"
+      ]
     },
     {
       "id": "error-loop-P1",
@@ -82,7 +175,10 @@
       "kind": "positive",
       "prompt": "这三道信号量题都错了，请按根因聚类并安排 3 次复测。",
       "expectedPrimary": "kaoyan-error-loop-coach",
-      "expectedBehavior": ["按错误机制而非题号聚类", "输出 ReviewQueue 与掌握证据"]
+      "expectedBehavior": [
+        "跨题错因聚类",
+        "安排复测并输出末尾 ReviewQueue"
+      ]
     },
     {
       "id": "error-loop-P2",
@@ -90,7 +186,21 @@
       "kind": "positive",
       "prompt": "我一周前错的极限题今天做对了，能算掌握吗？请给复测标准。",
       "expectedPrimary": "kaoyan-error-loop-coach",
-      "expectedBehavior": ["不以一次正确判定掌握", "给出间隔与变式证据要求"]
+      "expectedBehavior": [
+        "使用延迟掌握判据",
+        "当场或单次答对不算 mastered"
+      ]
+    },
+    {
+      "id": "error-loop-L1",
+      "skillUnderTest": "kaoyan-error-loop-coach",
+      "kind": "colloquial",
+      "prompt": "这些题我总是错，你帮我分分类，啥时候再测才算真会？",
+      "expectedPrimary": "kaoyan-error-loop-coach",
+      "expectedBehavior": [
+        "多题记录触发错题闭环",
+        "假设错因配证伪动作"
+      ]
     },
     {
       "id": "error-loop-C1",
@@ -98,8 +208,22 @@
       "kind": "conflict",
       "prompt": "请从零讲解这道 408 页面置换算法单题。",
       "expectedPrimary": "kaoyan-408-tutor",
-      "expectedNotPrimary": "kaoyan-error-loop-coach",
-      "expectedBehavior": ["完成单题讲解", "不因是一道错题就强制聚类"]
+      "expectedBehavior": [
+        "单题讲解归 408 tutor",
+        "不按题量机械路由"
+      ],
+      "expectedNotPrimary": "kaoyan-error-loop-coach"
+    },
+    {
+      "id": "error-loop-M1",
+      "skillUnderTest": "kaoyan-error-loop-coach",
+      "kind": "compound",
+      "prompt": "先把这 8 道错题按根因聚类并排复测，之后我再挑一道让老师讲。",
+      "expectedPrimary": "kaoyan-error-loop-coach",
+      "expectedBehavior": [
+        "当前主要产物是聚类复测",
+        "讲题作为下游交接"
+      ]
     },
     {
       "id": "mock-P1",
@@ -107,7 +231,10 @@
       "kind": "positive",
       "prompt": "生成 8 道原创数据结构章节测，限时 25 分钟，交卷后再公布答案。",
       "expectedPrimary": "kaoyan-mock-exam-coach",
-      "expectedBehavior": ["冻结题面和规则", "提交前不泄露答案或线索"]
+      "expectedBehavior": [
+        "冻结 examId 与题面版本",
+        "交卷前零泄露"
+      ]
     },
     {
       "id": "mock-P2",
@@ -115,7 +242,21 @@
       "kind": "positive",
       "prompt": "我有权使用下面 5 道题，请按原顺序组织计时测验，我提交后统一评分。",
       "expectedPrimary": "kaoyan-mock-exam-coach",
-      "expectedBehavior": ["确认授权与完整题面", "收卷后才评分复盘"]
+      "expectedBehavior": [
+        "只使用实际提供题目",
+        "公开不泄露答案的 rubric"
+      ]
+    },
+    {
+      "id": "mock-L1",
+      "skillUnderTest": "kaoyan-mock-exam-coach",
+      "kind": "colloquial",
+      "prompt": "来套原创高数卷，30 分钟，我自己计时，交卷再一起判。",
+      "expectedPrimary": "kaoyan-mock-exam-coach",
+      "expectedBehavior": [
+        "套卷统一交卷触发模考",
+        "不暗示后台计时"
+      ]
     },
     {
       "id": "mock-C1",
@@ -123,8 +264,22 @@
       "kind": "conflict",
       "prompt": "给我 5 道导数练习，每出一道就立即讲答案。",
       "expectedPrimary": "kaoyan-math2-coach",
-      "expectedNotPrimary": "kaoyan-mock-exam-coach",
-      "expectedBehavior": ["作为专项训练逐题讲解", "不建立冻结模考流程"]
+      "expectedBehavior": [
+        "即时讲题归数学教练",
+        "不满足冻结统一交卷"
+      ],
+      "expectedNotPrimary": "kaoyan-mock-exam-coach"
+    },
+    {
+      "id": "mock-M1",
+      "skillUnderTest": "kaoyan-mock-exam-coach",
+      "kind": "compound",
+      "prompt": "先核验今年数学二范围，再按官方范围给我一套 30 分钟原创卷。",
+      "expectedPrimary": "kaoyan-official-info-researcher",
+      "expectedBehavior": [
+        "当年范围阻塞出卷",
+        "核验后交接模考"
+      ]
     },
     {
       "id": "408-P1",
@@ -132,7 +287,10 @@
       "kind": "positive",
       "prompt": "这道中断题缺了一个选项，先告诉我哪些结论还能确定。",
       "expectedPrimary": "kaoyan-408-tutor",
-      "expectedBehavior": ["识别题面缺口", "只做有条件的有限分析"]
+      "expectedBehavior": [
+        "识别题面缺项",
+        "只给不受缺项影响的有限分析"
+      ]
     },
     {
       "id": "408-P2",
@@ -140,7 +298,21 @@
       "kind": "positive",
       "prompt": "我算这道 Cache 题选 B，但参考答案写 D，请逐步核对冲突。",
       "expectedPrimary": "kaoyan-408-tutor",
-      "expectedBehavior": ["分别列出用户推导和参考口径", "定位首个分歧而不盲从答案"]
+      "expectedBehavior": [
+        "分离用户材料与模型推导",
+        "用状态表或边界验证冲突"
+      ]
+    },
+    {
+      "id": "408-L1",
+      "skillUnderTest": "kaoyan-408-tutor",
+      "kind": "colloquial",
+      "prompt": "这道 Cache 访问序列到底咋走？给我画个状态表，顺便看边界。",
+      "expectedPrimary": "kaoyan-408-tutor",
+      "expectedBehavior": [
+        "状态表优先",
+        "解释复杂度或边界"
+      ]
     },
     {
       "id": "408-C1",
@@ -148,8 +320,22 @@
       "kind": "conflict",
       "prompt": "把我最近 12 道 408 错题按根因聚类并排下周复测。",
       "expectedPrimary": "kaoyan-error-loop-coach",
-      "expectedNotPrimary": "kaoyan-408-tutor",
-      "expectedBehavior": ["聚类错误机制", "输出复测队列而非逐题长讲"]
+      "expectedBehavior": [
+        "跨题聚类归错题闭环",
+        "不由单题 tutor 抢答"
+      ],
+      "expectedNotPrimary": "kaoyan-408-tutor"
+    },
+    {
+      "id": "408-M1",
+      "skillUnderTest": "kaoyan-408-tutor",
+      "kind": "compound",
+      "prompt": "先讲清这道 408 页表题并定位第一处错误，讲完我再把结论加入复测队列。",
+      "expectedPrimary": "kaoyan-408-tutor",
+      "expectedBehavior": [
+        "当前主要产物是讲题",
+        "只用交接卡传递单题结论"
+      ]
     },
     {
       "id": "math2-P1",
@@ -157,7 +343,10 @@
       "kind": "positive",
       "prompt": "讲解这个二元函数极值题，并说明拉格朗日乘数法的适用条件。",
       "expectedPrimary": "kaoyan-math2-coach",
-      "expectedBehavior": ["给出关键推导", "说明边界与验算"]
+      "expectedBehavior": [
+        "前提检查后给主解",
+        "使用独立信号复核"
+      ]
     },
     {
       "id": "math2-P2",
@@ -165,7 +354,21 @@
       "kind": "positive",
       "prompt": "我求导时总漏掉复合函数外层，请定位错因并设计 3 题专项训练。",
       "expectedPrimary": "kaoyan-math2-coach",
-      "expectedBehavior": ["定位具体错误机制", "提供递进且原创的专项题"]
+      "expectedBehavior": [
+        "定位当前题第一处错误",
+        "给一条迁移规则"
+      ]
+    },
+    {
+      "id": "math2-L1",
+      "skillUnderTest": "kaoyan-math2-coach",
+      "kind": "colloquial",
+      "prompt": "这道积分我老算错，先看我哪一步最早翻车，再独立验一遍。",
+      "expectedPrimary": "kaoyan-math2-coach",
+      "expectedBehavior": [
+        "单题总是错仍归数学二",
+        "固定五段流程"
+      ]
     },
     {
       "id": "math2-C1",
@@ -173,8 +376,22 @@
       "kind": "conflict",
       "prompt": "用原创高数题组织 30 分钟计时测验，我交卷后再统一评分。",
       "expectedPrimary": "kaoyan-mock-exam-coach",
-      "expectedNotPrimary": "kaoyan-math2-coach",
-      "expectedBehavior": ["冻结试卷并计时", "交卷前不逐题讲解"]
+      "expectedBehavior": [
+        "统一计时交卷归模考",
+        "不由数学教练即时讲"
+      ],
+      "expectedNotPrimary": "kaoyan-math2-coach"
+    },
+    {
+      "id": "math2-M1",
+      "skillUnderTest": "kaoyan-math2-coach",
+      "kind": "compound",
+      "prompt": "先找出我这道极限题的第一处错误，再把这个错误类型交给错题教练聚类。",
+      "expectedPrimary": "kaoyan-math2-coach",
+      "expectedBehavior": [
+        "当前主产物是单题定位",
+        "后续聚类用交接卡"
+      ]
     },
     {
       "id": "english2-P1",
@@ -182,7 +399,10 @@
       "kind": "positive",
       "prompt": "批改我的英语二图表作文，重点看任务完成度、逻辑和语言。",
       "expectedPrimary": "kaoyan-english2-coach",
-      "expectedBehavior": ["按维度批改", "保留原意给出改写和训练"]
+      "expectedBehavior": [
+        "先逐点修改再示例改写",
+        "估分明确非官方"
+      ]
     },
     {
       "id": "english2-P2",
@@ -190,7 +410,21 @@
       "kind": "positive",
       "prompt": "分析这段英语二阅读的长难句，并检查我的中文翻译。",
       "expectedPrimary": "kaoyan-english2-coach",
-      "expectedBehavior": ["拆分句法与指代", "区分理解错误和表达问题"]
+      "expectedBehavior": [
+        "拆主干与关系错误",
+        "用原文证据链"
+      ]
+    },
+    {
+      "id": "english2-L1",
+      "skillUnderTest": "kaoyan-english2-coach",
+      "kind": "colloquial",
+      "prompt": "这道阅读 B 和 C 到底看哪句？把证据链给我捋清。",
+      "expectedPrimary": "kaoyan-english2-coach",
+      "expectedBehavior": [
+        "设问到原文再到选项",
+        "定位证据链第一处断裂"
+      ]
     },
     {
       "id": "english2-C1",
@@ -198,8 +432,22 @@
       "kind": "conflict",
       "prompt": "把我过去两周的英语错题按根因分组并安排间隔复测。",
       "expectedPrimary": "kaoyan-error-loop-coach",
-      "expectedNotPrimary": "kaoyan-english2-coach",
-      "expectedBehavior": ["按错因建立复测闭环", "需要时再转交英语教练讲解"]
+      "expectedBehavior": [
+        "跨题复测归错题闭环",
+        "不由英语教练替代"
+      ],
+      "expectedNotPrimary": "kaoyan-english2-coach"
+    },
+    {
+      "id": "english2-M1",
+      "skillUnderTest": "kaoyan-english2-coach",
+      "kind": "compound",
+      "prompt": "先按英语二标准批改这篇作文并给非官方估分，之后把错误交给错题教练。",
+      "expectedPrimary": "kaoyan-english2-coach",
+      "expectedBehavior": [
+        "当前主要产物是作文批改",
+        "跨题闭环作为交接"
+      ]
     },
     {
       "id": "politics-P1",
@@ -207,7 +455,10 @@
       "kind": "positive",
       "prompt": "用矛盾普遍性和特殊性分析这道政治材料题。",
       "expectedPrimary": "kaoyan-politics-coach",
-      "expectedBehavior": ["连接原理与材料", "给出分层答题结构"]
+      "expectedBehavior": [
+        "按原理材料结论组织",
+        "材料证据与原理对应"
+      ]
     },
     {
       "id": "politics-P2",
@@ -215,7 +466,21 @@
       "kind": "positive",
       "prompt": "帮我复测社会主义核心价值观，先提问，等我回答后再纠错。",
       "expectedPrimary": "kaoyan-politics-coach",
-      "expectedBehavior": ["先测试回忆而非直接展示答案", "根据回答安排再测"]
+      "expectedBehavior": [
+        "主动回忆先问后答",
+        "原创内容使用标签"
+      ]
+    },
+    {
+      "id": "politics-L1",
+      "skillUnderTest": "kaoyan-politics-coach",
+      "kind": "colloquial",
+      "prompt": "这段材料到底对应啥原理？帮我按得分点捋成原理—材料—结论。",
+      "expectedPrimary": "kaoyan-politics-coach",
+      "expectedBehavior": [
+        "固定三段结构",
+        "先给得分点"
+      ]
     },
     {
       "id": "politics-C1",
@@ -223,8 +488,22 @@
       "kind": "conflict",
       "prompt": "今年最新的重要时政事件有哪些？请给官方发布日期和链接。",
       "expectedPrimary": "kaoyan-official-info-researcher",
-      "expectedNotPrimary": "kaoyan-politics-coach",
-      "expectedBehavior": ["访问官方来源核验", "不靠记忆列举当前事实"]
+      "expectedBehavior": [
+        "当前时政归官方核验",
+        "不得凭记忆"
+      ],
+      "expectedNotPrimary": "kaoyan-politics-coach"
+    },
+    {
+      "id": "politics-M1",
+      "skillUnderTest": "kaoyan-politics-coach",
+      "kind": "compound",
+      "prompt": "先核验今年这项就业政策的官方内容，再用相关政治原理分析材料。",
+      "expectedPrimary": "kaoyan-official-info-researcher",
+      "expectedBehavior": [
+        "当前政策事实前置",
+        "核验后交接政治教练"
+      ]
     },
     {
       "id": "past-paper-P1",
@@ -232,7 +511,10 @@
       "kind": "positive",
       "prompt": "分析我上传且有权使用的三年 408 真题，统计章节分布和能力层次。",
       "expectedPrimary": "kaoyan-past-paper-analyst",
-      "expectedBehavior": ["只分析已提供文件", "给出样本范围与可追溯结论"]
+      "expectedBehavior": [
+        "建立样本覆盖表",
+        "趋势带样本量和置信度"
+      ]
     },
     {
       "id": "past-paper-P2",
@@ -240,7 +522,21 @@
       "kind": "positive",
       "prompt": "这是我提供的两套英语二真题，请比较阅读题型和干扰项特点。",
       "expectedPrimary": "kaoyan-past-paper-analyst",
-      "expectedBehavior": ["确认文件与年份范围", "输出比较表和训练建议"]
+      "expectedBehavior": [
+        "声明缺页与分块范围",
+        "不补全试卷"
+      ]
+    },
+    {
+      "id": "past-paper-L1",
+      "skillUnderTest": "kaoyan-past-paper-analyst",
+      "kind": "colloquial",
+      "prompt": "我传了两套卷，帮我看看都覆盖了啥；样本少的地方别硬说趋势。",
+      "expectedPrimary": "kaoyan-past-paper-analyst",
+      "expectedBehavior": [
+        "套卷分析归真题分析",
+        "限制小样本趋势"
+      ]
     },
     {
       "id": "past-paper-C1",
@@ -248,8 +544,22 @@
       "kind": "conflict",
       "prompt": "这是一页老师讲义，不是真题。请整理成摘要和记忆卡片。",
       "expectedPrimary": "kaoyan-material-study-assistant",
-      "expectedNotPrimary": "kaoyan-past-paper-analyst",
-      "expectedBehavior": ["按讲义材料加工", "不套用真题统计框架"]
+      "expectedBehavior": [
+        "讲义加工归材料助手",
+        "不因文件形式误路由"
+      ],
+      "expectedNotPrimary": "kaoyan-past-paper-analyst"
+    },
+    {
+      "id": "past-paper-M1",
+      "skillUnderTest": "kaoyan-past-paper-analyst",
+      "kind": "compound",
+      "prompt": "先比较我提供的两套 408 真题覆盖和有限趋势，再挑其中一题交给老师讲。",
+      "expectedPrimary": "kaoyan-past-paper-analyst",
+      "expectedBehavior": [
+        "当前主要产物是真题分析",
+        "单题讲解作为交接"
+      ]
     },
     {
       "id": "material-P1",
@@ -257,7 +567,10 @@
       "kind": "positive",
       "prompt": "把我粘贴的操作系统讲义整理成摘要、问答卡片和 5 道原创练习。",
       "expectedPrimary": "kaoyan-material-study-assistant",
-      "expectedBehavior": ["限定在用户提供内容", "区分摘要、卡片和原创练习"]
+      "expectedBehavior": [
+        "按材料范围分块",
+        "摘要卡片与原创练习分标签"
+      ]
     },
     {
       "id": "material-P2",
@@ -265,7 +578,21 @@
       "kind": "positive",
       "prompt": "根据我提供的教材两段内容，做概念图式提纲并出自测题。",
       "expectedPrimary": "kaoyan-material-study-assistant",
-      "expectedBehavior": ["避免无必要大段复现", "给出可回忆的学习产物"]
+      "expectedBehavior": [
+        "只使用实际提供片段",
+        "列覆盖与缺失"
+      ]
+    },
+    {
+      "id": "material-L1",
+      "skillUnderTest": "kaoyan-material-study-assistant",
+      "kind": "colloquial",
+      "prompt": "这份笔记太乱了，先帮我捋个提纲，再做几张记忆卡。",
+      "expectedPrimary": "kaoyan-material-study-assistant",
+      "expectedBehavior": [
+        "口语化整理意图归材料助手",
+        "不生成无意义记录"
+      ]
     },
     {
       "id": "material-C1",
@@ -273,8 +600,22 @@
       "kind": "conflict",
       "prompt": "这是我上传的 408 讲义片段，请把其中的页面置换概念讲清楚并解答附题。",
       "expectedPrimary": "kaoyan-408-tutor",
-      "expectedNotPrimary": "kaoyan-material-study-assistant",
-      "expectedBehavior": ["按讲解意图转交 408 学科辅导", "不因载体是讲义而强制做摘要"]
+      "expectedBehavior": [
+        "学科讲解意图优先",
+        "材料载体不决定路由"
+      ],
+      "expectedNotPrimary": "kaoyan-material-study-assistant"
+    },
+    {
+      "id": "material-M1",
+      "skillUnderTest": "kaoyan-material-study-assistant",
+      "kind": "compound",
+      "prompt": "先把这份 408 笔记整理成提纲和卡片，之后我再挑一个概念让老师讲。",
+      "expectedPrimary": "kaoyan-material-study-assistant",
+      "expectedBehavior": [
+        "当前主要产物是材料加工",
+        "学科讲解作为交接"
+      ]
     },
     {
       "id": "official-P1",
@@ -282,7 +623,10 @@
       "kind": "positive",
       "prompt": "核验今年全国硕士研究生招生考试的报名时间和初试安排。",
       "expectedPrimary": "kaoyan-official-info-researcher",
-      "expectedBehavior": ["查询教育部或研招网", "给链接、发布日期与核验日期"]
+      "expectedBehavior": [
+        "实际访问一手官方来源",
+        "给直接 URL 和绝对核验日"
+      ]
     },
     {
       "id": "official-P2",
@@ -290,7 +634,21 @@
       "kind": "positive",
       "prompt": "请核验目标院校今年 085404 的招生目录；我稍后补院校名称。",
       "expectedPrimary": "kaoyan-official-info-researcher",
-      "expectedBehavior": ["只请求院校名称这一必要信息", "以院校官网为最终依据"]
+      "expectedBehavior": [
+        "请求最小院校缺口",
+        "比较文件年度和效力"
+      ]
+    },
+    {
+      "id": "official-L1",
+      "skillUnderTest": "kaoyan-official-info-researcher",
+      "kind": "colloquial",
+      "prompt": "今年报名到底啥时候？别按记忆说，给我官网和核验日期。",
+      "expectedPrimary": "kaoyan-official-info-researcher",
+      "expectedBehavior": [
+        "当前报名触发官方核验",
+        "失败时使用待核验"
+      ]
     },
     {
       "id": "official-C1",
@@ -298,8 +656,22 @@
       "kind": "conflict",
       "prompt": "讲解马克思主义认识论中实践与认识的关系，不需要当前政策。",
       "expectedPrimary": "kaoyan-politics-coach",
-      "expectedNotPrimary": "kaoyan-official-info-researcher",
-      "expectedBehavior": ["完成理论讲解", "不进行无关的当前信息检索"]
+      "expectedBehavior": [
+        "稳定理论归政治教练",
+        "不由官方核验员教学"
+      ],
+      "expectedNotPrimary": "kaoyan-official-info-researcher"
+    },
+    {
+      "id": "official-M1",
+      "skillUnderTest": "kaoyan-official-info-researcher",
+      "kind": "compound",
+      "prompt": "先核验目标院校今年专业目录和考试科目，再把准确结果交给规划师排计划。",
+      "expectedPrimary": "kaoyan-official-info-researcher",
+      "expectedBehavior": [
+        "官方事实阻塞后续规划",
+        "输出最小交接卡"
+      ]
     }
   ]
 }

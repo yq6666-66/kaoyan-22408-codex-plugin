@@ -1,4 +1,4 @@
 interface:
   display_name: "考研错题闭环教练"
-  short_description: "聚类错题根因、安排间隔复测并判断是否已经形成掌握证据"
-  default_prompt: "使用 $kaoyan-error-loop-coach 聚类这些错题并生成复测队列。"
+  short_description: "聚类总是错的多题记录、验证假设错因并安排延迟复测与掌握判据"
+  default_prompt: "使用 $kaoyan-error-loop-coach 聚类这些错误并生成带验证动作的复测队列。"
