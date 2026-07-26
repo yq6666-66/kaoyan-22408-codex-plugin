@@ -95,8 +95,6 @@ def terminate_process_tree(
     grace_seconds: float = 2.0,
 ) -> None:
     """Terminate one managed Codex process and all descendants."""
-    if process.poll() is not None:
-        return
     if platform == "nt":
         creationflags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
         subprocess.run(
@@ -107,26 +105,34 @@ def terminate_process_tree(
             creationflags=creationflags,
         )
     else:
+        process_group = process.pid
         try:
-            os.killpg(process.pid, signal.SIGTERM)
+            os.killpg(process_group, signal.SIGTERM)
         except ProcessLookupError:
             pass
-    try:
-        process.wait(timeout=grace_seconds)
-        return
-    except subprocess.TimeoutExpired:
-        pass
+        deadline = time.monotonic() + grace_seconds
+        while time.monotonic() < deadline:
+            try:
+                os.killpg(process_group, 0)
+            except ProcessLookupError:
+                break
+            time.sleep(0.05)
+        else:
+            try:
+                os.killpg(process_group, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
     if platform == "nt":
-        process.kill()
+        # taskkill /T /F is the tree kill; process.kill() only covers the leader.
+        try:
+            process.kill()
+        except ProcessLookupError:
+            pass
     else:
         try:
-            os.killpg(process.pid, signal.SIGKILL)
+            process.wait(timeout=grace_seconds)
         except ProcessLookupError:
             pass
-    try:
-        process.wait(timeout=grace_seconds)
-    except subprocess.TimeoutExpired:
-        process.kill()
         try:
             process.wait(timeout=grace_seconds)
         except subprocess.TimeoutExpired:
@@ -157,8 +163,13 @@ def managed_popen(
         )
     else:
         kwargs["start_new_session"] = True
-    process = subprocess.Popen(command, **kwargs)
-    register_process(process)
+    # Serialize the abort check, spawn, and registration.  Otherwise an abort
+    # can observe an empty registry between Popen() and register_process().
+    with PROCESS_LOCK:
+        if ABORT_EVENT.is_set():
+            raise NonRetryableEvaluationError("evaluation aborted before process launch")
+        process = subprocess.Popen(command, **kwargs)
+        ACTIVE_PROCESSES.add(process)
     return process
 
 
