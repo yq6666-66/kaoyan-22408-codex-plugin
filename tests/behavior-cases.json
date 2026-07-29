@@ -428,7 +428,7 @@
     {
       "id": "behavior-25-planner-obsidian-memory",
       "title": "规划师自动读取学习档案并结构化写回",
-      "hostContext": "obsidian.connected=true；writeMode=auto-structured；writeBridge=writable。\n已读取 2 条：[Obsidian记忆] 学习档案：targetDate=2026-12-20，weeklyHours=35；[Obsidian记忆] 当前进度：408 明显落后。\n本地执行器可在本轮结束前原子应用符合契约的结构化更新。",
+      "hostContext": "obsidian.connected=true；writeMode=auto-structured；writeBridge=writable。\n已读取 2 条：[Obsidian记忆] 学习档案：targetDate=2026-12-20，weeklyHours=35；[Obsidian记忆] 当前进度：408 明显落后。\n用户尚未确认本轮即将生成的具体计划；本地执行器只能在用户确认后原子应用该计划，本轮不得提前写回。",
       "transcript": [
         {
           "role": "user",
