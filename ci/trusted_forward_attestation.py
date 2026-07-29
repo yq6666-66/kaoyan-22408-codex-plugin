@@ -28,11 +28,19 @@ import forward_attestation as legacy  # noqa: E402
 PROFILE_COUNTS = {
     "1.1": (36, 12),
     "1.2": (60, 24),
+    "1.3": (60, 36),
 }
 SCHEMA_PATHS = {
     version: TRUSTED_ROOT / "ci" / "schemas" / f"evidence-{version}.schema.json"
     for version in PROFILE_COUNTS
 }
+# Teach the immutable legacy helpers how to build/validate a 1.3 response
+# manifest without modifying evals/ and invalidating the current 1.2 evidence.
+legacy.EVIDENCE_PROFILES["1.3"] = (
+    60,
+    36,
+    SCHEMA_PATHS["1.3"],
+)
 RELEVANT_INPUTS = (
     "plugins/kaoyan-22408",
     "tests/forward-cases.json",

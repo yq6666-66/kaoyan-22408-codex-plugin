@@ -24,7 +24,7 @@ except ImportError:
 def expand_cases(repo: Path) -> None:
     route_path = repo / "tests/forward-cases.json"
     routes = json.loads(route_path.read_text(encoding="utf-8"))
-    routes["schemaVersion"] = "1.2"
+    routes["schemaVersion"] = "1.3"
     templates = list(routes["cases"])
     while len(routes["cases"]) < 60:
         number = len(routes["cases"]) + 1
@@ -39,9 +39,9 @@ def expand_cases(repo: Path) -> None:
 
     behavior_path = repo / "tests/behavior-cases.json"
     behaviors = json.loads(behavior_path.read_text(encoding="utf-8"))
-    behaviors["schemaVersion"] = "1.2"
+    behaviors["schemaVersion"] = "1.3"
     templates = list(behaviors["cases"])
-    while len(behaviors["cases"]) < 24:
+    while len(behaviors["cases"]) < 36:
         number = len(behaviors["cases"]) + 1
         case = dict(templates[(number - 1) % len(templates)])
         case["id"] = f"transition-behavior-{number:02d}"
@@ -113,7 +113,7 @@ def build_evidence(repo: Path, schema_version: str, now: datetime) -> dict:
             for case in behavior_cases
         ],
     }
-    if schema_version == "1.2":
+    if schema_version in {"1.2", "1.3"}:
         evidence["cache_mode"] = "disabled"
     return evidence
 
@@ -130,7 +130,7 @@ class TrustedForwardAttestationTests(unittest.TestCase):
         if run_git(self.repo, "status", "--porcelain").stdout.strip():
             commit_all(self.repo, "expand transition cases")
         self.now = datetime.now(timezone.utc).replace(microsecond=0)
-        self.evidence = build_evidence(self.repo, "1.2", self.now)
+        self.evidence = build_evidence(self.repo, "1.3", self.now)
         self.evidence_path = self.repo / "tests/forward-eval-evidence.json"
         self.manifest_path = self.repo / "tests/forward-eval-response-manifest.json"
         self.statement_path = self.repo / "tests/forward-eval-attestation.json"
@@ -203,16 +203,16 @@ class TrustedForwardAttestationTests(unittest.TestCase):
             now=self.now,
         )
 
-    def test_accepts_60_24_and_requires_108_manifest_entries(self) -> None:
+    def test_accepts_60_36_and_requires_132_manifest_entries(self) -> None:
         self.sign()
         evidence = self.verify()
         self.assertEqual(evidence["route_summary"], {"passed": 60, "total": 60})
         manifest = json.loads(self.manifest_path.read_text(encoding="utf-8"))
-        self.assertEqual(len(manifest["entries"]), 108)
+        self.assertEqual(len(manifest["entries"]), 132)
         identities = {(entry["case_id"], entry["role"]) for entry in manifest["entries"]}
-        self.assertEqual(len(identities), 108)
+        self.assertEqual(len(identities), 132)
 
-    def test_rejects_wrong_v12_counts_and_unknown_profile(self) -> None:
+    def test_rejects_wrong_v13_counts_and_unknown_profile(self) -> None:
         cached = json.loads(json.dumps(self.evidence))
         cached["cache_mode"] = "enabled"
         with self.assertRaisesRegex(trusted.legacy.AuthenticationError, "schema violation"):
@@ -234,7 +234,7 @@ class TrustedForwardAttestationTests(unittest.TestCase):
         with self.assertRaisesRegex(trusted.legacy.AuthenticationError, "unsupported"):
             trusted.validate_evidence(self.repo, unknown)
 
-    def test_v12_requires_disabled_cache_mode(self) -> None:
+    def test_v13_requires_disabled_cache_mode(self) -> None:
         missing = json.loads(json.dumps(self.evidence))
         missing.pop("cache_mode")
         with self.assertRaisesRegex(trusted.legacy.AuthenticationError, "schema violation"):
@@ -265,7 +265,7 @@ class TrustedForwardAttestationTests(unittest.TestCase):
         with self.assertRaisesRegex(trusted.legacy.AuthenticationError, "must be an ancestor"):
             self.verify()
         trusted.BINDING_MODE = "protected-main"
-        self.assertEqual(self.verify()["schema_version"], "1.2")
+        self.assertEqual(self.verify()["schema_version"], "1.3")
 
     def test_rejects_changed_candidate_inputs(self) -> None:
         self.sign()
