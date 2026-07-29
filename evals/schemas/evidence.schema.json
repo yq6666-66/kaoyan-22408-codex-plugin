@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Kaoyan 22408 dynamic forward evaluation evidence 1.2",
+  "title": "Kaoyan 22408 dynamic forward evaluation evidence 1.3",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -21,7 +21,7 @@
     "behavior_results"
   ],
   "properties": {
-    "schema_version": {"const": "1.2"},
+    "schema_version": {"const": "1.3"},
     "complete": {"const": true},
     "generated_at": {"type": "string", "format": "date-time"},
     "source_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
@@ -42,8 +42,8 @@
     },
     "behavior_results": {
       "type": "array",
-      "minItems": 24,
-      "maxItems": 24,
+      "minItems": 36,
+      "maxItems": 36,
       "items": {"$ref": "#/$defs/behaviorResult"}
     }
   },

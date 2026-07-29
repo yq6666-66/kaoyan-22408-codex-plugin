@@ -51,7 +51,10 @@ def source_revision_matches_inputs(
         "tests/behavior-cases.json",
         "evals",
     ]
-    if not (schema_version == "1.2" and binding_mode == "protected-main"):
+    if not (
+        schema_version in {"1.2", "1.3"}
+        and binding_mode == "protected-main"
+    ):
         checks = [
             ["git", "cat-file", "-e", f"{revision}^{{commit}}"],
             ["git", "merge-base", "--is-ancestor", revision, "HEAD"],
@@ -101,7 +104,7 @@ def verify_evidence(
     route_cases = load_json(ROUTE_CASES)["cases"]
     behavior_cases = load_json(BEHAVIOR_CASES)["cases"]
     require(len(route_cases) == 60, "route case set must contain exactly 60 cases")
-    require(len(behavior_cases) == 24, "behavior case set must contain exactly 24 cases")
+    require(len(behavior_cases) == 36, "behavior case set must contain exactly 36 cases")
     require(
         evidence["plugin_tree_sha256"] == plugin_tree_sha256(),
         "evaluation evidence does not match the current plugin tree",
@@ -165,8 +168,8 @@ def verify_evidence(
 
     require(evidence["route_summary"] == {"passed": 60, "total": 60}, "route gate must be 60/60")
     require(
-        evidence["behavior_summary"] == {"passed": 24, "total": 24},
-        "behavior gate must be 24/24",
+        evidence["behavior_summary"] == {"passed": 36, "total": 36},
+        "behavior gate must be 36/36",
     )
     return evidence
 
@@ -192,7 +195,7 @@ def main() -> int:
         return 1
     print("[NOTICE] consistency only; this command does not authenticate the model run")
     print(f"[CONSISTENT] route claims: {evidence['route_summary']['passed']}/60")
-    print(f"[CONSISTENT] behavior claims: {evidence['behavior_summary']['passed']}/24")
+    print(f"[CONSISTENT] behavior claims: {evidence['behavior_summary']['passed']}/36")
     print(
         "[CONSISTENT] runtime claim: "
         f"{evidence['codex_version']} / {evidence['model']} / {evidence['service_tier']}"

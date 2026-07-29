@@ -15,6 +15,7 @@ from validate_repository import (  # noqa: E402
     ValidationError,
     check_behavior_cases,
     check_forward_cases,
+    check_obsidian_brain_contract,
     check_portable_schema,
     check_progress_accuracy_semantics,
     validate_repo,
@@ -48,6 +49,7 @@ class RepositoryContractTests(unittest.TestCase):
     def test_schema_and_eval_case_contracts(self) -> None:
         plugin = REPO / "plugins/kaoyan-22408"
         check_portable_schema(plugin)
+        check_obsidian_brain_contract(plugin)
         check_forward_cases(REPO)
         check_behavior_cases(REPO)
 
@@ -83,7 +85,7 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn("交卷时回报实际用时", mock)
         self.assertIn("不得写成“可附用时”", mock)
         self.assertIn("不下载、补齐、搜索或重建", material)
-        self.assertIn("没有跨会话长期记忆，也没有后台学习状态", material)
+        self.assertIn("没有后台学习状态", material)
         self.assertIn("必须另起“模型讲解”段落", tutor_408)
         self.assertIn("不得放在 `[用户材料]` 标签之下", tutor_408)
         self.assertIn("相对周期不是已提供的绝对日期", diagnostician)

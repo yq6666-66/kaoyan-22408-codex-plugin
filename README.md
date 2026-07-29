@@ -1,8 +1,8 @@
 # 考研 22408 Skills 插件
 
-`kaoyan-22408` 是面向数学二、英语二、408 与政治的中文学习插件，可在支持 Skills 插件的 ChatGPT 与 Codex 环境中使用。项目只包含 12 个 Skills、共享契约与品牌图标，不提供独立应用、App、MCP、后台服务、账号、内置题库或学习状态持久化。
+`kaoyan-22408` 是面向数学二、英语二、408 与政治的中文学习插件，可在支持 Skills 插件的 ChatGPT 与 Codex 环境中使用。项目只包含 12 个 Skills、共享契约与品牌图标，不提供独立应用、App、MCP、后台服务、账号或内置题库。用户可选择把本地 Obsidian Vault 作为跨会话学习记忆；发布者无法访问该 Vault。
 
-当前版本：`1.2.0`
+当前版本：`1.3.0`
 
 默认采用自适应简洁输出：先给可执行结论或立即行动，复杂问题再展开必要依据；需要连续学习时使用三行 Markdown 交接卡，必须生成的 Schema 1.1 JSON 永远放在回答末尾。
 
@@ -28,9 +28,10 @@
 ## 数据与内容边界
 
 - 发布者没有接收会话、文件、学习记录或 API Key 的服务器。
-- 插件只处理当前会话内容，不写入用户设备，也不暗示拥有跨会话记忆。
+- 未启用 Obsidian 大脑时，插件只处理当前会话内容，不写入用户设备，也不暗示拥有跨会话记忆。
+- 启用 Obsidian 大脑后，宿主只按本地配置读取和结构化更新用户自己的 Vault；配置、笔记和学习记录不会发送给插件发布者。
 - 真题和学习材料只处理用户当前会话直接提供的有限内容，或用户有权使用且实际提供的文件；不会搜索、补全或重建整套资料。
-- 跨会话继续时，用户可复制插件输出的 Schema 1.1 `StudyProfile`、`ProgressSnapshot` 或 `ReviewQueue` JSON。
+- 跨会话继续时，用户仍可复制插件输出的 Schema 1.1 `StudyProfile`、`ProgressSnapshot` 或 `ReviewQueue` JSON；启用 Obsidian 后这些对象也可作为本地可审计记忆。
 - 招考信息以教育部、研招网和目标院校官网为依据；时政与政策事实以中国政府网、国务院、中央部门或事项发布机构官网为依据。不能核验时会标记 `[待核验]`。
 - 输出使用 `[用户材料]`、`[原创练习]`、`[官方核验]`、`[待核验]` 区分证据来源。
 
@@ -52,7 +53,7 @@ GitHub 仓库是 repo marketplace 的安装源。GitHub Release 中的 ZIP 与 S
 以下命令要求当前 CLI 的 `codex plugin` 帮助中存在相应子命令：
 
 ```text
-codex plugin marketplace add yq6666-66/kaoyan-22408-codex-plugin --ref v1.2.0
+codex plugin marketplace add yq6666-66/kaoyan-22408-codex-plugin --ref v1.3.0
 codex plugin add kaoyan-22408@kaoyan-22408
 ```
 
@@ -61,7 +62,7 @@ codex plugin add kaoyan-22408@kaoyan-22408
 ### 桌面端安装
 
 ```text
-git clone --branch v1.2.0 --depth 1 https://github.com/yq6666-66/kaoyan-22408-codex-plugin.git
+git clone --branch v1.3.0 --depth 1 https://github.com/yq6666-66/kaoyan-22408-codex-plugin.git
 ```
 
 在 ChatGPT Desktop 或 Codex Desktop 中打开克隆后的仓库，重启桌面端，然后从仓库提供的 marketplace 安装 `kaoyan-22408`。桌面端菜单名称可能随版本变化。
@@ -88,6 +89,26 @@ Windows 也可使用只负责转发参数与退出码的 PowerShell 包装：
 ```
 
 退出码含义：`0` 表示验证成功或实际安装成功；`1` 表示验证、命令或安装失败；`2` 表示当前 Codex 不支持插件命令，需要改用桌面端 repo marketplace 人工安装。只有 `codex plugin add` 确实成功时，安装器才会输出 `Installed kaoyan-22408`。
+
+### 可选 Obsidian 大脑
+
+本功能只在具有本地文件权限的 Codex Desktop、Codex CLI 或兼容宿主中可用。ChatGPT Web 无法直接访问电脑上的 Vault，会自动退化为会话模式。
+
+在仓库根目录运行一次配置：
+
+```text
+python scripts/configure_obsidian_brain.py configure --vault <你的-Obsidian-Vault-绝对路径>
+python scripts/configure_obsidian_brain.py check
+```
+
+配置保存在当前用户目录下的 `.codex/kaoyan-22408/obsidian-brain.json`，不进入 Git。任一 22408 Skill 启动时都会检查该配置，优先检索 `20-项目/考研 22408`，并只自动沉淀目标、进度、错因、掌握证据和稳定方法等长期有效内容。
+
+临时只读可在请求中说“本次不记忆”或“只读模式”。全局开关：
+
+```text
+python scripts/configure_obsidian_brain.py disable
+python scripts/configure_obsidian_brain.py enable
+```
 
 ## 调用示例
 
@@ -124,7 +145,7 @@ ssh-keygen -Y sign -f <离线签名私钥路径> -n kaoyan-forward-eval tests/fo
 python evals/forward_attestation.py verify --repo . --allowed-signers <仓库外-allowed_signers-路径>
 ```
 
-`evals/verify_forward_evidence.py` 只检查仓库内证据的一致性，不能证明模型运行来源；它不替代上述分离签名门禁。签名有效期最多 30 天，且签名锁定源提交、插件树、测试集、评测器、完整证据字节和 108 份结构化响应摘要（60 份路由响应、24 份行为响应与 24 份独立 judge 结果）。正式门禁要求路由 `60/60`、行为 `24/24`，并拒绝混用模型、服务层或失败缓存。
+`evals/verify_forward_evidence.py` 只检查仓库内证据的一致性，不能证明模型运行来源；它不替代上述分离签名门禁。签名有效期最多 30 天，且签名锁定源提交、插件树、测试集、评测器、完整证据字节和 132 份结构化响应摘要（60 份路由响应、36 份行为响应与 36 份独立 judge 结果）。正式门禁要求路由 `60/60`、行为 `36/36`，并拒绝混用模型、服务层或失败缓存。
 
 非 dry-run 评测必须显式使用 `--no-cache`，证据同时记录 `cache_mode: disabled`。未达到完整门禁时不会覆盖仓库中的正式证据；仅把诊断副本写入被 Git 忽略的 `.cache/forward-eval-failures/`，且后续运行不会读取这些副本。
 

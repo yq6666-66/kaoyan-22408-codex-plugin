@@ -40,6 +40,7 @@ EXPECTED_SKILLS = {
 EXPECTED_REFERENCES = {
     "capability-routing-contract.md",
     "evidence-copyright-contract.md",
+    "obsidian-brain-contract.md",
     "portable-learning-records.md",
     "portable-learning-records.schema.json",
 }
@@ -317,6 +318,44 @@ def check_links(plugin: Path) -> None:
             require(resolved.exists(), f"Markdown link target does not exist: {md_path}: {target}")
 
 
+def check_obsidian_brain_contract(plugin: Path) -> None:
+    routing = read_utf8_text(plugin / "references" / "capability-routing-contract.md")
+    brain = read_utf8_text(plugin / "references" / "obsidian-brain-contract.md")
+    require(
+        "obsidian-brain-contract.md" in routing,
+        "routing contract must load the Obsidian brain contract",
+    )
+    for marker in (
+        ".codex/kaoyan-22408/obsidian-brain.json",
+        '"schemaVersion": "1.0"',
+        '"writeMode": "auto-structured"',
+        '"retrievalScope": "project-first"',
+        "[Obsidian记忆]",
+        "本次不记忆",
+        "未连接",
+        "最多使用 8 篇笔记",
+        "16,000",
+        "hypothesis",
+        "planned",
+        "completed",
+    ):
+        require(marker in brain, f"Obsidian brain contract is missing marker: {marker}")
+    combined = "\n".join(
+        read_utf8_text(path)
+        for path in plugin.rglob("*")
+        if path.is_file()
+    )
+    for private_marker in (
+        "C:\\Users\\admin",
+        "C:/Users/admin",
+        "ob知识库",
+    ):
+        require(
+            private_marker not in combined,
+            f"public plugin contains a private local path marker: {private_marker}",
+        )
+
+
 def check_portable_schema(plugin: Path) -> None:
     schema_path = plugin / "references" / "portable-learning-records.schema.json"
     schema = load_json(schema_path)
@@ -525,7 +564,7 @@ def check_release_tree(plugin: Path) -> None:
 
 def check_forward_cases(repo: Path) -> None:
     forward = load_json(repo / "tests" / "forward-cases.json")
-    require(isinstance(forward, dict) and forward.get("schemaVersion") == "1.2", "forward cases must use schemaVersion 1.2")
+    require(isinstance(forward, dict) and forward.get("schemaVersion") == "1.3", "forward cases must use schemaVersion 1.3")
     cases = forward.get("cases")
     require(isinstance(cases, list) and len(cases) == 60, "forward cases must contain exactly 60 cases")
     ids = [case.get("id") for case in cases if isinstance(case, dict)]
@@ -557,9 +596,9 @@ def check_forward_cases(repo: Path) -> None:
 
 def check_behavior_cases(repo: Path) -> None:
     behavior = load_json(repo / "tests" / "behavior-cases.json")
-    require(isinstance(behavior, dict) and behavior.get("schemaVersion") == "1.2", "behavior cases must use schemaVersion 1.2")
+    require(isinstance(behavior, dict) and behavior.get("schemaVersion") == "1.3", "behavior cases must use schemaVersion 1.3")
     cases = behavior.get("cases")
-    require(isinstance(cases, list) and len(cases) == 24, "behavior cases must contain exactly 24 cases")
+    require(isinstance(cases, list) and len(cases) == 36, "behavior cases must contain exactly 36 cases")
     ids: list[str] = []
     for case in cases:
         require(isinstance(case, dict), "each behavior case must be an object")
@@ -594,7 +633,7 @@ def check_behavior_cases(repo: Path) -> None:
         for case_id in ids
         if (match := re.fullmatch(r"behavior-(\d{2})-[a-z0-9-]+", case_id))
     }
-    require(numbers == set(range(1, 25)), "behavior case IDs must cover behavior-01 through behavior-24 exactly")
+    require(numbers == set(range(1, 37)), "behavior case IDs must cover behavior-01 through behavior-36 exactly")
 
 
 def check_repository_docs(repo: Path) -> None:
@@ -773,6 +812,7 @@ def validate_repo(
     check_repository_docs(repo)
     check_manifest(plugin)
     check_release_tree(plugin)
+    check_obsidian_brain_contract(plugin)
     check_portable_schema(plugin)
 
     skill_root = plugin / "skills"
@@ -790,9 +830,9 @@ def validate_repo(
     return [
         "manifest and marketplace",
         "12 Skills and openai.yaml files",
-        "shared contracts and portable-record JSON Schema",
+        "shared contracts, optional Obsidian brain, and portable-record JSON Schema",
         "exact release allowlist, UTF-8/LF, and sensitive-content scan",
-        "60 routing cases and 24 behavior cases",
+        "60 routing cases and 36 behavior cases",
         "Git-history and forward-evidence gates",
     ]
 

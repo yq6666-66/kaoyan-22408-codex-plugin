@@ -1,6 +1,6 @@
 # 便携学习记录契约 1.1
 
-便携记录用于把当前会话结果复制到下一次会话。插件不保存对象；由用户自行保管并在需要时重新粘贴。机器校验规则见 [portable-learning-records.schema.json](portable-learning-records.schema.json)。
+便携记录用于把当前会话结果复制到下一次会话。未启用 Obsidian 大脑时由用户自行保管并在需要时重新粘贴；启用后可按大脑契约在用户自己的 Vault 中结构化保存，但仍保持可复制、可审计和可迁移。机器校验规则见 [portable-learning-records.schema.json](portable-learning-records.schema.json)。
 
 ## 通用规则
 

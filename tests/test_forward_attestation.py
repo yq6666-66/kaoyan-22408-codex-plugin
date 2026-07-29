@@ -40,7 +40,7 @@ def build_evidence(repo: Path, generated_at: datetime) -> dict:
         (repo / "tests/behavior-cases.json").read_text(encoding="utf-8")
     )["cases"]
     return {
-        "schema_version": "1.2",
+        "schema_version": "1.3",
         "complete": True,
         "generated_at": generated_at.isoformat().replace("+00:00", "Z"),
         "source_revision": run_git(repo, "rev-parse", "HEAD").stdout.strip(),
