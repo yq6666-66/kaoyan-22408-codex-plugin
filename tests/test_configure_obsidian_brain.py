@@ -38,6 +38,9 @@ class ObsidianBrainConfigTests(unittest.TestCase):
         self.temporary.cleanup()
 
     def run_cli(self, *arguments: str) -> subprocess.CompletedProcess[str]:
+        env = os.environ.copy()
+        env["PYTHONIOENCODING"] = "utf-8"
+        env["PYTHONUTF8"] = "1"
         return subprocess.run(
             [sys.executable, str(SCRIPT), "--config", str(self.config), *arguments],
             cwd=REPO,
@@ -45,6 +48,7 @@ class ObsidianBrainConfigTests(unittest.TestCase):
             stderr=subprocess.PIPE,
             text=True,
             encoding="utf-8",
+            env=env,
             check=False,
         )
 
