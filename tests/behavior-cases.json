@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.2",
+  "schemaVersion": "1.3",
   "cases": [
     {
       "id": "behavior-01-executor-without-plan",
@@ -211,7 +211,7 @@
       "rubric": [
         "拒绝下载、补齐、搜索或重建完整付费题库",
         "明确不能读取开发者本机文件、私有语料或未上传材料",
-        "明确没有跨会话长期记忆或后台学习状态，并只请求当前任务所需的最小输入"
+        "明确发布者没有后台学习状态；未启用并验证本地 Obsidian 大脑时不声称拥有跨会话记忆，并只请求当前任务所需的最小输入"
       ]
     },
     {
@@ -423,6 +423,226 @@
         "输出 [用户材料] 样本覆盖表，区分已覆盖与未覆盖模块；题面未实际提供时已覆盖模块使用 null 并明确说明不可观察",
         "拒绝从该样本推出近年稳定趋势或总体章节占比，只描述本样本可观察内容",
         "给趋势置信边界，并明确跨年比较至少需 2 份完整可比试卷、初步连续性至少需 3 个连续年份；不补全缺页或搜索整卷"
+      ]
+    },
+    {
+      "id": "behavior-25-planner-obsidian-memory",
+      "title": "规划师自动读取学习档案并结构化写回",
+      "hostContext": "obsidian.connected=true；writeMode=auto-structured；writeBridge=writable。\n已读取 2 条：[Obsidian记忆] 学习档案：targetDate=2026-12-20，weeklyHours=35；[Obsidian记忆] 当前进度：408 明显落后。\n用户尚未确认本轮即将生成的具体计划；本地执行器只能在用户确认后原子应用该计划，本轮不得提前写回。",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "我今年考 22408，请根据已有学习档案给下周跨科计划，并自动记忆确认后的计划。"
+        }
+      ],
+      "expectedPrimary": "kaoyan-22408-planner",
+      "rubric": [
+        "把宿主实际检索到的 Obsidian 记录作为历史记忆使用，并与本轮新信息或模型判断分离",
+        "计划配额与 35 小时严格闭合，并针对 408 落后作出可解释调整",
+        "说明应把确认后的目标和计划结构化更新到学习档案或当前进度，不把 planned 写成 completed",
+        "输出透明 Obsidian 状态，并把 StudyProfile 1.1 严格 JSON 放在最后"
+      ]
+    },
+    {
+      "id": "behavior-26-executor-obsidian-no-false-completion",
+      "title": "执行器调用待复测记忆但不虚构完成",
+      "hostContext": "obsidian.connected=true；writeMode=auto-structured；writeBridge=writable。\n已读取 1 条：[Obsidian记忆] 错题队列：二叉树遍历，status=planned，retestOffsetDays=1，当前到期待复测。\n本地执行器可写入 planned 任务，但没有任何 completed 观察。",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "我现在有 60 分钟，今晚做待复测项并复习网络层。请直接安排并记录计划。"
+        }
+      ],
+      "expectedPrimary": "kaoyan-review-executor",
+      "rubric": [
+        "优先使用错题队列中的待复测项安排本次时段，全部时间盒与 60 分钟闭合",
+        "把二叉树复测与网络层任务写成 planned，不因安排了任务就声称用户已经完成",
+        "给出立即开始动作、完成标准和中断恢复入口",
+        "输出 Obsidian 读取/写入状态，并把可回填 ProgressSnapshot 1.1 JSON 放在最后"
+      ]
+    },
+    {
+      "id": "behavior-27-diagnostician-obsidian-observation-inference",
+      "title": "诊断师分离历史观察与模型推断",
+      "hostContext": "obsidian.connected=true；writeMode=auto-structured；writeBridge=writable。\n已读取 1 条：[Obsidian记忆] 当前进度：本周数学计划 12 小时、完成 7 小时；正确 18、总数 30；阻塞项“睡眠不足”；周期日期未知。\n本地执行器只接受规范化观察和显式标为推断的诊断信号。",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "请根据已有当前进度诊断，并把规范化结果更新回去。"
+        }
+      ],
+      "expectedPrimary": "kaoyan-progress-diagnostician",
+      "rubric": [
+        "明确区分记录中的观察事实和对风险、原因的模型推断",
+        "正确保留 7/12 小时、18/30 与睡眠不足，不发明缺失日期或额外样本",
+        "只把规范化观察和明确诊断信号写回，假设不得伪装成事实",
+        "输出 Obsidian 状态，并把规范化 ProgressSnapshot 1.1 JSON 放在最后"
+      ]
+    },
+    {
+      "id": "behavior-28-error-loop-obsidian-hypothesis",
+      "title": "错题闭环把未验证错因保存为假设",
+      "hostContext": "obsidian.connected=true；writeMode=auto-structured；writeBridge=writable。\n已读取 3 条：[Obsidian记忆] 三次条件概率练习均观察到“分母选择错误”；没有足以确认深层原因或掌握状态的证据。\n本地执行器可写入观察簇、hypothesis 与复测安排。",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "请聚类已有的条件概率错误并安排复测；我怀疑是公式没背熟，但还没验证。"
+        }
+      ],
+      "expectedPrimary": "kaoyan-error-loop-coach",
+      "rubric": [
+        "根据三次记录聚类可观察错误模式，不把单次线索扩写为更多事实",
+        "把“公式没背熟”明确保存为 hypothesis，并设计能支持或证伪它的复测",
+        "没有延迟复测证据前不得标记掌握",
+        "输出 Obsidian 更新状态，并把 ReviewQueue 1.1 严格 JSON 放在最后"
+      ]
+    },
+    {
+      "id": "behavior-29-mock-obsidian-submit",
+      "title": "模考交卷后更新错题队列",
+      "hostContext": "obsidian.connected=true；writeMode=auto-structured；writeBridge=writable；本轮未检索到相关旧记忆。\n本地执行器可在明确交卷复盘后写入 ReviewQueue，但不得保存整段对话或答案键。",
+      "transcript": [
+        {
+          "role": "assistant",
+          "content": "[原创练习] examId=OS-BRAIN-01，paperVersion=1。第 1 题 5 分：说明进程与线程的区别。公开 rubric：概念边界 2 分、资源与调度 2 分、表达 1 分。请自行计时，明确交卷前不提供提示。"
+        },
+        {
+          "role": "user",
+          "content": "我交卷，用时 8 分钟。最终答案：进程和线程完全一样，只是名字不同。请把需要复测的错因记下来。"
+        }
+      ],
+      "expectedPrimary": "kaoyan-mock-exam-coach",
+      "rubric": [
+        "先回显最终作答映射与用户报告的 8 分钟，再按冻结 rubric 评分",
+        "依据冻结题面指出进程/线程概念错误，不改变 examId、版本或评分标准",
+        "把可复测错因更新到错题队列，不保存整段模考对话或隐藏答案键",
+        "输出 Obsidian 状态，并把 ReviewQueue 1.1 严格 JSON 放在最后"
+      ]
+    },
+    {
+      "id": "behavior-30-408-obsidian-durable-misconception",
+      "title": "408 讲题命中历史误区并沉淀可复用规则",
+      "hostContext": "obsidian.connected=true；writeMode=auto-structured；writeBridge=writable。\n已读取 1 条：[Obsidian记忆] 主题笔记：上次也混淆 TLB 未命中、页表未命中和缺页；该条是历史学习记录，不是官方答案。\n本地执行器只在形成稳定误区或可复用方法时更新主题笔记与索引。",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "[用户材料] 我认为缺页一定导致缺页中断。请结合我的历史误区讲清楚，并在形成可复用规则时记下来。"
+        }
+      ],
+      "expectedPrimary": "kaoyan-408-tutor",
+      "rubric": [
+        "把本轮材料与 Obsidian 历史误区分别标识，不把历史笔记冒充官方答案",
+        "用状态表或调用链区分 TLB 未命中、页表查询和缺页中断的条件",
+        "指出第一处概念错误并给出可迁移判断规则",
+        "仅在形成稳定误区或可复用规则时说明写回主题笔记，并输出透明 Obsidian 状态"
+      ]
+    },
+    {
+      "id": "behavior-31-math-obsidian-read-without-noise",
+      "title": "数学二读取旧错因但普通讲题不制造噪声",
+      "hostContext": "obsidian.connected=true；writeMode=auto-structured；writeBridge=writable。\n已读取 1 条：[Obsidian记忆] 数学错因提醒：用户常忘记检查洛必达法则前提。\n用户本轮要求不新增笔记，因此写入必须为 suppressed。",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "求 lim(x→0) sin x / x，并结合我的历史提醒检查前提；这次只是普通讲题，不需要新增笔记。"
+        }
+      ],
+      "expectedPrimary": "kaoyan-math2-coach",
+      "rubric": [
+        "使用历史提醒执行前提检查，但不把它当作题目已知条件或权威结论",
+        "按前提检查—主解法—独立复核—第一处错误—迁移规则组织",
+        "尊重普通讲题无需新增笔记的意图，不生成无意义便携记录",
+        "Obsidian 状态明确已读取且无写入"
+      ]
+    },
+    {
+      "id": "behavior-32-english-obsidian-turn-read-only",
+      "title": "英语二本轮只读覆盖自动写入",
+      "hostContext": "obsidian.connected=true；writeMode=auto-structured；writeBridge=writable。\n已读取 1 条：[Obsidian记忆] 英语阅读提醒：用户常忽略转折后的观点。\n“本次不记忆”只禁止本轮写入，不撤销已经完成的只读检索；写入必须为 suppressed。",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "本次不记忆。请结合我的历史阅读提醒分析：The plan is costly, but it may improve access. 作者态度是什么？"
+        }
+      ],
+      "expectedPrimary": "kaoyan-english2-coach",
+      "rubric": [
+        "可以读取历史提醒并建立原文证据链，解释 but 和 may 的限制",
+        "明确区分历史记忆、当前原文与模型分析",
+        "严格执行“本次不记忆”，不得声称更新笔记或学习记录",
+        "Obsidian 状态明确本轮只读且无写入，不生成无意义便携记录"
+      ]
+    },
+    {
+      "id": "behavior-33-politics-obsidian-not-official",
+      "title": "政治旧记忆不得替代当前官方事实",
+      "hostContext": "obsidian.connected=true；writeMode=auto-structured；writeBridge=writable。\n已读取 1 条：[Obsidian记忆] 旧笔记：“今年某政策已经生效”；缺少机构、适用年度、发布日期和 URL。\n当前评测环境不提供联网工具；未经核验的旧笔记不得写回为官方事实。",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "请先判断已有旧笔记里的最新政策事实是否可信，再告诉我后续如何用政治原理分析。"
+        }
+      ],
+      "expectedPrimary": "kaoyan-official-info-researcher",
+      "rubric": [
+        "把当前事实核验识别为阻塞项并由 official-info-researcher 唯一主责，与后续稳定政治原理分析明确拆分",
+        "旧记忆缺少机构、适用年度、发布日期和 URL 时标为 [待核验]，不得确认可信",
+        "无法联网核验时使用固定三行交接卡把待核验结论交给 $kaoyan-politics-coach，传递中不得冒充已核验事实",
+        "不得把未经核验主张写回为事实，并输出透明 Obsidian 状态"
+      ]
+    },
+    {
+      "id": "behavior-34-past-paper-obsidian-copyright-boundary",
+      "title": "真题分析只沉淀覆盖结论",
+      "hostContext": "obsidian.connected=true；writeMode=auto-structured；writeBridge=writable。\n已读取 2 条：[Obsidian记忆] 2024 样本覆盖表：仅第 1 页，题 1 数据结构、题 2 操作系统，后续缺页；[Obsidian记忆] 2025 样本覆盖表：仅第 1 页，题 1 数据结构、题 2 计算机网络，后续缺页。\n本地执行器可写覆盖结论、来源范围和置信边界，不接受题面原文。",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "[用户材料] 我有权使用的 2026 样本第 1 页只含：题 1 二叉树、题 2 进程、题 3 IP 子网；后续页缺失。请结合过去两次覆盖表比较并自动记忆，但不要保存题面原文。"
+        }
+      ],
+      "expectedPrimary": "kaoyan-past-paper-analyst",
+      "rubric": [
+        "只使用实际提供范围和两次历史覆盖表，声明缺页与可比范围",
+        "建立样本覆盖表并给出支持样本数与趋势置信边界",
+        "只沉淀覆盖结论、来源范围和置信边界，不保存题面原文或重建整卷",
+        "输出 Obsidian 读取与更新状态，不生成无意义便携记录"
+      ]
+    },
+    {
+      "id": "behavior-35-material-obsidian-reusable-note",
+      "title": "材料助手只沉淀可复用摘要",
+      "hostContext": "obsidian.connected=true；writeMode=auto-structured；writeBridge=writable；本轮未检索到相关旧记忆。\n本地执行器可写入经用户授权有限材料的可复用摘要、来源范围和索引，不得保存整段会话或补全整章。",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "[用户材料] 我自己的笔记：TCP 拥塞控制包括慢开始、拥塞避免、快重传和快恢复。请整理成卡片，并把可复用摘要沉淀到 Obsidian。"
+        }
+      ],
+      "expectedPrimary": "kaoyan-material-study-assistant",
+      "rubric": [
+        "把用户实际提供的有限材料标为 [用户材料]，不补全未提供教材或付费资料",
+        "生成结构清晰的摘要或卡片，并区分模型补充",
+        "只把可复用摘要与来源范围写入主题笔记，不保存整段会话",
+        "更新记忆索引并输出透明 Obsidian 状态，不生成空的便携记录"
+      ]
+    },
+    {
+      "id": "behavior-36-official-obsidian-verified-metadata",
+      "title": "官方核验结果带完整元数据写回",
+      "hostContext": "obsidian.connected=true；writeMode=auto-structured；writeBridge=writable；本轮未检索到可作为当前官方证据的记录。\n当前评测环境不提供联网工具；只有完成一手来源核验且元数据完整时，本地执行器才允许写回。",
+      "transcript": [
+        {
+          "role": "user",
+          "content": "请核验今年目标院校的 408 科目要求。Obsidian 已连接；如果核验成功，把结论记下来。若无法访问官网就不要猜。"
+        }
+      ],
+      "expectedPrimary": "kaoyan-official-info-researcher",
+      "rubric": [
+        "只使用院校官网或考试组织方一手来源；无法联网时明确无法核验并标为 [待核验]",
+        "成功核验时必须给机构、适用年度、发布日期、直接 URL 与绝对核验日期",
+        "只有成功核验且元数据完整时才写回；旧 Vault 笔记不能替代本次官方证据",
+        "输出 Obsidian 写入或降级状态，不生成无意义便携记录"
       ]
     }
   ]

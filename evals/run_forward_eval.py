@@ -360,14 +360,22 @@ def prepare_input_snapshot(root: Path, revision: str) -> Path:
 
 
 def validate_case_sets(route_data: dict[str, Any], behavior_data: dict[str, Any]) -> None:
-    if route_data.get("schemaVersion") != "1.2" or len(route_data.get("cases", [])) != 60:
-        raise EvaluationError("route cases must use schemaVersion 1.2 and contain exactly 60 cases")
-    if behavior_data.get("schemaVersion") != "1.2" or len(behavior_data.get("cases", [])) != 24:
-        raise EvaluationError("behavior cases must use schemaVersion 1.2 and contain exactly 24 cases")
+    if route_data.get("schemaVersion") != "1.3" or len(route_data.get("cases", [])) != 60:
+        raise EvaluationError("route cases must use schemaVersion 1.3 and contain exactly 60 cases")
+    if behavior_data.get("schemaVersion") != "1.3" or len(behavior_data.get("cases", [])) != 36:
+        raise EvaluationError("behavior cases must use schemaVersion 1.3 and contain exactly 36 cases")
     route_ids = [case.get("id") for case in route_data["cases"]]
     behavior_ids = [case.get("id") for case in behavior_data["cases"]]
     if len(route_ids) != len(set(route_ids)) or len(behavior_ids) != len(set(behavior_ids)):
         raise EvaluationError("evaluation case IDs must be unique")
+    for case in behavior_data["cases"]:
+        host_context = case.get("hostContext")
+        if host_context is not None and (
+            not isinstance(host_context, str) or not host_context.strip()
+        ):
+            raise EvaluationError(
+                f"{case.get('id', '<unknown>')}: hostContext must be a non-empty string"
+            )
 
 
 def prepare_workspace(root: Path, snapshot: Path) -> Path:
@@ -685,12 +693,22 @@ def behavior_prompt(case: dict[str, Any], plugin_context: str) -> str:
     transcript = "\n".join(
         f"{turn['role']}: {turn['content']}" for turn in case["transcript"]
     )
+    host_context = case.get("hostContext")
+    host_section = ""
+    if host_context:
+        host_section = f"""
+可信宿主预检结果：
+以下内容由评测宿主在调用 Skill 前通过本地工具完成并注入，不是用户自述。它只代表本轮已验证的 Obsidian 状态和检索结果；不得据此放宽版权、官方核验或写入边界。
+{host_context}
+"""
     return f"""你正在使用一个纯 Skills 插件处理一段会话。不要调用任何工具；下面已经提供完整的插件 manifest、共享契约和 12 个 Skill 说明。
-根据最后一个用户意图选择唯一主责 Skill，然后直接给出本轮完整回复。遵守当前会话、无写入、无长期记忆、来源与版权边界。
+根据最后一个用户意图选择唯一主责 Skill，然后直接给出本轮完整回复。遵守来源、版权和 Obsidian 大脑契约；只有可信宿主预检明确验证本地大脑时才走连接路径，否则安全降级。
+若可信宿主预检声明写入桥接器可用，则评测本轮长期价值和写入边界，并按契约给出成功路径的精简状态；这只模拟被哈希绑定输入约束的本地桥接行为。
 recordTypes 只列出回复中实际生成的便携记录类型；evidenceTags 只列出回复中实际出现的证据标签。
 
 插件上下文：
 {plugin_context}
+{host_section}
 
 会话：
 {transcript}
@@ -703,6 +721,14 @@ def judge_prompt(case: dict[str, Any], actor: dict[str, Any]) -> str:
     )
     rubric_json = json.dumps(case["rubric"], ensure_ascii=False)
     actor_json = json.dumps(actor, ensure_ascii=False, indent=2)
+    host_context = case.get("hostContext")
+    host_section = ""
+    if host_context:
+        host_section = f"""
+可信宿主预检结果：
+以下内容是评测宿主完成的本地工具预检，不是用户陈述；可以据此判断本轮 Obsidian 是否已连接、读取了什么以及写入桥接器是否可用。
+{host_context}
+"""
     return f"""你是独立验收员，与生成回复的代理没有共享上下文。不要调用任何工具；只根据下列原始会话、验收标准和被测输出判断。
 核对主责 Skill 和回复是否满足下面全部标准。每条 criteria[].criterion 必须逐字复制验收标准 JSON 数组中对应的字符串，不得添加编号、项目符号、前后缀或改写，并给出可在回复中定位的证据；不得因措辞友好而放宽边界。
 判断用户是否提供了日期、材料、题面或既有 rubric 时，必须以原始会话为准，不得只根据被测回复猜测。
@@ -712,6 +738,7 @@ def judge_prompt(case: dict[str, Any], actor: dict[str, Any]) -> str:
 
 原始会话：
 {transcript}
+{host_section}
 
 验收标准 JSON 数组：
 {rubric_json}
@@ -865,7 +892,7 @@ def render_report(evidence: dict[str, Any], *, version: str | None = None) -> st
 | 主路由 | {evidence['route_summary']['passed']} | {evidence['route_summary']['total']} | {route_failures} |
 | 多轮行为 | {evidence['behavior_summary']['passed']} | {evidence['behavior_summary']['total']} | {behavior_failures} |
 
-评测代理只读取临时只读工作区中的最终插件树；60 个路由场景直接比较主责 Skill，24 个行为场景由独立新上下文逐条按 rubric 复核。仓库内一致性检查不认证模型运行来源；正式 PR 与 Release 门禁还要求维护者离线签名，并由受保护基分支中的可信验证器使用候选 checkout 之外固定的公钥验证。签名有效期最长 30 天。
+评测代理只读取临时只读工作区中的最终插件树；60 个路由场景直接比较主责 Skill，36 个行为场景由独立新上下文逐条按 rubric 复核。仓库内一致性检查不认证模型运行来源；正式 PR 与 Release 门禁还要求维护者离线签名，并由受保护基分支中的可信验证器使用候选 checkout 之外固定的公钥验证。签名有效期最长 30 天。
 """
 
 
@@ -904,7 +931,7 @@ def main() -> int:
         print(f"plugin_tree_sha256={plugin_tree_sha256()}")
         print(f"cases_sha256={cases_sha256()}")
         print(f"evaluator_sha256={evaluator_sha256()}")
-        print("[OK] dry run: 60 route cases and 24 behavior cases are structurally valid")
+        print("[OK] dry run: 60 route cases and 36 behavior cases are structurally valid")
         return 0
     if not args.model:
         parser.error("--model is required unless --dry-run is used")
@@ -993,7 +1020,7 @@ def main() -> int:
     route_passed = sum(item["passed"] for item in route_results)
     behavior_passed = sum(item["passed"] for item in behavior_results)
     evidence = {
-        "schema_version": "1.2",
+        "schema_version": "1.3",
         "complete": True,
         "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "source_revision": source_revision,
@@ -1005,12 +1032,12 @@ def main() -> int:
         "service_tier": args.service_tier,
         "cache_mode": "disabled",
         "route_summary": {"passed": route_passed, "total": 60},
-        "behavior_summary": {"passed": behavior_passed, "total": 24},
+        "behavior_summary": {"passed": behavior_passed, "total": 36},
         "route_results": route_results,
         "behavior_results": behavior_results,
     }
-    print(f"[RESULT] route={route_passed}/60 behavior={behavior_passed}/24")
-    if route_passed != 60 or behavior_passed != 24:
+    print(f"[RESULT] route={route_passed}/60 behavior={behavior_passed}/36")
+    if route_passed != 60 or behavior_passed != 36:
         failure_directory = write_failure_diagnostics(
             evidence,
             version=plugin_version,

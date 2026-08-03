@@ -2,6 +2,21 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/)。
 
+## [1.3.0] - 2026-07-29
+
+### 新增
+
+- 增加可选本地 Obsidian 大脑协议，任一 22408 Skill 都会在配置有效时自动检索并结构化沉淀长期学习记忆。
+- 增加本机配置与幂等初始化脚本，支持 `configure`、`check`、`enable`、`disable` 和 `--dry-run`。
+- 增加考研专属学习档案、当前进度、错题队列、记忆索引和知识笔记目录。
+- 为 12 个 Skill 各增加一个 Obsidian 行为场景，正式行为门禁扩展至 `36/36`。
+
+### 调整
+
+- 公共输出顺序增加透明的 Obsidian 连接、读取和写入状态；便携 Schema 1.1 JSON 仍保持为最后一个内容块。
+- 内部 evidence schema 升级为 1.3；路由门禁继续保持 `60/60`。
+- 隐私政策明确本地 Vault 由用户和宿主管理，发布者不接收配置、笔记或学习记录。
+
 ## [1.2.0] - 2026-07-26
 
 ### 新增
@@ -56,6 +71,7 @@
 - 采用纯 Skills 架构，无 App、MCP、后台服务、账号系统或数据持久化。
 - 不内置第三方题库、讲义、真题合集或解析库。
 
+[1.3.0]: https://github.com/yq6666-66/kaoyan-22408-codex-plugin/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/yq6666-66/kaoyan-22408-codex-plugin/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/yq6666-66/kaoyan-22408-codex-plugin/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/yq6666-66/kaoyan-22408-codex-plugin/releases/tag/v1.0.0

@@ -23,7 +23,8 @@ STATEMENT_SCHEMA_VERSION = "1.0"
 RESPONSE_MANIFEST_SCHEMA_VERSION = "1.0"
 EVIDENCE_PROFILES = {
     "1.1": (36, 12, Path(__file__).resolve().parent / "schemas" / "evidence-1.1.schema.json"),
-    "1.2": (60, 24, Path(__file__).resolve().parent / "schemas" / "evidence.schema.json"),
+    "1.2": (60, 24, Path(__file__).resolve().parents[1] / "ci" / "schemas" / "evidence-1.2.schema.json"),
+    "1.3": (60, 36, Path(__file__).resolve().parent / "schemas" / "evidence.schema.json"),
 }
 
 

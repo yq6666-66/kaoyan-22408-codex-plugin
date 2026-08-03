@@ -50,6 +50,27 @@ class RepositoryMutationTests(unittest.TestCase):
         path.write_bytes(path.read_bytes().replace(b"\n", b"\r\n"))
         self.assert_invalid()
 
+    def test_private_obsidian_path_is_rejected(self) -> None:
+        path = self.plugin / "references" / "obsidian-brain-contract.md"
+        path.write_text(
+            path.read_text(encoding="utf-8")
+            + "\nC:\\Users\\admin\\Documents\\ob知识库\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+        with self.assertRaisesRegex(ValidationError, "private local path"):
+            validate_repo(self.repo, verify_evidence=False, scan_history=False)
+
+    def test_missing_obsidian_brain_loader_is_rejected(self) -> None:
+        path = self.plugin / "references" / "capability-routing-contract.md"
+        text = path.read_text(encoding="utf-8").replace(
+            "obsidian-brain-contract.md",
+            "missing-brain-contract.md",
+        )
+        path.write_text(text, encoding="utf-8", newline="\n")
+        with self.assertRaisesRegex(ValidationError, "Obsidian brain contract"):
+            validate_repo(self.repo, verify_evidence=False, scan_history=False)
+
     def test_invalid_utf8_is_rejected(self) -> None:
         path = self.plugin / "references" / "evidence-copyright-contract.md"
         path.write_bytes(b"\xff\xfe")

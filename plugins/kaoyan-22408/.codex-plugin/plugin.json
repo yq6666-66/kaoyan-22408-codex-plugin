@@ -1,7 +1,7 @@
 {
   "name": "kaoyan-22408",
-  "version": "1.2.0",
-  "description": "面向考研 22408 的中文学习 Skills，提供规划、执行、诊断、学科辅导、错题复测、模考、材料分析与官方信息核验。",
+  "version": "1.3.0",
+  "description": "面向考研 22408 的中文学习 Skills，提供规划、执行、诊断、学科辅导、错题复测、模考、材料分析、官方信息核验与可选本地 Obsidian 记忆。",
   "author": {
     "name": "yq6666-66",
     "url": "https://github.com/yq6666-66"
@@ -22,7 +22,7 @@
   "interface": {
     "displayName": "考研 22408",
     "shortDescription": "面向数学二、英语二、408 与政治的中文学习助手",
-    "longDescription": "纯 Skills 考研学习插件，覆盖跨科规划、单次学习时段执行、进度诊断、错题复测、原创模考、四科学习辅导、用户材料分析和官方信息核验。插件不提供后台服务，也不保存用户材料或学习记录。",
+    "longDescription": "纯 Skills 考研学习插件，覆盖跨科规划、单次学习时段执行、进度诊断、错题复测、原创模考、四科学习辅导、用户材料分析和官方信息核验。可选连接用户自行配置的本地 Obsidian Vault，发布者不接收笔记或学习记录。",
     "developerName": "yq6666-66",
     "category": "Education",
     "capabilities": [
@@ -30,7 +30,8 @@
       "Planning",
       "Tutoring",
       "Assessment",
-      "Research"
+      "Research",
+      "Local Knowledge"
     ],
     "websiteURL": "https://github.com/yq6666-66/kaoyan-22408-codex-plugin",
     "privacyPolicyURL": "https://github.com/yq6666-66/kaoyan-22408-codex-plugin/blob/main/PRIVACY.md",

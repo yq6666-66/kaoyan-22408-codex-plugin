@@ -54,7 +54,7 @@ def valid_evidence() -> dict:
     routes = load_json(ROUTE_CASES)["cases"]
     behaviors = load_json(BEHAVIOR_CASES)["cases"]
     return {
-        "schema_version": "1.2",
+        "schema_version": "1.3",
         "complete": True,
         "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "source_revision": "0" * 40,
@@ -66,7 +66,7 @@ def valid_evidence() -> dict:
         "service_tier": "fast",
         "cache_mode": "disabled",
         "route_summary": {"passed": 60, "total": 60},
-        "behavior_summary": {"passed": 24, "total": 24},
+        "behavior_summary": {"passed": 36, "total": 36},
         "route_results": [
             {
                 "id": case["id"],
@@ -157,7 +157,7 @@ class ForwardEvidenceTests(unittest.TestCase):
         completed = subprocess.CompletedProcess([], 0, stdout="", stderr="")
         with patch("verify_forward_evidence.subprocess.run", return_value=completed) as run:
             self.assertTrue(
-                source_revision_matches_inputs("0" * 40, "1.2", "protected-main")
+                source_revision_matches_inputs("0" * 40, "1.3", "protected-main")
             )
         self.assertEqual(run.call_count, 1)
         self.assertIn("status", run.call_args.args[0])
@@ -165,7 +165,7 @@ class ForwardEvidenceTests(unittest.TestCase):
     def test_default_pr_binding_checks_commit_ancestry_and_relevant_diff(self) -> None:
         completed = subprocess.CompletedProcess([], 0, stdout="", stderr="")
         with patch("verify_forward_evidence.subprocess.run", return_value=completed) as run:
-            self.assertTrue(source_revision_matches_inputs("0" * 40, "1.2"))
+            self.assertTrue(source_revision_matches_inputs("0" * 40, "1.3"))
         commands = [call.args[0] for call in run.call_args_list]
         self.assertEqual(len(commands), 4)
         self.assertIn("cat-file", commands[0])
@@ -309,7 +309,7 @@ class ForwardEvidenceTests(unittest.TestCase):
             with self.assertRaisesRegex(AuthenticationError, "schema violation"):
                 publish_evidence_artifacts(
                     evidence,
-                    version="1.2.0",
+                    version="1.3.0",
                     evidence_path=paths[0],
                     response_manifest_path=paths[1],
                     report_path=paths[2],
@@ -328,7 +328,7 @@ class ForwardEvidenceTests(unittest.TestCase):
             root = Path(temporary)
             directory = write_failure_diagnostics(
                 evidence,
-                version="1.2.0",
+                version="1.3.0",
                 output_root=root,
             )
             self.assertEqual(directory.parent, root)
