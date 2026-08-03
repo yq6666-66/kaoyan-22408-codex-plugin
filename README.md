@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 1 seconds
-Output:
 # 考研 22408 Skills 插件
 
 `kaoyan-22408` 是面向数学二、英语二、408 与政治的中文学习插件，可在支持 Skills 插件的 ChatGPT 与 Codex 环境中使用。项目只包含 12 个 Skills、共享契约与品牌图标，不提供独立应用、App、MCP、后台服务、账号或内置题库。用户可选择把本地 Obsidian Vault 或已授权的 Notion 工作区作为跨会话学习记忆；发布者无法访问这些笔记。
@@ -154,4 +151,3 @@ CI 在 Windows 与 Ubuntu 分别执行同一离线门禁并构建发布包，随
 - 问题与建议：[GitHub Issues](https://github.com/yq6666-66/kaoyan-22408-codex-plugin/issues)
 - 安全问题：[SECURITY.md](SECURITY.md)
 - 许可：[MIT](LICENSE)
-

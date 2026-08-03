@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 1.2 seconds
-Output:
 from __future__ import annotations
 
 import hashlib
@@ -108,4 +105,3 @@ class ReleaseArchiveTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

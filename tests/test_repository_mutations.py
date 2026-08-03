@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 1.2 seconds
-Output:
 from __future__ import annotations
 
 import json
@@ -47,7 +44,7 @@ class RepositoryMutationTests(unittest.TestCase):
 
     def test_crlf_release_text_is_rejected(self) -> None:
         path = self.plugin / "references" / "capability-routing-contract.md"
-        path.write_bytes(path.read_bytes().replace(b"\n", b"\n"))
+        path.write_bytes(path.read_bytes().replace(b"\n", b"\r\n"))
         self.assert_invalid()
 
     def test_private_obsidian_path_is_rejected(self) -> None:
@@ -242,4 +239,3 @@ class RepositoryMutationTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

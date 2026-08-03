@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 1.2 seconds
-Output:
 #!/usr/bin/env python3
 """Build a byte-for-byte reproducible release ZIP from committed Git blobs."""
 
@@ -278,4 +275,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

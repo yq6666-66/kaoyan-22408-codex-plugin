@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 1.2 seconds
-Output:
 #!/usr/bin/env python3
 """Run repository tests, Semgrep, and official-validator release gates."""
 
@@ -173,4 +170,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

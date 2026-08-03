@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 1.2 seconds
-Output:
 from __future__ import annotations
 
 import shutil
@@ -49,4 +46,3 @@ def copy_as_committed_repo(destination: Path) -> Path:
 def commit_all(repo: Path, message: str = "mutation") -> None:
     run_git(repo, "add", "--all")
     run_git(repo, "commit", "-m", message)
-

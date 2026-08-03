@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 1.3 seconds
-Output:
 # 安全政策
 
 ## 支持版本
@@ -37,4 +34,3 @@ Output:
 - 不把场景资产的静态完整性描述为模型实际通过率；语义体验仅作为非阻塞人工抽查；
 - Windows 与 Ubuntu 构建生成字节一致的 ZIP 和相同 SHA-256；
 - 通过受保护分支和 tag workflow 发布，禁止强制推送或改写已有版本标签。
-

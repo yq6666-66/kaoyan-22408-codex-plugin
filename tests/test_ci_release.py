@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 1.1 seconds
-Output:
 from __future__ import annotations
 
 import hashlib
@@ -114,4 +111,3 @@ class ReleaseCiTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

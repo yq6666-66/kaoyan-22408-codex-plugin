@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 1.4 seconds
-Output:
 #!/usr/bin/env python3
 """Validate the public Skills-only repository and its release payload."""
 
@@ -827,4 +824,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

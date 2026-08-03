@@ -1,6 +1,3 @@
-Exit code: 0
-Wall time: 1 seconds
-Output:
 # 版本记录
 
 本项目遵循 [Semantic Versioning](https://semver.org/)。
@@ -96,4 +93,3 @@ Output:
 [1.2.0]: https://github.com/yq6666-66/kaoyan-22408-codex-plugin/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/yq6666-66/kaoyan-22408-codex-plugin/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/yq6666-66/kaoyan-22408-codex-plugin/releases/tag/v1.0.0
-
