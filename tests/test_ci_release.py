@@ -55,9 +55,7 @@ class ReleaseCiTests(unittest.TestCase):
         self.assertIn("pull_request_target:", workflow)
         self.assertIn("path: trusted", workflow)
         self.assertIn("path: candidate", workflow)
-        self.assertIn("trusted/ci/trusted_forward_attestation.py verify", workflow)
-        self.assertIn("--binding-mode pr", workflow)
-        self.assertIn("--expected-head", workflow)
+        self.assertIn("trusted/ci/trusted_offline_gate.py --repo candidate", workflow)
         self.assertNotIn("python candidate/", workflow)
         self.assertNotIn("pip install -r candidate/", workflow)
 
@@ -68,9 +66,9 @@ class ReleaseCiTests(unittest.TestCase):
         verifier_step = candidate_run_steps[0]
         self.assertEqual(
             verifier_step["name"],
-            "Verify detached signature with externally pinned signer",
+            "Verify candidate with trusted offline gate",
         )
-        self.assertIn("trusted/ci/trusted_forward_attestation.py", verifier_step["run"])
+        self.assertIn("trusted/ci/trusted_offline_gate.py", verifier_step["run"])
         self.assertIn("--repo candidate", verifier_step["run"])
         self.assertNotIn("working-directory", verifier_step)
         self.assertTrue(all("working-directory" not in step for step in steps))
