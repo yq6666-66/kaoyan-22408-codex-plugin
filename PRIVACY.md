@@ -40,3 +40,4 @@
 ## 变更与联系
 
 政策更新会通过本仓库版本记录发布。隐私问题可通过 [GitHub Issues](https://github.com/yq6666-66/kaoyan-22408-codex-plugin/issues) 联系；请勿在公开 Issue 中提交个人信息、访问凭据或未公开材料。
+
