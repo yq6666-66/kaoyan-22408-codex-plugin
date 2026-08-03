@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 1.2 seconds
+Output:
 #!/usr/bin/env python3
 """Run repository tests, Semgrep, and official-validator release gates."""
 
@@ -74,11 +77,6 @@ def main() -> int:
         type=Path,
         default=Path("tests/system-validator-evidence.json"),
     )
-    parser.add_argument(
-        "--evidence-binding-mode",
-        choices=("pr", "protected-main"),
-        default="pr",
-    )
     args = parser.parse_args()
 
     repo = Path(__file__).resolve().parents[1]
@@ -94,20 +92,13 @@ def main() -> int:
         print(f"[FAIL] {exc}", file=sys.stderr)
         return 1
 
-    run(
-        [
-            sys.executable,
-            "scripts/validate_repository.py",
-            "--evidence-binding-mode",
-            args.evidence_binding_mode,
-        ],
-        repo,
-        env,
-    )
+    run([sys.executable, "scripts/validate_repository.py"], repo, env)
     run([sys.executable, "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py", "-v"], repo, env)
 
     semgrep = shutil.which("semgrep")
-    if semgrep:
+    if os.name == "nt":
+        print("[SKIP] Semgrep on Windows; pinned Linux CI is the authoritative Semgrep gate")
+    elif semgrep:
         env.setdefault(
             "SEMGREP_SETTINGS_FILE",
             str(Path(tempfile.gettempdir()) / "kaoyan-22408-semgrep-settings.yml"),
@@ -182,3 +173,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 1.2 seconds
+Output:
 from __future__ import annotations
 
 import shutil
@@ -29,13 +32,6 @@ def copy_as_committed_repo(destination: Path) -> Path:
         ".pytest_cache",
         ".codex-security",
         "*.pyc",
-        # Generated release evidence belongs to the real repository history.
-        # Tests that exercise evidence create their own isolated bundle; copying
-        # the production bundle would retain its signature and source revision.
-        "forward-eval-evidence.json",
-        "forward-eval-response-manifest.json",
-        "forward-eval-attestation.json",
-        "forward-eval-attestation.json.sig",
     )
     shutil.copytree(REPO, destination, ignore=ignored)
     submission = destination / "submission"
@@ -53,3 +49,4 @@ def copy_as_committed_repo(destination: Path) -> Path:
 def commit_all(repo: Path, message: str = "mutation") -> None:
     run_git(repo, "add", "--all")
     run_git(repo, "commit", "-m", message)
+

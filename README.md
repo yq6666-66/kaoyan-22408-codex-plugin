@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 1 seconds
+Output:
 # 考研 22408 Skills 插件
 
 `kaoyan-22408` 是面向数学二、英语二、408 与政治的中文学习插件，可在支持 Skills 插件的 ChatGPT 与 Codex 环境中使用。项目只包含 12 个 Skills、共享契约与品牌图标，不提供独立应用、App、MCP、后台服务、账号或内置题库。用户可选择把本地 Obsidian Vault 或已授权的 Notion 工作区作为跨会话学习记忆；发布者无法访问这些笔记。
@@ -137,25 +140,11 @@ python scripts/check.py
 python scripts/build_release.py
 ```
 
-`check.py` 运行仓库静态检查、结构校验和测试。`build_release.py` 从 `plugin.json.version` 派生 ZIP 文件名，同时生成对应的 `.zip.sha256`，并只打包完整路径允许列表中的插件文件。正式发布还要求官方插件校验、12 个 Skill 校验、动态前向评测证据，以及 Windows 与 Ubuntu 构建得到完全相同的 SHA-256。
+`check.py` 运行完全离线的仓库静态检查、结构校验、单元测试、Semgrep 和官方 validator 证据校验，不调用模型，也不要求安装或登录 Codex CLI。`build_release.py` 从 `plugin.json.version` 派生 ZIP 文件名，同时生成对应的 `.zip.sha256`，并只打包完整路径允许列表中的插件文件。
 
-动态评测在已提交且输入树干净的版本上运行。评测器会生成证据和逐响应摘要清单：
+发布门禁包括 60 个路由场景和 36 个行为场景的数量、ID、主责 Skill、最近邻冲突、rubric、Schema 与覆盖完整性检查。它验证规则和测试资产是否完整，但不声称这些场景已经由某个模型实际运行。语义体验可在 ChatGPT/Codex 新任务中人工抽查，不作为自动发布阻塞条件。
 
-```text
-python evals/trusted_forward_eval.py --model <固定的-Codex-模型> --service-tier <固定服务层> --no-cache
-python evals/forward_attestation.py prepare --repo .
-ssh-keygen -Y sign -f <离线签名私钥路径> -n kaoyan-forward-eval tests/forward-eval-attestation.json
-```
-
-私钥不得进入仓库、CI 变量或评测工作区。仓库只提交评测证据、响应摘要清单、规范化声明和 OpenSSH 分离签名。受保护工作流从基分支运行可信验证器，并从仓库变量 `KAOYAN_FORWARD_EVAL_ALLOWED_SIGNERS` 将维护者公钥固定到候选 checkout 之外：
-
-```text
-python evals/forward_attestation.py verify --repo . --allowed-signers <仓库外-allowed_signers-路径>
-```
-
-`evals/verify_forward_evidence.py` 只检查仓库内证据的一致性，不能证明模型运行来源；它不替代上述分离签名门禁。签名有效期最多 30 天，且签名锁定源提交、插件树、测试集、评测器、完整证据字节和 132 份结构化响应摘要（60 份路由响应、36 份行为响应与 36 份独立 judge 结果）。正式门禁要求路由 `60/60`、行为 `36/36`，并拒绝混用模型、服务层或失败缓存。
-
-非 dry-run 评测必须显式使用 `--no-cache`，证据同时记录 `cache_mode: disabled`。未达到完整门禁时不会覆盖仓库中的正式证据；仅把诊断副本写入被 Git 忽略的 `.cache/forward-eval-failures/`，且后续运行不会读取这些副本。
+CI 在 Windows 与 Ubuntu 分别执行同一离线门禁并构建发布包，随后要求两个 ZIP 字节一致。Tag workflow 只允许位于 `main` 历史中的、版本与 manifest 一致的 `v*` 标签发布。完整设计见 [离线质量门禁](QUALITY_GATES.md)。
 
 版本记录见 [CHANGELOG.md](CHANGELOG.md)。
 

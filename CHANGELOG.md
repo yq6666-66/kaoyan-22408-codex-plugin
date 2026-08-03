@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 1 seconds
+Output:
 # 版本记录
 
 本项目遵循 [Semantic Versioning](https://semver.org/)。
@@ -12,6 +15,12 @@
 ### 调整
 
 - 12 个 Skills 通过公共路由契约条件式接入 Notion，不新增总控 Skill、MCP、后台服务或发布者数据库。
+- 发布门禁改为完全离线、可重复的静态验证、单元测试、安全扫描、官方 validator 与跨平台一致构建；不再要求登录 Codex CLI。
+- 保留 60 个路由和 36 个行为场景作为规则覆盖资产，验证其结构、路由、rubric 与 Schema 完整性，不再声称模型运行通过率。
+
+### 移除
+
+- 移除 Codex CLI 模型评测器、响应缓存、前向证据、离线签名器、公钥变量和 `pull_request_target` 认证工作流。
 
 ## [1.3.0] - 2026-07-29
 

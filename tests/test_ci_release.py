@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 1.1 seconds
+Output:
 from __future__ import annotations
 
 import hashlib
@@ -34,46 +37,25 @@ class ReleaseCiTests(unittest.TestCase):
             for path in paths
         ]
 
-    def test_normal_ci_labels_unsigned_evidence_as_non_authoritative(self) -> None:
+    def test_ci_uses_only_offline_quality_gates(self) -> None:
         workflow = (REPO / ".github/workflows/ci.yml").read_text(encoding="utf-8")
-        self.assertIn("Check forward-evidence consistency (non-authoritative)", workflow)
-        self.assertIn("hashFiles('tests/forward-eval-evidence.json')", workflow)
-        self.assertIn("EVIDENCE_BINDING_MODE", workflow)
-        self.assertIn("--evidence-binding-mode", workflow)
-        self.assertIn("--binding-mode \"$EVIDENCE_BINDING_MODE\"", workflow)
-        self.assertIn("forward_attestation.py verify", workflow)
-        self.assertIn("KAOYAN_FORWARD_EVAL_ALLOWED_SIGNERS", workflow)
+        self.assertIn("Run offline quality gates", workflow)
+        self.assertIn("python scripts/check.py --verify-system-evidence", workflow)
+        self.assertIn("python scripts/build_release.py", workflow)
+        self.assertNotIn("forward-eval", workflow)
+        self.assertNotIn("trusted_forward", workflow)
+        self.assertNotIn("ALLOWED_SIGNERS", workflow)
+        self.assertNotIn("codex exec", workflow)
+        self.assertNotIn("--evidence-binding-mode", workflow)
         self.assertIn(
             'git merge-base --is-ancestor "$GITHUB_SHA" refs/remotes/origin/main',
             workflow,
         )
 
-    def test_protected_workflow_never_executes_candidate_code(self) -> None:
-        workflow = (
-            REPO / ".github/workflows/authenticated-forward-evidence.yml"
-        ).read_text(encoding="utf-8")
-        self.assertIn("pull_request_target:", workflow)
-        self.assertIn("path: trusted", workflow)
-        self.assertIn("path: candidate", workflow)
-        self.assertIn("trusted/ci/trusted_forward_attestation.py verify", workflow)
-        self.assertIn("--binding-mode pr", workflow)
-        self.assertIn("--expected-head", workflow)
-        self.assertNotIn("python candidate/", workflow)
-        self.assertNotIn("pip install -r candidate/", workflow)
-
-        document = yaml.safe_load(workflow)
-        steps = document["jobs"]["authenticated-forward-evidence"]["steps"]
-        candidate_run_steps = [step for step in steps if "candidate" in step.get("run", "")]
-        self.assertEqual(len(candidate_run_steps), 1)
-        verifier_step = candidate_run_steps[0]
-        self.assertEqual(
-            verifier_step["name"],
-            "Verify detached signature with externally pinned signer",
+    def test_obsolete_authenticated_evidence_workflow_is_absent(self) -> None:
+        self.assertFalse(
+            (REPO / ".github/workflows/authenticated-forward-evidence.yml").exists()
         )
-        self.assertIn("trusted/ci/trusted_forward_attestation.py", verifier_step["run"])
-        self.assertIn("--repo candidate", verifier_step["run"])
-        self.assertNotIn("working-directory", verifier_step)
-        self.assertTrue(all("working-directory" not in step for step in steps))
 
     def test_actions_are_pinned_to_the_approved_node24_commits(self) -> None:
         seen: set[str] = set()
@@ -132,3 +114,4 @@ class ReleaseCiTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

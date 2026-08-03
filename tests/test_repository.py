@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 1.2 seconds
+Output:
 from __future__ import annotations
 
 import json
@@ -24,7 +27,7 @@ from validate_repository import (  # noqa: E402
 
 class RepositoryContractTests(unittest.TestCase):
     def test_repository_contract(self) -> None:
-        results = validate_repo(REPO, verify_evidence=False, scan_history=False)
+        results = validate_repo(REPO, scan_history=False)
         self.assertEqual(len(results), 6)
 
     def test_manifest_is_release_semver_and_skills_only(self) -> None:
@@ -121,3 +124,4 @@ class RepositoryContractTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

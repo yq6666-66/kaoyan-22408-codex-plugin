@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 1 seconds
+Output:
 name: CI
 
 on:
@@ -31,19 +34,10 @@ jobs:
           python-version: "3.12"
       - name: Install pinned development dependencies
         run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
-      - name: Run static, unit, security, and local-validator evidence gates
-        env:
-          EVIDENCE_BINDING_MODE: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'protected-main' || 'pr' }}
-        run: python scripts/check.py --verify-system-evidence --evidence-binding-mode "$EVIDENCE_BINDING_MODE"
-      - name: Check forward-evidence consistency (non-authoritative)
-        if: ${{ hashFiles('tests/forward-eval-evidence.json') != '' }}
-        env:
-          EVIDENCE_BINDING_MODE: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'protected-main' || 'pr' }}
-        run: python evals/verify_forward_evidence.py --max-age-days 30 --binding-mode "$EVIDENCE_BINDING_MODE"
+      - name: Run offline quality gates
+        run: python scripts/check.py --verify-system-evidence
       - name: Build Ubuntu release archive
-        env:
-          EVIDENCE_BINDING_MODE: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'protected-main' || 'pr' }}
-        run: python scripts/build_release.py --evidence-binding-mode "$EVIDENCE_BINDING_MODE"
+        run: python scripts/build_release.py
       - name: Read manifest-derived metadata
         id: meta
         run: python ci/release_metadata.py --artifact-suffix ubuntu --github-output "$GITHUB_OUTPUT"
@@ -76,13 +70,9 @@ jobs:
       - name: Install pinned core dependencies
         run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema==4.25.1
       - name: Validate repository
-        env:
-          EVIDENCE_BINDING_MODE: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'protected-main' || 'pr' }}
-        run: python scripts/validate_repository.py --evidence-binding-mode $env:EVIDENCE_BINDING_MODE
+        run: python scripts/validate_repository.py
       - name: Build Windows release archive
-        env:
-          EVIDENCE_BINDING_MODE: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'protected-main' || 'pr' }}
-        run: python scripts/build_release.py --evidence-binding-mode $env:EVIDENCE_BINDING_MODE
+        run: python scripts/build_release.py
       - name: Read manifest-derived metadata
         id: meta
         shell: pwsh
@@ -150,21 +140,6 @@ jobs:
           python-version: "3.12"
       - name: Require tag commit to be on protected main
         run: git merge-base --is-ancestor "$GITHUB_SHA" refs/remotes/origin/main
-      - name: Install authenticated-evidence verifier dependency
-        run: python -m pip install --disable-pip-version-check jsonschema==4.25.1
-      - name: Verify externally authenticated forward evidence
-        env:
-          ALLOWED_SIGNERS: ${{ vars.KAOYAN_FORWARD_EVAL_ALLOWED_SIGNERS }}
-        run: |
-          if [ -z "$ALLOWED_SIGNERS" ]; then
-            echo "KAOYAN_FORWARD_EVAL_ALLOWED_SIGNERS is not configured" >&2
-            exit 1
-          fi
-          printf '%s\n' "$ALLOWED_SIGNERS" > "$RUNNER_TEMP/kaoyan-forward-eval.allowed_signers"
-          python ci/trusted_forward_attestation.py verify \
-            --repo . \
-            --binding-mode protected-main \
-            --allowed-signers "$RUNNER_TEMP/kaoyan-forward-eval.allowed_signers"
       - name: Require tag to match manifest version
         id: meta
         run: python ci/release_metadata.py --expect-tag "$GITHUB_REF_NAME" --github-output "$GITHUB_OUTPUT"
@@ -183,3 +158,4 @@ jobs:
           --verify-tag
           --title "kaoyan-22408 ${{ steps.meta.outputs.tag }}"
           --generate-notes
+
