@@ -38,6 +38,11 @@ class ReleaseCiTests(unittest.TestCase):
         workflow = (REPO / ".github/workflows/ci.yml").read_text(encoding="utf-8")
         self.assertIn("Run offline quality gates", workflow)
         self.assertIn("python scripts/check.py --verify-system-evidence", workflow)
+        self.assertEqual(
+            workflow.count("python scripts/check.py --verify-system-evidence"),
+            2,
+        )
+        self.assertIn("Run Windows offline quality gates", workflow)
         self.assertIn("python scripts/build_release.py", workflow)
         self.assertNotIn("forward-eval", workflow)
         self.assertNotIn("trusted_forward", workflow)
