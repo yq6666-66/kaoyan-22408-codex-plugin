@@ -13,6 +13,7 @@
 
 - 12 个 Skills 通过公共路由契约条件式接入 Notion，不新增总控 Skill、MCP、后台服务或发布者数据库。
 - 发布门禁改为完全离线、可重复的静态验证、单元测试、安全扫描、官方 validator 与跨平台一致构建；不再要求登录 Codex CLI。
+- 增加 GitHub Actions 手动发布后备入口；无需本地 GitHub/Codex CLI 登录，且仍强制最新 `main`、manifest 标签匹配和完整跨平台门禁。
 - 保留 60 个路由和 36 个行为场景作为规则覆盖资产，验证其结构、路由、rubric 与 Schema 完整性，不再声称模型运行通过率。
 
 ### 移除

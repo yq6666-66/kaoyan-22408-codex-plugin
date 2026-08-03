@@ -54,6 +54,21 @@ class ReleaseCiTests(unittest.TestCase):
             workflow,
         )
 
+    def test_manual_release_fallback_is_gated_and_manifest_bound(self) -> None:
+        workflow = (REPO / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+        self.assertIn("release_tag:", workflow)
+        self.assertIn("inputs.release_tag != ''", workflow)
+        self.assertIn(
+            'test "$GITHUB_SHA" = "$(git rev-parse refs/remotes/origin/main)"',
+            workflow,
+        )
+        self.assertIn(
+            'python ci/release_metadata.py --expect-tag "$RELEASE_TAG"',
+            workflow,
+        )
+        self.assertIn('args+=(--target "$GITHUB_SHA")', workflow)
+        self.assertIn("args+=(--verify-tag)", workflow)
+
     def test_obsolete_authenticated_evidence_workflow_is_absent(self) -> None:
         self.assertFalse(
             (REPO / ".github/workflows/authenticated-forward-evidence.yml").exists()
