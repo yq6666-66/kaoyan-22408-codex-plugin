@@ -1,9 +1,7 @@
-Exit code: 0
-Wall time: 1 seconds
-Output:
 # 离线质量门禁
 
 本仓库的自动发布检查不调用模型，也不要求安装或登录 Codex CLI。所有门禁都可以在干净仓库、Windows 与 Ubuntu GitHub Actions 中重复执行。
+因此，维护者无需准备 Codex CLI 会话、模型额度或在线评测凭据。
 
 ## 自动阻塞项
 
