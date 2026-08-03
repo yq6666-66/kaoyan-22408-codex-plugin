@@ -41,6 +41,7 @@ EXPECTED_REFERENCES = {
     "capability-routing-contract.md",
     "evidence-copyright-contract.md",
     "obsidian-brain-contract.md",
+    "notion-brain-contract.md",
     "portable-learning-records.md",
     "portable-learning-records.schema.json",
 }
@@ -321,6 +322,7 @@ def check_links(plugin: Path) -> None:
 def check_obsidian_brain_contract(plugin: Path) -> None:
     routing = read_utf8_text(plugin / "references" / "capability-routing-contract.md")
     brain = read_utf8_text(plugin / "references" / "obsidian-brain-contract.md")
+    notion = read_utf8_text(plugin / "references" / "notion-brain-contract.md")
     require(
         "obsidian-brain-contract.md" in routing,
         "routing contract must load the Obsidian brain contract",
@@ -340,6 +342,25 @@ def check_obsidian_brain_contract(plugin: Path) -> None:
         "completed",
     ):
         require(marker in brain, f"Obsidian brain contract is missing marker: {marker}")
+    require(
+        "notion-brain-contract.md" in routing,
+        "routing contract must conditionally load the Notion brain contract",
+    )
+    for marker in (
+        "Notion:search",
+        "Notion:fetch",
+        "Notion:notion-create-pages",
+        "Notion:notion-update-page",
+        "filters: {}",
+        "[Notion记忆]",
+        "本次不记忆",
+        "old_str",
+        "new_str",
+        "planned",
+        "completed",
+        "hypothesis",
+    ):
+        require(marker in notion, f"Notion brain contract is missing marker: {marker}")
     combined = "\n".join(
         read_utf8_text(path)
         for path in plugin.rglob("*")
@@ -857,3 +878,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
