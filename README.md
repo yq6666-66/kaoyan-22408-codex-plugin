@@ -165,4 +165,3 @@ python evals/forward_attestation.py verify --repo . --allowed-signers <仓库外
 - 问题与建议：[GitHub Issues](https://github.com/yq6666-66/kaoyan-22408-codex-plugin/issues)
 - 安全问题：[SECURITY.md](SECURITY.md)
 - 许可：[MIT](LICENSE)
-
