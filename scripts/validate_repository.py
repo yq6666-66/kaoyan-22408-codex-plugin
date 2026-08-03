@@ -371,4 +371,511 @@ def check_obsidian_brain_contract(plugin: Path) -> None:
         "C:/Users/admin",
         "obçŸ¥è¯†åº“",
     ):
-        requÛº¶‰žËkºwµçq½ˆ ˆ¨ˆ¤è(€€€€€€€É•ÅÕ¥É”¡¹½ÐÁ…Ñ ¹¥Í}Íåµ±¥¹¬ ¤°˜‰É•±•…Í”ÑÉ•”µÕÍÐ¹½Ð½¹Ñ…¥¸Íåµ‰½±¥Œ±¥¹­ÌèíÁ…Ñ¡ôˆ¤((€€€…ÑÕ…±}™¥±•Ì€ôì(€€€€€€€Á…Ñ ¹É•±…Ñ¥Ù•}Ñ¼¡Á±Õ¥¸¤¹…Í}Á½Í¥à ¤(€€€€€€€™½ÈÁ…Ñ ¥¸Á±Õ¥¸¹É±½ˆ ˆ¨ˆ¤(€€€€€€€¥˜Á…Ñ ¹¥Í}™¥±” ¤(€€€ô(€€€É•ÅÕ¥É”¡…ÑÕ…±}™¥±•Ì€ôô11=]}I1M}%1L°€‰É•±•…Í”ÑÉ•”‘½•Ì¹½Ðµ…Ñ Ñ¡”•á…Ð™Õ±°µÁ…Ñ …±±½Ý±¥ÍÐˆ¤((€€€™½ÈÉ•±…Ñ¥Ù”¥¸Í½ÉÑ•¡…ÑÕ…±}™¥±•Ì¤è(€€€€€€€ÁÕÉ”€ôAÕÉ•A½Í¥áA…Ñ ¡É•±…Ñ¥Ù”¤(€€€€€€€É•ÅÕ¥É”¡¹½Ð€¡íÁ…ÉÐ¹±½Ý•È ¤™½ÈÁ…ÉÐ¥¸ÁÕÉ”¹Á…ÉÑÍô€˜=I	%9}AQ!}AIQL¤°˜‰™½É‰¥‘‘•¸É•±•…Í”Á…Ñ èíÉ•±…Ñ¥Ù•ôˆ¤(€€€€€€€Ñ•áÐ€ôÉ•…‘}ÕÑ˜á}Ñ•áÐ¡Á±Õ¥¸€¼A…Ñ  ©ÁÕÉ”¹Á…ÉÑÌ¤¤(€€€€€€€É•ÅÕ¥É”¡A1!=1H¹½Ð¥¸Ñ•áÐ¹ÕÁÁ•È ¤°˜‰É•±•…Í”™¥±”½¹Ñ…¥¹Ì…¸Õ¹™¥¹¥Í¡•Á±…•¡½±‘•ÈèíÉ•±…Ñ¥Ù•ôˆ¤(€€€€€€€™½ÈÁ…ÑÑ•É¸¥¸1e}AQQI9Lè(€€€€€€€€€€€É•ÅÕ¥É”¡Á…ÑÑ•É¸¹Í•…É ¡Ñ•áÐ¤¥Ì9½¹”°˜‰É•±•…Í”™¥±”½¹Ñ…¥¹Ì„É•µ½Ù•µÍåÍÑ•´µ…É­•ÈèíÉ•±…Ñ¥Ù•ôˆ¤(€€€€€€€™½ÈÁ…ÑÑ•É¸¥¸M9M%Q%Y}AQQI9Lè(€€€€€€€€€€€É•ÅÕ¥É”¡Á…ÑÑ•É¸¹Í•…É ¡Ñ•áÐ¤¥Ì9½¹”°˜‰É•±•…Í”™¥±”½¹Ñ…¥¹Ì„±¥­•±äÍ•É•ÐèíÉ•±…Ñ¥Ù•ôˆ¤(()‘•˜¡•­}™½ÉÝ…É‘}…Í•Ì¡É•Á¼èA…Ñ ¤€´ø9½¹”è(€€€™½ÉÝ…É€ô±½…‘}©Í½¸¡É•Á¼€¼€‰Ñ•ÍÑÌˆ€¼€‰™½ÉÝ…Éµ…Í•Ì¹©Í½¸ˆ¤(€€€É•ÅÕ¥É”¡¥Í¥¹ÍÑ…¹”¡™½ÉÝ…É°‘¥Ð¤…¹™½ÉÝ…É¹•Ð ‰Í¡•µ…Y•ÉÍ¥½¸ˆ¤€ôô€ˆÄ¸Ìˆ°€‰™½ÉÝ…É…Í•ÌµÕÍÐÕÍ”Í¡•µ…Y•ÉÍ¥½¸€Ä¸Ìˆ¤(€€€…Í•Ì€ô™½ÉÝ…É¹•Ð ‰…Í•Ìˆ¤(€€€É•ÅÕ¥É”¡¥Í¥¹ÍÑ…¹”¡…Í•Ì°±¥ÍÐ¤…¹±•¸¡…Í•Ì¤€ôô€ØÀ°€‰™½ÉÝ…É…Í•ÌµÕÍÐ½¹Ñ…¥¸•á…Ñ±ä€ØÀ…Í•Ìˆ¤(€€€¥‘Ì€ôm…Í”¹•Ð ‰¥ˆ¤™½È…Í”¥¸…Í•Ì¥˜¥Í¥¹ÍÑ…¹”¡…Í”°‘¥Ð¥t(€€€É•ÅÕ¥É”¡±•¸¡¥‘Ì¤€ôô€ØÀ…¹±•¸¡Í•Ð¡¥‘Ì¤¤€ôô€ØÀ…¹…±°¡¥Í¥¹ÍÑ…¹”¡¥Ñ•´°ÍÑÈ¤…¹¥Ñ•´™½È¥Ñ•´¥¸¥‘Ì¤°€‰™½ÉÝ…É…Í”%ÌµÕÍÐ‰”Õ¹¥ÅÕ”¹½¸µ•µÁÑäÍÑÉ¥¹Ìˆ¤(€€€½Õ¹ÑÌè‘¥ÑmÍÑÈ°½Õ¹Ñ•ÉmÍÑÉut€ô‘•™…Õ±Ñ‘¥Ð¡½Õ¹Ñ•È¤(€€€™½È…Í”¥¸…Í•Ìè(€€€€€€€É•ÅÕ¥É”¡¥Í¥¹ÍÑ…¹”¡…Í”°‘¥Ð¤°€‰•… ™½ÉÝ…É…Í”µÕÍÐ‰”…¸½‰©•Ðˆ¤(€€€€€€€Í­¥±°€ô…Í”¹•Ð ‰Í­¥±±U¹‘•ÉQ•ÍÐˆ¤(€€€€€€€­¥¹€ô…Í”¹•Ð ‰­¥¹ˆ¤(€€€€€€€É•ÅÕ¥É”¡Í­¥±°¥¸aAQ}M-%11L°˜‰™½ÉÝ…É…Í”½¹Ñ…¥¹Ì…¸Õ¹­¹½Ý¸M­¥±°èí…Í”¹•Ð ¥œ¥ôˆ¤(€€€€€€€É•ÅÕ¥É”¡­¥¹¥¸ì‰Á½Í¥Ñ¥Ù”ˆ°€‰½±±½ÅÕ¥…°ˆ°€‰½¹™±¥Ðˆ°€‰½µÁ½Õ¹‰ô°˜‰™½ÉÝ…É…Í”­¥¹¥Ì¥¹Ù…±¥èí…Í”¹•Ð ¥œ¥ôˆ¤(€€€€€€€É•ÅÕ¥É”¡…Í”¹•Ð ‰•áÁ•Ñ•‘AÉ¥µ…Éäˆ¤¥¸aAQ}M-%11L°˜‰™½ÉÝ…É…Í”É½ÕÑ”¥Ì¥¹Ù…±¥èí…Í”¹•Ð ¥œ¥ôˆ¤(€€€€€€€É•ÅÕ¥É”¡¥Í¥¹ÍÑ…¹”¡…Í”¹•Ð ‰ÁÉ½µÁÐˆ¤°ÍÑÈ¤…¹…Í•l‰ÁÉ½µÁÐ‰t¹ÍÑÉ¥À ¤°˜‰™½ÉÝ…É…Í”¡…Ì¹¼ÁÉ½µÁÐèí…Í”¹•Ð ¥œ¥ôˆ¤(€€€€€€€É•ÅÕ¥É”¡¥Í¥¹ÍÑ…¹”¡…Í”¹•Ð ‰•áÁ•Ñ•‘	•¡…Ù¥½Èˆ¤°±¥ÍÐ¤…¹…Í•l‰•áÁ•Ñ•‘	•¡…Ù¥½È‰t°˜‰™½ÉÝ…É…Í”¡…Ì¹¼‰•¡…Ù¥½È…ÍÍ•ÉÑ¥½¹Ìèí…Í”¹•Ð ¥œ¥ôˆ¤(€€€€€€€É•ÅÕ¥É” (€€€€€€€€€€€…±°¡¥Í¥¹ÍÑ…¹”¡¥Ñ•´°ÍÑÈ¤…¹¥Ñ•´¹ÍÑÉ¥À ¤™½È¥Ñ•´¥¸…Í•l‰•áÁ•Ñ•‘	•¡…Ù¥½È‰t¤°(€€€€€€€€€€€˜‰™½ÉÝ…É‰•¡…Ù¥½È…ÍÍ•ÉÑ¥½¹ÌµÕÍÐ‰”¹½¸µ•µÁÑäÍÑÉ¥¹Ìèí…Í”¹•Ð ¥œ¥ôˆ°(€€€€€€€€¤(€€€€€€€¥˜­¥¹¥¸ì‰Á½Í¥Ñ¥Ù”ˆ°€‰½±±½ÅÕ¥…°‰ôè(€€€€€€€€€€€É•ÅÕ¥É”¡…Í•l‰•áÁ•Ñ•‘AÉ¥µ…Éä‰t€ôôÍ­¥±°°˜‰í­¥¹‘ô…Í”‘½•Ì¹½ÐÉ½ÕÑ”Ñ¼Ñ¡”M­¥±°Õ¹‘•ÈÑ•ÍÐèí…Í”¹•Ð ¥œ¥ôˆ¤(€€€€€€€•±¥˜­¥¹€ôô€‰½¹™±¥Ðˆè(€€€€€€€€€€€É•ÅÕ¥É”¡…Í”¹•Ð ‰•áÁ•Ñ•‘9½ÑAÉ¥µ…Éäˆ¤€ôôÍ­¥±°°˜‰½¹™±¥Ð…Í”‘½•Ì¹½Ð•á±Õ‘”Ñ¡”M­¥±°Õ¹‘•ÈÑ•ÍÐèí…Í”¹•Ð ¥œ¥ôˆ¤(€€€€€€€€€€€É•ÅÕ¥É”¡…Í•l‰•áÁ•Ñ•‘AÉ¥µ…Éä‰t€„ôÍ­¥±°°˜‰½¹™±¥Ð…Í”ÍÑ¥±°É½ÕÑ•ÌÑ¼Ñ¡”•á±Õ‘•M­¥±°èí…Í”¹•Ð ¥œ¥ôˆ¤(€€€€€€€½Õ¹ÑÍmÍ­¥±±um­¥¹‘t€¬ô€Ä(€€€™½ÈÍ­¥±°¥¸aAQ}M-%11Lè(€€€€€€€•áÁ•Ñ•€ô½Õ¹Ñ•È¡ì‰Á½Í¥Ñ¥Ù”ˆè€È°€‰½±±½ÅÕ¥…°ˆè€Ä°€‰½¹™±¥Ðˆè€Ä°€‰½µÁ½Õ¹ˆè€Åô¤(€€€€€€€É•ÅÕ¥É”¡½Õ¹ÑÍmÍ­¥±±t€ôô•áÁ•Ñ•°˜‰íÍ­¥±±ôµÕÍÐ¡…Ù”€ÈÁ½Í¥Ñ¥Ù”°€Ä½±±½ÅÕ¥…°°€Ä½¹™±¥Ð°…¹€Ä½µÁ½Õ¹…Í”ˆ¤(()‘•˜¡•­}‰•¡…Ù¥½É}…Í•Ì¡É•Á¼èA…Ñ ¤€´ø9½¹”è(€€€‰•¡…Ù¥½È€ô±½…‘}©Í½¸¡É•Á¼€¼€‰Ñ•ÍÑÌˆ€¼€‰‰•¡…Ù¥½Èµ…Í•Ì¹©Í½¸ˆ¤(€€€É•ÅÕ¥É”¡¥Í¥¹ÍÑ…¹”¡‰•¡…Ù¥½È°‘¥Ð¤…¹‰•¡…Ù¥½È¹•Ð ‰Í¡•µ…Y•ÉÍ¥½¸ˆ¤€ôô€ˆÄ¸Ìˆ°€‰‰•¡…Ù¥½È…Í•ÌµÕÍÐÕÍ”Í¡•µ…Y•ÉÍ¥½¸€Ä¸Ìˆ¤(€€€…Í•Ì€ô‰•¡…Ù¥½È¹•Ð ‰…Í•Ìˆ¤(€€€É•ÅÕ¥É”¡¥Í¥¹ÍÑ…¹”¡…Í•Ì°±¥ÍÐ¤…¹±•¸¡…Í•Ì¤€ôô€ÌØ°€‰‰•¡…Ù¥½È…Í•ÌµÕÍÐ½¹Ñ…¥¸•á…Ñ±ä€ÌØ…Í•Ìˆ¤(€€€¥‘Ìè±¥ÍÑmÍÑÉt€ômt(€€€™½È…Í”¥¸…Í•Ìè(€€€€€€€É•ÅÕ¥É”¡¥Í¥¹ÍÑ…¹”¡…Í”°‘¥Ð¤°€‰•… ‰•¡…Ù¥½È…Í”µÕÍÐ‰”…¸½‰©•Ðˆ¤(€€€€€€€…Í•}¥€ô…Í”¹•Ð ‰¥ˆ¤(€€€€€€€É•ÅÕ¥É”¡¥Í¥¹ÍÑ…¹”¡…Í•}¥°ÍÑÈ¤…¹…Í•}¥¹ÍÑÉ¥À ¤°€‰‰•¡…Ù¥½È…Í”%µÕÍÐ‰”„¹½¸µ•µÁÑäÍÑÉ¥¹œˆ¤(€€€€€€€¥‘Ì¹…ÁÁ•¹¡…Í•}¥¤(€€€€€€€É•ÅÕ¥É”¡…Í”¹•Ð ‰•áÁ•Ñ•‘AÉ¥µ…Éäˆ¤¥¸aAQ}M-%11L°˜‰‰•¡…Ù¥½È…Í”É½ÕÑ”¥Ì¥¹Ù…±¥èí…Í•}¥‘ôˆ¤(€€€€€€€¡…Í}ÁÉ½µÁÐ€ô¥Í¥¹ÍÑ…¹”¡…Í”¹•Ð ‰ÁÉ½µÁÐˆ¤°ÍÑÈ¤…¹‰½½°¡…Í•l‰ÁÉ½µÁÐ‰t¹ÍÑÉ¥À ¤¤(€€€€€€€¡…Í}ÑÕÉ¹Ì€ô¥Í¥¹ÍÑ…¹”¡…Í”¹•Ð ‰ÑÕÉ¹Ìˆ¤°±¥ÍÐ¤…¹‰½½°¡…Í•l‰ÑÕÉ¹Ì‰t¤(€€€€€€€¡…Í}ÑÉ…¹ÍÉ¥ÁÐ€ô¥Í¥¹ÍÑ…¹”¡…Í”¹•Ð ‰ÑÉ…¹ÍÉ¥ÁÐˆ¤°±¥ÍÐ¤…¹‰½½°¡…Í•l‰ÑÉ…¹ÍÉ¥ÁÐ‰t¤(€€€€€€€É•ÅÕ¥É” (€€€€€€€€€€€¡…Í}ÁÉ½µÁÐ½È¡…Í}ÑÕÉ¹Ì½È¡…Í}ÑÉ…¹ÍÉ¥ÁÐ°(€€€€€€€€€€€˜‰‰•¡…Ù¥½È…Í”µÕÍÐ½¹Ñ…¥¸ÁÉ½µÁÐ°ÑÕÉ¹Ì°½ÈÑÉ…¹ÍÉ¥ÁÐèí…Í•}¥‘ôˆ°(€€€€€€€€¤(€€€€€€€ÉÕ‰É¥Œ€ô…Í”¹•Ð ‰ÉÕ‰É¥Œˆ¤(€€€€€€€É•ÅÕ¥É”¡¥Í¥¹ÍÑ…¹”¡ÉÕ‰É¥Œ°±¥ÍÐ¤…¹‰½½°¡ÉÕ‰É¥Œ¤°˜‰‰•¡…Ù¥½È…Í”µÕÍÐ½¹Ñ…¥¸„¹½¸µ•µÁÑäÉÕ‰É¥Œ±¥ÍÐèí…Í•}¥‘ôˆ¤(€€€€€€€É•ÅÕ¥É” (€€€€€€€€€€€…±°¡¥Í¥¹ÍÑ…¹”¡¥Ñ•´°ÍÑÈ¤…¹¥Ñ•´¹ÍÑÉ¥À ¤™½È¥Ñ•´¥¸ÉÕ‰É¥Œ¤°(€€€€€€€€€€€˜‰‰•¡…Ù¥½ÈÉÕ‰É¥Œ•¹ÑÉ¥•ÌµÕÍÐ‰”¹½¸µ•µÁÑäÍÑÉ¥¹Ìèí…Í•}¥‘ôˆ°(€€€€€€€€¤(€€€€€€€¥˜¡…Í}ÑÉ…¹ÍÉ¥ÁÐè(€€€€€€€€€€€™½ÈÑÕÉ¸¥¸…Í•l‰ÑÉ…¹ÍÉ¥ÁÐ‰tè(€€€€€€€€€€€€€€€É•ÅÕ¥É”¡¥Í¥¹ÍÑ…¹”¡ÑÕÉ¸°‘¥Ð¤°˜‰‰•¡…Ù¥½ÈÑÉ…¹ÍÉ¥ÁÐÑÕÉ¸µÕÍÐ‰”…¸½‰©•Ðèí…Í•}¥‘ôˆ¤(€€€€€€€€€€€€€€€É•ÅÕ¥É”¡ÑÕÉ¸¹•Ð ‰É½±”ˆ¤¥¸ì‰ÕÍ•Èˆ°€‰…ÍÍ¥ÍÑ…¹Ð‰ô°˜‰‰•¡…Ù¥½ÈÑÉ…¹ÍÉ¥ÁÐÉ½±”¥Ì¥¹Ù…±¥èí…Í•}¥‘ôˆ¤(€€€€€€€€€€€€€€€É•ÅÕ¥É” (€€€€€€€€€€€€€€€€€€€¥Í¥¹ÍÑ…¹”¡ÑÕÉ¸¹•Ð ‰½¹Ñ•¹Ðˆ¤°ÍÑÈ¤…¹ÑÕÉ¹l‰½¹Ñ•¹Ð‰t¹ÍÑÉ¥À ¤°(€€€€€€€€€€€€€€€€€€€˜‰‰•¡…Ù¥½ÈÑÉ…¹ÍÉ¥ÁÐ½¹Ñ•¹Ð¥Ì•µÁÑäèí…Í•}¥‘ôˆ°(€€€€€€€€€€€€€€€€¤(€€€É•ÅÕ¥É”¡±•¸¡¥‘Ì¤€ôô±•¸¡Í•Ð¡¥‘Ì¤¤°€‰‰•¡…Ù¥½È…Í”%ÌµÕÍÐ‰”Õ¹¥ÅÕ”ˆ¤(€€€¹Õµ‰•ÉÌ€ôì(€€€€€€€¥¹Ð¡µ…Ñ ¹É½ÕÀ Ä¤¤(€€€€€€€™½È…Í•}¥¥¸¥‘Ì(€€€€€€€¥˜€¡µ…Ñ €èôÉ”¹™Õ±±µ…Ñ ¡È‰‰•¡…Ù¥½È´¡q‘ìÉô¤µm„µèÀ´äµt¬ˆ°…Í•}¥¤¤(€€€ô(€€€É•ÅÕ¥É”¡¹Õµ‰•ÉÌ€ôôÍ•Ð¡É…¹” Ä°€ÌÜ¤¤°€‰‰•¡…Ù¥½È…Í”%ÌµÕÍÐ½Ù•È‰•¡…Ù¥½È´ÀÄÑ¡É½Õ ‰•¡…Ù¥½È´ÌØ•á…Ñ±äˆ¤(()‘•˜¡•­}É•Á½Í¥Ñ½Éå}‘½Ì¡É•Á¼èA…Ñ ¤€´ø9½¹”è(€€€É•ÅÕ¥É•€ôì(€€€€€€€€‰I5¹µˆ°(€€€€€€€€‰!91=¹µˆ°(€€€€€€€€‰1%9Mˆ°(€€€€€€€€‰AI%Yd¹µˆ°(€€€€€€€€‰QI5L¹µˆ°(€€€€€€€€‰MUI%Qd¹µˆ°(€€€€€€€€‰Q!%I}AIQe}=9Q9P¹µˆ°(€€€€€€€€ˆ¹…•¹ÑÌ½Á±Õ¥¹Ì½µ…É­•ÑÁ±…”¹©Í½¸ˆ°(€€€€€€€€‰Ñ•ÍÑÌ½™½ÉÝ…Éµ…Í•Ì¹©Í½¸ˆ°(€€€€€€€€‰Ñ•ÍÑÌ½‰•¡…Ù¥½Èµ…Í•Ì¹©Í½¸ˆ°(€€€€€€€€‰Ñ•ÍÑÌ½ÍåÍÑ•´µÙ…±¥‘…Ñ½Èµ•Ù¥‘•¹”¹©Í½¸ˆ°(€€€ô(€€€™½ÈÉ•±…Ñ¥Ù”¥¸É•ÅÕ¥É•è(€€€€€€€É•ÅÕ¥É” ¡É•Á¼€¼É•±…Ñ¥Ù”¤¹¥Í}™¥±” ¤°˜‰É•ÅÕ¥É•É•Á½Í¥Ñ½Éä™¥±”¥Ìµ¥ÍÍ¥¹œèíÉ•±…Ñ¥Ù•ôˆ¤(€€€É•ÅÕ¥É”¡¹½Ð€¡É•Á¼€¼€‰ÍÕ‰µ¥ÍÍ¥½¸ˆ¤¹•á¥ÍÑÌ ¤°€‰½‰Í½±•Ñ”ÍÕ‰µ¥ÍÍ¥½¸‘¥É•Ñ½ÉäµÕÍÐ‰”…‰Í•¹Ðˆ¤((€€€µ…¹¥™•ÍÐ€ô±½…‘}©Í½¸ (€€€€€€€É•Á¼€¼A…Ñ  ©A1U%9}I1Q%Y}AQ ¹Á…ÉÑÌ¤€¼€ˆ¹½‘•àµÁ±Õ¥¸ˆ€¼€‰Á±Õ¥¸¹©Í½¸ˆ(€€€€¤(€€€Ù•ÉÍ¥½¸€ôµ…¹¥™•ÍÐ¹•Ð ‰Ù•ÉÍ¥½¸ˆ¤¥˜¥Í¥¹ÍÑ…¹”¡µ…¹¥™•ÍÐ°‘¥Ð¤•±Í”9½¹”(€€€É•ÅÕ¥É” (€€€€€€€¥Í¥¹ÍÑ…¹”¡Ù•ÉÍ¥½¸°ÍÑÈ¤…¹M5YH¹™Õ±±µ…Ñ ¡Ù•ÉÍ¥½¸¤¥Ì¹½Ð9½¹”°(€€€€€€€€‰µ…¹¥™•ÍÐÙ•ÉÍ¥½¸¥ÌÕ¹…Ù…¥±…‰±”™½È‘½Õµ•¹Ñ…Ñ¥½¸¡•­Ìˆ°(€€€€¤(€€€É•…‘µ”€ôÉ•…‘}ÕÑ˜á}Ñ•áÐ¡É•Á¼€¼€‰I5¹µˆ¤(€€€É•ÅÕ¥É” (€€€€€€€˜‹–öO–&7ž&#šr³¾òiíÙ•ÉÍ¥½¹õ€ˆ¥¸É•…‘µ”°(€€€€€€€€‰I5ÕÉÉ•¹ÐÙ•ÉÍ¥½¸µÕÍÐµ…Ñ Á±Õ¥¸¹©Í½¸¹Ù•ÉÍ¥½¸ˆ°(€€€€¤(€€€É•ÅÕ¥É” (€€€€€€€˜ˆ´µÉ•˜ÙíÙ•ÉÍ¥½¹ôˆ¥¸É•…‘µ”°(€€€€€€€€‰I5µ…É­•ÑÁ±…”É•˜µÕÍÐµ…Ñ Á±Õ¥¸¹©Í½¸¹Ù•ÉÍ¥½¸ˆ°(€€€€¤(€€€É•ÅÕ¥É” (€€€€€€€˜ˆ´µ‰É…¹ ÙíÙ•ÉÍ¥½¹ôˆ¥¸É•…‘µ”°(€€€€€€€€‰I5±½¹”Ñ…œµÕÍÐµ…Ñ Á±Õ¥¸¹©Í½¸¹Ù•ÉÍ¥½¸ˆ°(€€€€¤(€€€¡…¹•±½œ€ôÉ•…‘}ÕÑ˜á}Ñ•áÐ¡É•Á¼€¼€‰!91=¹µˆ¤(€€€ÕÉÉ•¹Ñ}É•±•…Í”€ôÉ”¹Í•…É  (€€€€€€€È‰xŒŒql¡myqut¬¥qt€´€¡U¹É•±•…Í•‘ñq‘ìÑôµq‘ìÉôµq‘ìÉô¤ˆ°(€€€€€€€¡…¹•±½œ°(€€€€€€€É”¹5U1Q%1%9°(€€€€¤(€€€É•ÅÕ¥É”¡ÕÉÉ•¹Ñ}É•±•…Í”¥Ì¹½Ð9½¹”°€‰!91=µÕÍÐÍÑ…ÉÐÝ¥Ñ „Ù•ÉÍ¥½¹•É•±•…Í”¡•…‘¥¹œˆ¤(€€€É•ÅÕ¥É” (€€€€€€€ÕÉÉ•¹Ñ}É•±•…Í”¹É½ÕÀ Ä¤€ôôÙ•ÉÍ¥½¸°(€€€€€€€€‰!91=ÕÉÉ•¹ÐÙ•ÉÍ¥½¸µÕÍÐµ…Ñ Á±Õ¥¸¹©Í½¸¹Ù•ÉÍ¥½¸ˆ°(€€€€¤((€€€µ…É­•ÑÁ±…”€ô±½…‘}©Í½¸¡É•Á¼€¼€ˆ¹…•¹ÑÌˆ€¼€‰Á±Õ¥¹Ìˆ€¼€‰µ…É­•ÑÁ±…”¹©Í½¸ˆ¤(€€€É•ÅÕ¥É”¡¥Í¥¹ÍÑ…¹”¡µ…É­•ÑÁ±…”°‘¥Ð¤…¹µ…É­•ÑÁ±…”¹•Ð ‰¹…µ”ˆ¤€ôô€‰­…½å…¸´ÈÈÐÀàˆ°€‰µ…É­•ÑÁ±…”¹…µ”¥Ì¥¹Ù…±¥ˆ¤(€€€Á±Õ¥¹Ì€ôµ…É­•ÑÁ±…”¹•Ð ‰Á±Õ¥¹Ìˆ¤(€€€É•ÅÕ¥É”¡¥Í¥¹ÍÑ…¹”¡Á±Õ¥¹Ì°±¥ÍÐ¤…¹±•¸¡Á±Õ¥¹Ì¤€ôô€Ä°€‰µ…É­•ÑÁ±…”µÕÍÐ½¹Ñ…¥¸•á…Ñ±ä½¹”Á±Õ¥¸ˆ¤(€€€•¹ÑÉä€ôÁ±Õ¥¹ÍlÁt(€€€É•ÅÕ¥É”¡¥Í¥¹ÍÑ…¹”¡•¹ÑÉä°‘¥Ð¤…¹•¹ÑÉä¹•Ð ‰¹…µ”ˆ¤€ôô€‰­…½å…¸´ÈÈÐÀàˆ°€‰µ…É­•ÑÁ±…”Á±Õ¥¸¹…µ”¥Ì¥¹Ù…±¥ˆ¤(€€€É•ÅÕ¥É”¡•¹ÑÉä¹•Ð ‰…Ñ•½Éäˆ¤€ôô€‰‘Õ…Ñ¥½¸ˆ°€‰µ…É­•ÑÁ±…”…Ñ•½ÉäµÕÍÐ‰”‘Õ…Ñ¥½¸ˆ¤(€€€É•ÅÕ¥É”¡•¹ÑÉä¹•Ð ‰Í½ÕÉ”ˆ°íô¤¹•Ð ‰Á…Ñ ˆ¤€ôô€ˆ¸½Á±Õ¥¹Ì½­…½å…¸´ÈÈÐÀàˆ°€‰µ…É­•ÑÁ±…”Í½ÕÉ”¹Á…Ñ ¥Ì¥¹Ù…±¥ˆ¤(€€€É•ÅÕ¥É”¡•¹ÑÉä¹•Ð ‰Á½±¥äˆ°íô¤¹•Ð ‰¥¹ÍÑ…±±…Ñ¥½¸ˆ¤€ôô€‰Y%1	1ˆ°€‰µ…É­•ÑÁ±…”¥¹ÍÑ…±±…Ñ¥½¸Á½±¥ä¥Ì¥¹Ù…±¥ˆ¤(€€€É•ÅÕ¥É”¡•¹ÑÉä¹•Ð ‰Á½±¥äˆ°íô¤¹•Ð ‰…ÕÑ¡•¹Ñ¥…Ñ¥½¸ˆ¤€ôô€‰=9}%9MQ10ˆ°€‰µ…É­•ÑÁ±…”…ÕÑ¡•¹Ñ¥…Ñ¥½¸Á½±¥ä¥Ì¥¹Ù…±¥ˆ¤(()‘•˜}ÉÕ¹}¥Ð¡É•Á¼èA…Ñ °…ÉÕµ•¹ÑÌè±¥ÍÑmÍÑÉt°€¨°¥¹ÁÕÑ}‰åÑ•Ìè‰åÑ•Ìð9½¹”€ô9½¹”¤€´øÍÕ‰ÁÉ½•ÍÌ¹½µÁ±•Ñ•‘AÉ½•ÍÍm‰åÑ•Ítè(€€€ÑÉäè(€€€€€€€É•ÍÕ±Ð€ôÍÕ‰ÁÉ½•ÍÌ¹ÉÕ¸ (€€€€€€€€€€€l‰¥Ðˆ°€©…ÉÕµ•¹ÑÍt°(€€€€€€€€€€€ÝõÉ•Á¼°(€€€€€€€€€€€¥¹ÁÕÐõ¥¹ÁÕÑ}‰åÑ•Ì°(€€€€€€€€€€€ÍÑ‘½ÕÐõÍÕ‰ÁÉ½•ÍÌ¹A%A°(€€€€€€€€€€€ÍÑ‘•ÉÈõÍÕ‰ÁÉ½•ÍÌ¹A%A°(€€€€€€€€€€€¡•¬õ…±Í”°(€€€€€€€€¤(€€€•á•ÁÐ=MÉÉ½È…Ì•áŒè(€€€€€€€É…¥Í”Y…±¥‘…Ñ¥½¹ÉÉ½È¡˜‰…¹¹½ÐÉÕ¸¥Ðèí•áôˆ¤™É½´•áŒ(€€€É•ÅÕ¥É”¡É•ÍÕ±Ð¹É•ÑÕÉ¹½‘”€ôô€À°˜‰¥Ðìœ€œ¹©½¥¸¡…ÉÕµ•¹ÑÌ¥ô™…¥±•èíÉ•ÍÕ±Ð¹ÍÑ‘•ÉÈ¹‘•½‘” ÕÑ˜´àœ°€É•Á±…”œ¤¹ÍÑÉ¥À ¥ôˆ¤(€€€É•ÑÕÉ¸É•ÍÕ±Ð(()‘•˜¡•­}¥Ñ}¡¥ÍÑ½Éä¡É•Á¼èA…Ñ ¤€´ø9½¹”è(€€€½‰©•ÑÍ}½ÕÑÁÕÐ€ô}ÉÕ¹}¥Ð¡É•Á¼°l‰É•Øµ±¥ÍÐˆ°€ˆ´µ½‰©•ÑÌˆ°€ˆ´µ…±°‰t¤¹ÍÑ‘½ÕÐ¹‘•½‘” ‰ÕÑ˜´àˆ°€‰ÍÑÉ¥Ðˆ¤(€€€½‰©•Ñ}Á…Ñ¡Ìè‘¥ÑmÍÑÈ°ÍÑÉt€ôíô(€€€½‰©•Ñ}¥‘Ìè±¥ÍÑmÍÑÉt€ômt(€€€™½È±¥¹”¥¸½‰©•ÑÍ}½ÕÑÁÕÐ¹ÍÁ±¥Ñ±¥¹•Ì ¤è(€€€€€€€½‰©•Ñ}¥°|°Á…Ñ €ô±¥¹”¹Á…ÉÑ¥Ñ¥½¸ ˆ€ˆ¤(€€€€€€€¥˜½‰©•Ñ}¥…¹½‰©•Ñ}¥¹½Ð¥¸½‰©•Ñ}Á…Ñ¡Ìè(€€€€€€€€€€€½‰©•Ñ}¥‘Ì¹…ÁÁ•¹¡½‰©•Ñ}¥¤(€€€€€€€€€€€½‰©•Ñ}Á…Ñ¡Ím½‰©•Ñ}¥‘t€ôÁ…Ñ (€€€€€€€¥˜Á…Ñ è(€€€€€€€€€€€Á…ÉÑÌ€ôíÁ…ÉÐ¹±½Ý•È ¤™½ÈÁ…ÉÐ¥¸AÕÉ•A½Í¥áA…Ñ ¡Á…Ñ ¤¹Á…ÉÑÍô(€€€€€€€€€€€É•ÅÕ¥É”¡¹½Ð€¡Á…ÉÑÌ€˜!%MQ=Ie}=I	%9}AQ!}AIQL¤°˜‰¥Ð¡¥ÍÑ½Éä½¹Ñ…¥¹Ì„É•µ½Ù•ÁÉ¥Ù…Ñ”µ‘…Ñ„Á…Ñ èíÁ…Ñ¡ôˆ¤(€€€€€€€€€€€•¹½‘•‘}Á…Ñ €ôÁ…Ñ ¹•¹½‘” ‰ÕÑ˜´àˆ¤(€€€€€€€€€€€™½ÈÁ…ÑÑ•É¸¥¸!%MQ=Ie}MIQ}AQQI9Lè(€€€€€€€€€€€€€€€É•ÅÕ¥É”¡Á…ÑÑ•É¸¹Í•…É ¡•¹½‘•‘}Á…Ñ ¤¥Ì9½¹”°˜‰¥Ð¡¥ÍÑ½Éä½¹Ñ…¥¹Ì„±¥­•±äÍ•É•Ð¥¸„Á…Ñ èíÁ…Ñ¡ôˆ¤((€€€¥˜¹½Ð½‰©•Ñ}¥‘Ìè(€€€€€€€É•ÑÕÉ¸(€€€‰…Ñ €ô}ÉÕ¹}¥Ð¡É•Á¼°l‰…Ðµ™¥±”ˆ°€ˆ´µ‰…Ñ ‰t°¥¹ÁÕÑ}‰åÑ•Ìô ‰q¸ˆ¹©½¥¸¡½‰©•Ñ}¥‘Ì¤€¬€‰q¸ˆ¤¹•¹½‘” ‰…Í¥¤ˆ¤¤¹ÍÑ‘½ÕÐ(€€€ÍÑÉ•…´€ô¥¼¹	åÑ•Í%<¡‰…Ñ ¤(€€€™½ÈÉ•ÅÕ•ÍÑ•‘}¥¥¸½‰©•Ñ}¥‘Ìè(€€€€€€€¡•…‘•È€ôÍÑÉ•…´¹É•…‘±¥¹” ¤¹ÉÍÑÉ¥À¡ˆ‰q¸ˆ¤(€€€€€€€™¥•±‘Ì€ô¡•…‘•È¹ÍÁ±¥Ð ¤(€€€€€€€É•ÅÕ¥É”¡±•¸¡™¥•±‘Ì¤€øô€Ì°˜‰Õ¹•áÁ•Ñ•¥Ð…Ðµ™¥±”É•ÍÁ½¹Í”™½ÈíÉ•ÅÕ•ÍÑ•‘}¥‘ôˆ¤(€€€€€€€½‰©•Ñ}ÑåÁ”€ô™¥•±‘ÍlÅt(€€€€€€€Í¥é”€ô¥¹Ð¡™¥•±‘ÍlÉt¤(€€€€€€€Á…å±½…€ôÍÑÉ•…´¹É•…¡Í¥é”¤(€€€€€€€É•ÅÕ¥É”¡±•¸¡Á…å±½…¤€ôôÍ¥é”…¹ÍÑÉ•…´¹É•… Ä¤€ôôˆ‰q¸ˆ°˜‰ÑÉÕ¹…Ñ•¥Ð½‰©•ÐèíÉ•ÅÕ•ÍÑ•‘}¥‘ôˆ¤(€€€€€€€Á…Ñ €ô½‰©•Ñ}Á…Ñ¡Ì¹•Ð¡É•ÅÕ•ÍÑ•‘}¥°€ˆˆ¤(€€€€€€€¥˜½‰©•Ñ}ÑåÁ”¥¸íˆ‰‰±½ˆˆ°ˆ‰½µµ¥Ðˆ°ˆ‰Ñ…œ‰ôè(€€€€€€€€€€€™½ÈÁ…ÑÑ•É¸¥¸!%MQ=Ie}MIQ}AQQI9Lè(€€€€€€€€€€€€€€€É•ÅÕ¥É”¡Á…ÑÑ•É¸¹Í•…É ¡Á…å±½…¤¥Ì9½¹”°˜‰¥Ð¡¥ÍÑ½Éä½¹Ñ…¥¹Ì„±¥­•±äÍ•É•Ð¥¸íÁ…Ñ ½ÈÉ•ÅÕ•ÍÑ•‘}¥‘ôˆ¤(€€€€€€€¥˜½‰©•Ñ}ÑåÁ”€ôôˆ‰‰±½ˆˆ…¹Á…Ñ ¹½Ð¥¸ìˆ¹Í•µÉ•À¹åµ°ˆ°€‰ÍÉ¥ÁÑÌ½Ù…±¥‘…Ñ•}É•Á½Í¥Ñ½Éä¹Áä‰ôè(€€€€€€€€€€€™½ÈÁ…ÑÑ•É¸¥¸!%MQ=Ie}1e}AQQI9Lè(€€€€€€€€€€€€€€€É•ÅÕ¥É”¡Á…ÑÑ•É¸¹Í•…É ¡Á…å±½…¤¥Ì9½¹”°˜‰¥Ð¡¥ÍÑ½Éä½¹Ñ…¥¹Ì„É•µ½Ù•µÍåÍÑ•´µ…É­•È¥¸íÁ…Ñ ½ÈÉ•ÅÕ•ÍÑ•‘}¥‘ôˆ¤(()‘•˜¡•­}™½ÉÝ…É‘}•Ù¥‘•¹”¡É•Á¼èA…Ñ °€¨°‰¥¹‘¥¹}µ½‘”èÍÑÈ€ô€‰ÁÈˆ¤€´ø9½¹”è(€€€É•ÅÕ¥É” (€€€€€€€‰¥¹‘¥¹}µ½‘”¥¸ì‰ÁÈˆ°€‰ÁÉ½Ñ•Ñ•µµ…¥¸‰ô°(€€€€€€€€‰™½ÉÝ…Éµ•Ù¥‘•¹”‰¥¹‘¥¹œµ½‘”¥Ì¥¹Ù…±¥ˆ°(€€€€¤(€€€‰Õ¹‘±”€ôì(€€€€€€€€‰•Ù¥‘•¹”ˆèÉ•Á¼€¼€‰Ñ•ÍÑÌˆ€¼€‰™½ÉÝ…Éµ•Ù…°µ•Ù¥‘•¹”¹©Í½¸ˆ°(€€€€€€€€‰É•ÍÁ½¹Í”µ…¹¥™•ÍÐˆèÉ•Á¼€¼€‰Ñ•ÍÑÌ½™½ÉÝ…Éµ•Ù…°µÉ•ÍÁ½¹Í”µµ…¹¥™•ÍÐ¹©Í½¸ˆ°(€€€€€€€€‰…ÑÑ•ÍÑ…Ñ¥½¸ÍÑ…Ñ•µ•¹ÐˆèÉ•Á¼€¼€‰Ñ•ÍÑÌ½™½ÉÝ…Éµ•Ù…°µ…ÑÑ•ÍÑ…Ñ¥½¸¹©Í½¸ˆ°(€€€€€€€€‰…ÑÑ•ÍÑ…Ñ¥½¸Í¥¹…ÑÕÉ”ˆèÉ•Á¼€¼€‰Ñ•ÍÑÌ½™½ÉÝ…Éµ•Ù…°µ…ÑÑ•ÍÑ…Ñ¥½¸¹©Í½¸¹Í¥œˆ°(€€€ô(€€€•á¥ÍÑ¥¹œ€ôí±…‰•°™½È±…‰•°°Á…Ñ ¥¸‰Õ¹‘±”¹¥Ñ•µÌ ¤¥˜Á…Ñ ¹•á¥ÍÑÌ ¥ô(€€€¥˜¹½Ð•á¥ÍÑ¥¹œè(€€€€€€€É•ÑÕÉ¸(€€€É•ÅÕ¥É” (€€€€€€€•á¥ÍÑ¥¹œ€ôôÍ•Ð¡‰Õ¹‘±”¤°(€€€€€€€€‰™½ÉÝ…Éµ•Ù…°•Ù¥‘•¹”‰Õ¹‘±”¥Ì¥¹½µÁ±•Ñ”è€ˆ(€€€€€€€˜‰ÁÉ•Í•¹ÐõíÍ½ÉÑ•¡•á¥ÍÑ¥¹œ¥ôˆ°(€€€€¤(€€€™½È±…‰•°°Á…Ñ ¥¸‰Õ¹‘±”¹¥Ñ•µÌ ¤è(€€€€€€€É•ÅÕ¥É”¡Á…Ñ ¹¥Í}™¥±” ¤°˜‰™½ÉÝ…Éµ•Ù…°í±…‰•±ôµÕÍÐ‰”„É•Õ±…È™¥±”ˆ¤(€€€€€€€É•ÅÕ¥É”¡¹½ÐÁ…Ñ ¹¥Í}Íåµ±¥¹¬ ¤°˜‰™½ÉÝ…Éµ•Ù…°í±…‰•±ôµÕÍÐ¹½Ð‰”„Íåµ±¥¹¬ˆ¤(€€€•Ù¥‘•¹”€ô‰Õ¹‘±•l‰•Ù¥‘•¹”‰t(€€€Ù•É¥™¥•È€ôÉ•Á¼€¼€‰•Ù…±Ìˆ€¼€‰Ù•É¥™å}™½ÉÝ…É‘}•Ù¥‘•¹”¹Áäˆ(€€€É•ÅÕ¥É”¡Ù•É¥™¥•È¹¥Í}™¥±” ¤°€‰™½ÉÝ…Éµ•Ù…°•Ù¥‘•¹”•á¥ÍÑÌ‰ÕÐ¥ÑÌÙ•É¥™¥•È¥Ìµ¥ÍÍ¥¹œˆ¤(€€€É•ÍÕ±Ð€ôÍÕ‰ÁÉ½•ÍÌ¹ÉÕ¸ (€€€€€€€l(€€€€€€€€€€€ÍåÌ¹•á•ÕÑ…‰±”°(€€€€€€€€€€€ÍÑÈ¡Ù•É¥™¥•È¤°(€€€€€€€€€€€€ˆ´µµ…àµ…”µ‘…åÌˆ°(€€€€€€€€€€€€ˆÌÀˆ°(€€€€€€€€€€€€ˆ´µ‰¥¹‘¥¹œµµ½‘”ˆ°(€€€€€€€€€€€‰¥¹‘¥¹}µ½‘”°(€€€€€€€t°(€€€€€€€ÝõÉ•Á¼°(€€€€€€€ÍÑ‘½ÕÐõÍÕ‰ÁÉ½•ÍÌ¹A%A°(€€€€€€€ÍÑ‘•ÉÈõÍÕ‰ÁÉ½•ÍÌ¹A%A°(€€€€€€€Ñ•áÐõQÉÕ”°(€€€€€€€•¹½‘¥¹œô‰ÕÑ˜´àˆ°(€€€€€€€•ÉÉ½ÉÌô‰É•Á±…”ˆ°(€€€€€€€¡•¬õ…±Í”°(€€€€¤(€€€‘•Ñ…¥°€ô€¡É•ÍÕ±Ð¹ÍÑ‘•ÉÈ½ÈÉ•ÍÕ±Ð¹ÍÑ‘½ÕÐ¤¹ÍÑÉ¥À ¤(€€€É•ÅÕ¥É”¡É•ÍÕ±Ð¹É•ÑÕÉ¹½‘”€ôô€À°˜‰™½ÉÝ…Éµ•Ù…°•Ù¥‘•¹”¥Ì¥¹Ù…±¥½ÈÍÑ…±”èí‘•Ñ…¥±ôˆ¤(()‘•˜Ù…±¥‘…Ñ•}É•Á¼ (€€€É•Á¼èA…Ñ ð9½¹”€ô9½¹”°(€€€€¨°(€€€Ù•É¥™å}•Ù¥‘•¹”è‰½½°€ôQÉÕ”°(€€€Í…¹}¡¥ÍÑ½Éäè‰½½°€ôQÉÕ”°(€€€•Ù¥‘•¹•}‰¥¹‘¥¹}µ½‘”èÍÑÈ€ô€‰ÁÈˆ°(¤€´ø±¥ÍÑmÍÑÉtè(€€€É•Á¼€ô€¡É•Á¼½ÈA…Ñ ¡}}™¥±•}|¤¹É•Í½±Ù” ¤¹Á…É•¹ÑÍlÅt¤¹É•Í½±Ù” ¤(€€€Á±Õ¥¸€ôÉ•Á¼€¼A…Ñ  ©A1U%9}I1Q%Y}AQ ¹Á…ÉÑÌ¤(€€€É•ÅÕ¥É”¡Á±Õ¥¸¹¥Í}‘¥È ¤°˜‰Á±Õ¥¸‘¥É•Ñ½Éä‘½•Ì¹½Ð•á¥ÍÐèíÁ±Õ¥¹ôˆ¤((€€€¡•­}É•Á½Í¥Ñ½Éå}‘½Ì¡É•Á¼¤(€€€¡•­}µ…¹¥™•ÍÐ¡Á±Õ¥¸¤(€€€¡•­}É•±•…Í•}ÑÉ•”¡Á±Õ¥¸¤(€€€¡•­}½‰Í¥‘¥…¹}‰É…¥¹}½¹ÑÉ…Ð¡Á±Õ¥¸¤(€€€¡•­}Á½ÉÑ…‰±•}Í¡•µ„¡Á±Õ¥¸¤((€€€Í­¥±±}É½½Ð€ôÁ±Õ¥¸€¼€‰Í­¥±±Ìˆ(€€€Í­¥±±}‘¥ÉÌ€ôíÁ…Ñ ¹¹…µ”èÁ…Ñ ™½ÈÁ…Ñ ¥¸Í­¥±±}É½½Ð¹¥Ñ•É‘¥È ¤¥˜Á…Ñ ¹¥Í}‘¥È ¥ô(€€€É•ÅÕ¥É”¡Í•Ð¡Í­¥±±}‘¥ÉÌ¤€ôôaAQ}M-%11L°€‰M­¥±°Í•ÐµÕÍÐµ…Ñ Ñ¡”€ÄÈµM­¥±°‘•Í¥¸ˆ¤(€€€™½È¹…µ”¥¸Í½ÉÑ•¡aAQ}M-%11L¤è(€€€€€€€¡•­}Í­¥±°¡Í­¥±±}‘¥ÉÍm¹…µ•t¤(€€€¡•­}±¥¹­Ì¡Á±Õ¥¸¤(€€€¡•­}™½ÉÝ…É‘}…Í•Ì¡É•Á¼¤(€€€¡•­}‰•¡…Ù¥½É}…Í•Ì¡É•Á¼¤(€€€¥˜Í…¹}¡¥ÍÑ½Éäè(€€€€€€€¡•­}¥Ñ}¡¥ÍÑ½Éä¡É•Á¼¤(€€€¥˜Ù•É¥™å}•Ù¥‘•¹”è(€€€€€€€¡•­}™½ÉÝ…É‘}•Ù¥‘•¹”¡É•Á¼°‰¥¹‘¥¹}µ½‘”õ•Ù¥‘•¹•}‰¥¹‘¥¹}µ½‘”¤(€€€É•ÑÕÉ¸l(€€€€€€€€‰µ…¹¥™•ÍÐ…¹µ…É­•ÑÁ±…”ˆ°(€€€€€€€€ˆÄÈM­¥±±Ì…¹½Á•¹…¤¹å…µ°™¥±•Ìˆ°(€€€€€€€€‰Í¡…É•½¹ÑÉ…ÑÌ°½ÁÑ¥½¹…°=‰Í¥‘¥…¸‰É…¥¸°…¹Á½ÉÑ…‰±”µÉ•½É)M=8M¡•µ„ˆ°(€€€€€€€€‰•á…ÐÉ•±•…Í”…±±½Ý±¥ÍÐ°UQ´à½1°…¹Í•¹Í¥Ñ¥Ù”µ½¹Ñ•¹ÐÍ…¸ˆ°(€€€€€€€€ˆØÀÉ½ÕÑ¥¹œ…Í•Ì…¹€ÌØ‰•¡…Ù¥½È…Í•Ìˆ°(€€€€€€€€‰¥Ðµ¡¥ÍÑ½Éä…¹™½ÉÝ…Éµ•Ù¥‘•¹”…Ñ•Ìˆ°(€€€t(()‘•˜µ…¥¸ ¤€´ø¥¹Ðè(€€€Á…ÉÍ•È€ô…ÉÁ…ÉÍ”¹ÉÕµ•¹ÑA…ÉÍ•È¡‘•ÍÉ¥ÁÑ¥½¸õ}}‘½}|¤(€€€Á…ÉÍ•È¹…‘‘}…ÉÕµ•¹Ð (€€€€€€€€ˆ´µ•Ù¥‘•¹”µ‰¥¹‘¥¹œµµ½‘”ˆ°(€€€€€€€¡½¥•Ìô ‰ÁÈˆ°€‰ÁÉ½Ñ•Ñ•µµ…¥¸ˆ¤°(€€€€€€€‘•™…Õ±Ðô‰ÁÈˆ°(€€€€¤(€€€…ÉÌ€ôÁ…ÉÍ•È¹Á…ÉÍ•}…ÉÌ ¤(€€€ÑÉäè(€€€€€€€É•ÍÕ±ÑÌ€ôÙ…±¥‘…Ñ•}É•Á¼¡•Ù¥‘•¹•}‰¥¹‘¥¹}µ½‘”õ…ÉÌ¹•Ù¥‘•¹•}‰¥¹‘¥¹}µ½‘”¤(€€€•á•ÁÐ€¡=MÉÉ½È°U¹¥½‘•ÉÉ½È°Y…±¥‘…Ñ¥½¹ÉÉ½È¤…Ì•áŒè(€€€€€€€ÁÉ¥¹Ð¡˜‰m%1tí•áôˆ°™¥±”õÍåÌ¹ÍÑ‘•ÉÈ¤(€€€€€€€É•ÑÕÉ¸€Ä(€€€™½ÈÉ•ÍÕ±Ð¥¸É•ÍÕ±ÑÌè(€€€€€€€ÁÉ¥¹Ð¡˜‰m=-tíÉ•ÍÕ±Ñôˆ¤(€€€É•ÑÕÉ¸€À(()¥˜}}¹…µ•}|€ôô€‰}}µ…¥¹}|ˆè(€€€É…¥Í”MåÍÑ•µá¥Ð¡µ…¥¸ ¤¤(
+        require(
+            private_marker not in combined,
+            f"public plugin contains a private local path marker: {private_marker}",
+        )
+
+
+def check_portable_schema(plugin: Path) -> None:
+    schema_path = plugin / "references" / "portable-learning-records.schema.json"
+    schema = load_json(schema_path)
+    require(isinstance(schema, dict), "portable record schema must be an object")
+    require(schema.get("$schema") == "https://json-schema.org/draft/2020-12/schema", "portable record schema must use Draft 2020-12")
+    try:
+        Draft202012Validator.check_schema(schema)
+    except SchemaError as exc:
+        raise ValidationError(f"invalid portable-record JSON Schema: {exc.message}") from exc
+
+    output_samples = (
+        {
+            "schemaVersion": "1.1",
+            "recordType": "StudyProfile",
+            "targetExam": None,
+            "targetDate": None,
+            "weeklyHours": None,
+            "currentPhase": None,
+            "constraints": [],
+        },
+        {
+            "schemaVersion": "1.1",
+            "recordType": "ProgressSnapshot",
+            "period": {"start": None, "end": None},
+            "metrics": [],
+            "accuracy": [],
+            "blockers": [],
+        },
+        {
+            "schemaVersion": "1.1",
+            "recordType": "ReviewQueue",
+            "generatedAt": None,
+            "items": [],
+        },
+    )
+    validator = Draft202012Validator(schema, format_checker=FormatChecker())
+    for sample in output_samples:
+        try:
+            validator.validate(sample)
+        except JsonSchemaValidationError as exc:
+            raise ValidationError(f"portable-record schema rejects a required 1.1 shape: {exc.message}") from exc
+
+    defs = schema.get("$defs")
+    require(isinstance(defs, dict) and "legacyInput" in defs, "portable-record schema must expose $defs/legacyInput")
+    legacy_root = {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "$ref": "#/$defs/legacyInput",
+        "$defs": defs,
+    }
+    legacy_validator = Draft202012Validator(legacy_root, format_checker=FormatChecker())
+    legacy_samples = (
+        {
+            "schemaVersion": "1.0",
+            "period": {"start": "2026-07-01", "end": "2026-07-07"},
+            "plannedUnits": 10,
+            "completedUnits": 8,
+            "accuracy": 0.7,
+            "sampleSize": 20,
+            "legacyExtension": "preserve me",
+        },
+        {
+            "schemaVersion": "1.0",
+            "items": [{"topic": "limit", "retestDate": "D+3"}],
+        },
+        {
+            "schemaVersion": "1.0",
+            "targetExam": "æœªæä¾›",
+            "targetDate": "",
+            "weeklyHours": "unknown",
+            "currentPhase": "",
+            "constraints": [],
+            "blockers": ["legacy extension that also resembles progress data"],
+            "unrecognizedExtension": {"preserve": True},
+        },
+    )
+    for sample in legacy_samples:
+        try:
+            legacy_validator.validate(sample)
+        except JsonSchemaValidationError as exc:
+            raise ValidationError(f"portable-record schema rejects a supported 1.0 input: {exc.message}") from exc
+    require(
+        all(not validator.is_valid(sample) for sample in legacy_samples),
+        "portable-record root schema must reject all Schema 1.0 inputs",
+    )
+    invalid_11_date = {
+        "schemaVersion": "1.1",
+        "recordType": "ReviewQueue",
+        "generatedAt": None,
+        "items": [
+            {
+                "subject": None,
+                "topic": "limit",
+                "errorCause": None,
+                "errorCauseStatus": None,
+                "nextRetestDate": "D+3",
+                "retestOffsetDays": None,
+                "status": "pending",
+                "masteryEvidence": [],
+            }
+        ],
+    }
+    require(
+        not validator.is_valid(invalid_11_date),
+        "portable-record schema must reject D+N in a Schema 1.1 date field",
+    )
+    invalid_date_and_offset = {
+        **invalid_11_date,
+        "items": [
+            {
+                **invalid_11_date["items"][0],
+                "nextRetestDate": "2026-07-18",
+                "retestOffsetDays": 3,
+            }
+        ],
+    }
+    require(
+        not validator.is_valid(invalid_date_and_offset),
+        "portable-record schema must reject simultaneous nextRetestDate and retestOffsetDays",
+    )
+    invalid_zero_total = {
+        "schemaVersion": "1.1",
+        "recordType": "ProgressSnapshot",
+        "period": {"start": None, "end": None},
+        "metrics": [],
+        "accuracy": [
+            {"subject": "math2", "correct": 1, "total": 0, "rate": None}
+        ],
+        "blockers": [],
+    }
+    require(
+        not validator.is_valid(invalid_zero_total),
+        "portable-record schema must reject correct > 0 when total is zero",
+    )
+    valid_accuracy_record = {
+        "schemaVersion": "1.1",
+        "recordType": "ProgressSnapshot",
+        "period": {"start": None, "end": None},
+        "metrics": [],
+        "accuracy": [
+            {"subject": "english2", "correct": 16, "total": 20, "rate": 0.8}
+        ],
+        "blockers": [],
+    }
+    check_progress_accuracy_semantics(valid_accuracy_record)
+    semantic_mutations = (
+        {"subject": "english2", "correct": 21, "total": 20, "rate": 1.0},
+        {"subject": "english2", "correct": 16, "total": 20, "rate": 0.7},
+    )
+    for entry in semantic_mutations:
+        record = {**valid_accuracy_record, "accuracy": [entry]}
+        try:
+            check_progress_accuracy_semantics(record)
+        except ValidationError:
+            continue
+        raise ValidationError("portable-record semantic gate accepted inconsistent accuracy values")
+
+
+def check_progress_accuracy_semantics(record: dict[str, Any]) -> None:
+    """Enforce numeric relationships JSON Schema cannot express portably."""
+
+    require(record.get("recordType") == "ProgressSnapshot", "accuracy semantics require ProgressSnapshot")
+    accuracy = record.get("accuracy")
+    require(isinstance(accuracy, list), "ProgressSnapshot accuracy must be an array")
+    for index, entry in enumerate(accuracy):
+        require(isinstance(entry, dict), f"accuracy[{index}] must be an object")
+        correct = entry.get("correct")
+        total = entry.get("total")
+        rate = entry.get("rate")
+        if correct is not None and total is not None:
+            require(correct <= total, f"accuracy[{index}].correct must not exceed total")
+        if total == 0:
+            require(correct in {None, 0}, f"accuracy[{index}].correct must be 0 or null when total is zero")
+            require(rate is None, f"accuracy[{index}].rate must be null when total is zero")
+        elif correct is not None and total is not None and rate is not None:
+            expected_rate = correct / total
+            require(
+                math.isclose(rate, expected_rate, rel_tol=0.0, abs_tol=1e-12),
+                f"accuracy[{index}].rate must equal correct / total",
+            )
+
+
+def check_release_tree(plugin: Path) -> None:
+    roots = {path.name for path in plugin.iterdir()}
+    require(roots == ALLOWED_PLUGIN_ROOTS, f"plugin roots do not match the release allowlist: {sorted(roots)}")
+
+    for path in plugin.rglob("*"):
+        require(not path.is_symlink(), f"release tree must not contain symbolic links: {path}")
+
+    actual_files = {
+        path.relative_to(plugin).as_posix()
+        for path in plugin.rglob("*")
+        if path.is_file()
+    }
+    require(actual_files == ALLOWED_RELEASE_FILES, "release tree does not match the exact full-path allowlist")
+
+    for relative in sorted(actual_files):
+        pure = PurePosixPath(relative)
+        require(not ({part.lower() for part in pure.parts} & FORBIDDEN_PATH_PARTS), f"forbidden release path: {relative}")
+        text = read_utf8_text(plugin / Path(*pure.parts))
+        require(PLACEHOLDER not in text.upper(), f"release file contains an unfinished placeholder: {relative}")
+        for pattern in LEGACY_PATTERNS:
+            require(pattern.search(text) is None, f"release file contains a removed-system marker: {relative}")
+        for pattern in SENSITIVE_PATTERNS:
+            require(pattern.search(text) is None, f"release file contains a likely secret: {relative}")
+
+
+def check_forward_cases(repo: Path) -> None:
+    forward = load_json(repo / "tests" / "forward-cases.json")
+    require(isinstance(forward, dict) and forward.get("schemaVersion") == "1.3", "forward cases must use schemaVersion 1.3")
+    cases = forward.get("cases")
+    require(isinstance(cases, list) and len(cases) == 60, "forward cases must contain exactly 60 cases")
+    ids = [case.get("id") for case in cases if isinstance(case, dict)]
+    require(len(ids) == 60 and len(set(ids)) == 60 and all(isinstance(item, str) and item for item in ids), "forward case IDs must be unique non-empty strings")
+    counts: dict[str, Counter[str]] = defaultdict(Counter)
+    for case in cases:
+        require(isinstance(case, dict), "each forward case must be an object")
+        skill = case.get("skillUnderTest")
+        kind = case.get("kind")
+        require(skill in EXPECTED_SKILLS, f"forward case contains an unknown Skill: {case.get('id')}")
+        require(kind in {"positive", "colloquial", "conflict", "compound"}, f"forward case kind is invalid: {case.get('id')}")
+        require(case.get("expectedPrimary") in EXPECTED_SKILLS, f"forward case route is invalid: {case.get('id')}")
+        require(isinstance(case.get("prompt"), str) and case["prompt"].strip(), f"forward case has no prompt: {case.get('id')}")
+        require(isinstance(case.get("expectedBehavior"), list) and case["expectedBehavior"], f"forward case has no behavior assertions: {case.get('id')}")
+        require(
+            all(isinstance(item, str) and item.strip() for item in case["expectedBehavior"]),
+            f"forward behavior assertions must be non-empty strings: {case.get('id')}",
+        )
+        if kind in {"positive", "colloquial"}:
+            require(case["expectedPrimary"] == skill, f"{kind} case does not route to the Skill under test: {case.get('id')}")
+        elif kind == "conflict":
+            require(case.get("expectedNotPrimary") == skill, f"conflict case does not exclude the Skill under test: {case.get('id')}")
+            require(case["expectedPrimary"] != skill, f"conflict case still routes to the excluded Skill: {case.get('id')}")
+        counts[skill][kind] += 1
+    for skill in EXPECTED_SKILLS:
+        expected = Counter({"positive": 2, "colloquial": 1, "conflict": 1, "compound": 1})
+        require(counts[skill] == expected, f"{skill} must have 2 positive, 1 colloquial, 1 conflict, and 1 compound case")
+
+
+def check_behavior_cases(repo: Path) -> None:
+    behavior = load_json(repo / "tests" / "behavior-cases.json")
+    require(isinstance(behavior, dict) and behavior.get("schemaVersion") == "1.3", "behavior cases must use schemaVersion 1.3")
+    cases = behavior.get("cases")
+    require(isinstance(cases, list) and len(cases) == 36, "behavior cases must contain exactly 36 cases")
+    ids: list[str] = []
+    for case in cases:
+        require(isinstance(case, dict), "each behavior case must be an object")
+        case_id = case.get("id")
+        require(isinstance(case_id, str) and case_id.strip(), "behavior case ID must be a non-empty string")
+        ids.append(case_id)
+        require(case.get("expectedPrimary") in EXPECTED_SKILLS, f"behavior case route is invalid: {case_id}")
+        has_prompt = isinstance(case.get("prompt"), str) and bool(case["prompt"].strip())
+        has_turns = isinstance(case.get("turns"), list) and bool(case["turns"])
+        has_transcript = isinstance(case.get("transcript"), list) and bool(case["transcript"])
+        require(
+            has_prompt or has_turns or has_transcript,
+            f"behavior case must contain prompt, turns, or transcript: {case_id}",
+        )
+        rubric = case.get("rubric")
+        require(isinstance(rubric, list) and bool(rubric), f"behavior case must contain a non-empty rubric list: {case_id}")
+        require(
+            all(isinstance(item, str) and item.strip() for item in rubric),
+            f"behavior rubric entries must be non-empty strings: {case_id}",
+        )
+        if has_transcript:
+            for turn in case["transcript"]:
+                require(isinstance(turn, dict), f"behavior transcript turn must be an object: {case_id}")
+                require(turn.get("role") in {"user", "assistant"}, f"behavior transcript role is invalid: {case_id}")
+                require(
+                    isinstance(turn.get("content"), str) and turn["content"].strip(),
+                    f"behavior transcript content is empty: {case_id}",
+                )
+    require(len(ids) == len(set(ids)), "behavior case IDs must be unique")
+    numbers = {
+        int(match.group(1))
+        for case_id in ids
+        if (match := re.fullmatch(r"behavior-(\d{2})-[a-z0-9-]+", case_id))
+    }
+    require(numbers == set(range(1, 37)), "behavior case IDs must cover behavior-01 through behavior-36 exactly")
+
+
+def check_repository_docs(repo: Path) -> None:
+    required = {
+        "README.md",
+        "CHANGELOG.md",
+        "LICENSE",
+        "PRIVACY.md",
+        "TERMS.md",
+        "SECURITY.md",
+        "THIRD_PARTY_CONTENT.md",
+        ".agents/plugins/marketplace.json",
+        "tests/forward-cases.json",
+        "tests/behavior-cases.json",
+        "tests/system-validator-evidence.json",
+    }
+    for relative in required:
+        require((repo / relative).is_file(), f"required repository file is missing: {relative}")
+    require(not (repo / "submission").exists(), "obsolete submission directory must be absent")
+
+    manifest = load_json(
+        repo / Path(*PLUGIN_RELATIVE_PATH.parts) / ".codex-plugin" / "plugin.json"
+    )
+    version = manifest.get("version") if isinstance(manifest, dict) else None
+    require(
+        isinstance(version, str) and SEMVER.fullmatch(version) is not None,
+        "manifest version is unavailable for documentation checks",
+    )
+    readme = read_utf8_text(repo / "README.md")
+    require(
+        f"å½“å‰ç‰ˆæœ¬ï¼š`{version}`" in readme,
+        "README current version must match plugin.json.version",
+    )
+    require(
+        f"--ref v{version}" in readme,
+        "README marketplace ref must match plugin.json.version",
+    )
+    require(
+        f"--branch v{version}" in readme,
+        "README clone tag must match plugin.json.version",
+    )
+    changelog = read_utf8_text(repo / "CHANGELOG.md")
+    current_release = re.search(
+        r"^## \[([^\]]+)\] - (Unreleased|\d{4}-\d{2}-\d{2})$",
+        changelog,
+        re.MULTILINE,
+    )
+    require(current_release is not None, "CHANGELOG must start with a versioned release heading")
+    require(
+        current_release.group(1) == version,
+        "CHANGELOG current version must match plugin.json.version",
+    )
+
+    marketplace = load_json(repo / ".agents" / "plugins" / "marketplace.json")
+    require(isinstance(marketplace, dict) and marketplace.get("name") == "kaoyan-22408", "marketplace name is invalid")
+    plugins = marketplace.get("plugins")
+    require(isinstance(plugins, list) and len(plugins) == 1, "marketplace must contain exactly one plugin")
+    entry = plugins[0]
+    require(isinstance(entry, dict) and entry.get("name") == "kaoyan-22408", "marketplace plugin name is invalid")
+    require(entry.get("category") == "Education", "marketplace category must be Education")
+    require(entry.get("source", {}).get("path") == "./plugins/kaoyan-22408", "marketplace source.path is invalid")
+    require(entry.get("policy", {}).get("installation") == "AVAILABLE", "marketplace installation policy is invalid")
+    require(entry.get("policy", {}).get("authentication") == "ON_INSTALL", "marketplace authentication policy is invalid")
+
+
+def _run_git(repo: Path, arguments: list[str], *, input_bytes: bytes | None = None) -> subprocess.CompletedProcess[bytes]:
+    try:
+        result = subprocess.run(
+            ["git", *arguments],
+            cwd=repo,
+            input=input_bytes,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+        )
+    except OSError as exc:
+        raise ValidationError(f"cannot run git: {exc}") from exc
+    require(result.returncode == 0, f"git {' '.join(arguments)} failed: {result.stderr.decode('utf-8', 'replace').strip()}")
+    return result
+
+
+def check_git_history(repo: Path) -> None:
+    objects_output = _run_git(repo, ["rev-list", "--objects", "--all"]).stdout.decode("utf-8", "strict")
+    object_paths: dict[str, str] = {}
+    object_ids: list[str] = []
+    for line in objects_output.splitlines():
+        object_id, _, path = line.partition(" ")
+        if object_id and object_id not in object_paths:
+            object_ids.append(object_id)
+            object_paths[object_id] = path
+        if path:
+            parts = {part.lower() for part in PurePosixPath(path).parts}
+            require(not (parts & HISTORY_FORBIDDEN_PATH_PARTS), f"Git history contains a removed private-data path: {path}")
+            encoded_path = path.encode("utf-8")
+            for pattern in HISTORY_SECRET_PATTERNS:
+                require(pattern.search(encoded_path) is None, f"Git history contains a likely secret in a path: {path}")
+
+    if not object_ids:
+        return
+    batch = _run_git(repo, ["cat-file", "--batch"], input_bytes=("\n".join(object_ids) + "\n").encode("ascii")).stdout
+    stream = io.BytesIO(batch)
+    for requested_id in object_ids:
+        header = stream.readline().rstrip(b"\n")
+        fields = header.split()
+        require(len(fields) >= 3, f"unexpected git cat-file response for {requested_id}")
+        object_type = fields[1]
+        size = int(fields[2])
+        payload = stream.read(size)
+        require(len(payload) == size and stream.read(1) == b"\n", f"truncated git object: {requested_id}")
+        path = object_paths.get(requested_id, "")
+        if object_type in {b"blob", b"commit", b"tag"}:
+            for pattern in HISTORY_SECRET_PATTERNS:
+                require(pattern.search(payload) is None, f"Git history contains a likely secret in {path or requested_id}")
+        if object_type == b"blob" and path not in {".semgrep.yml", "scripts/validate_repository.py"}:
+            for pattern in HISTORY_LEGACY_PATTERNS:
+                require(pattern.search(payload) is None, f"Git history contains a removed-system marker in {path or requested_id}")
+
+
+def check_forward_evidence(repo: Path, *, binding_mode: str = "pr") -> None:
+    require(
+        binding_mode in {"pr", "protected-main"},
+        "forward-evidence binding mode is invalid",
+    )
+    bundle = {
+        "evidence": repo / "tests" / "forward-eval-evidence.json",
+        "response manifest": repo / "tests/forward-eval-response-manifest.json",
+        "attestation statement": repo / "tests/forward-eval-attestation.json",
+        "attestation signature": repo / "tests/forward-eval-attestation.json.sig",
+    }
+    existing = {label for label, path in bundle.items() if path.exists()}
+    if not existing:
+        return
+    require(
+        existing == set(bundle),
+        "forward-eval evidence bundle is incomplete: "
+        f"present={sorted(existing)}",
+    )
+    for label, path in bundle.items():
+        require(path.is_file(), f"forward-eval {label} must be a regular file")
+        require(not path.is_symlink(), f"forward-eval {label} must not be a symlink")
+    evidence = bundle["evidence"]
+    verifier = repo / "evals" / "verify_forward_evidence.py"
+    require(verifier.is_file(), "forward-eval evidence exists but its verifier is missing")
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(verifier),
+            "--max-age-days",
+            "30",
+            "--binding-mode",
+            binding_mode,
+        ],
+        cwd=repo,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        check=False,
+    )
+    detail = (result.stderr or result.stdout).strip()
+    require(result.returncode == 0, f"forward-eval evidence is invalid or stale: {detail}")
+
+
+def validate_repo(
+    repo: Path | None = None,
+    *,
+    verify_evidence: bool = True,
+    scan_history: bool = True,
+    evidence_binding_mode: str = "pr",
+) -> list[str]:
+    repo = (repo or Path(__file__).resolve().parents[1]).resolve()
+    plugin = repo / Path(*PLUGIN_RELATIVE_PATH.parts)
+    require(plugin.is_dir(), f"plugin directory does not exist: {plugin}")
+
+    check_repository_docs(repo)
+    check_manifest(plugin)
+    check_release_tree(plugin)
+    check_obsidian_brain_contract(plugin)
+    check_portable_schema(plugin)
+
+    skill_root = plugin / "skills"
+    skill_dirs = {path.name: path for path in skill_root.iterdir() if path.is_dir()}
+    require(set(skill_dirs) == EXPECTED_SKILLS, "Skill set must match the 12-Skill design")
+    for name in sorted(EXPECTED_SKILLS):
+        check_skill(skill_dirs[name])
+    check_links(plugin)
+    check_forward_cases(repo)
+    check_behavior_cases(repo)
+    if scan_history:
+        check_git_history(repo)
+    if verify_evidence:
+        check_forward_evidence(repo, binding_mode=evidence_binding_mode)
+    return [
+        "manifest and marketplace",
+        "12 Skills and openai.yaml files",
+        "shared contracts, optional Obsidian brain, and portable-record JSON Schema",
+        "exact release allowlist, UTF-8/LF, and sensitive-content scan",
+        "60 routing cases and 36 behavior cases",
+        "Git-history and forward-evidence gates",
+    ]
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--evidence-binding-mode",
+        choices=("pr", "protected-main"),
+        default="pr",
+    )
+    args = parser.parse_args()
+    try:
+        results = validate_repo(evidence_binding_mode=args.evidence_binding_mode)
+    except (OSError, UnicodeError, ValidationError) as exc:
+        print(f"[FAIL] {exc}", file=sys.stderr)
+        return 1
+    for result in results:
+        print(f"[OK] {result}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+
