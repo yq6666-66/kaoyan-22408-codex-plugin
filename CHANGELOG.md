@@ -2,6 +2,23 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/)。
 
+## [1.4.0] - 2026-08-03
+
+### 新增
+
+- 增加可选 Notion 学习大脑契约：在用户授权的工作区中检索相关页面，并按对话内容沉淀最小、可复用的学习增量。
+- 增加 Notion 与 Obsidian 的来源分离、只读覆盖、目标页面确认、并发合并和写入失败降级规则。
+
+### 调整
+
+- 12 个 Skills 通过公共路由契约条件式接入 Notion，不新增总控 Skill、MCP、后台服务或发布者数据库。
+- 发布门禁改为完全离线、可重复的静态验证、单元测试、安全扫描、官方 validator 与跨平台一致构建；不再要求登录 Codex CLI。
+- 保留 60 个路由和 36 个行为场景作为规则覆盖资产，验证其结构、路由、rubric 与 Schema 完整性，不再声称模型运行通过率。
+
+### 移除
+
+- 移除 Codex CLI 模型评测器、响应缓存、前向证据、离线签名器、公钥变量和 `pull_request_target` 认证工作流。
+
 ## [1.3.0] - 2026-07-29
 
 ### 新增
@@ -71,6 +88,7 @@
 - 采用纯 Skills 架构，无 App、MCP、后台服务、账号系统或数据持久化。
 - 不内置第三方题库、讲义、真题合集或解析库。
 
+[1.4.0]: https://github.com/yq6666-66/kaoyan-22408-codex-plugin/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/yq6666-66/kaoyan-22408-codex-plugin/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/yq6666-66/kaoyan-22408-codex-plugin/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/yq6666-66/kaoyan-22408-codex-plugin/compare/v1.0.0...v1.1.0

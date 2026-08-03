@@ -218,12 +218,10 @@ def validate_release_archive(archive_path: Path) -> tuple[str, ...]:
 def build_archive(
     repo: Path,
     output: Path | None = None,
-    *,
-    evidence_binding_mode: str = "pr",
 ) -> ReleaseArtifact:
     repo = repo.resolve()
     _require_clean_plugin_tree(repo)
-    validate_repo(repo, evidence_binding_mode=evidence_binding_mode)
+    validate_repo(repo)
     payloads = committed_plugin_blobs(repo)
     version = _manifest_version(payloads)
     archive_path = (output or repo / "dist" / f"kaoyan-22408-{version}.zip").resolve()
@@ -259,21 +257,12 @@ def main() -> int:
         type=Path,
         help="optional ZIP path; default name is derived from plugin.json.version",
     )
-    parser.add_argument(
-        "--evidence-binding-mode",
-        choices=("pr", "protected-main"),
-        default="pr",
-    )
     args = parser.parse_args()
     output = args.output
     if output is not None and not output.is_absolute():
         output = repo / output
     try:
-        artifact = build_archive(
-            repo,
-            output,
-            evidence_binding_mode=args.evidence_binding_mode,
-        )
+        artifact = build_archive(repo, output)
     except ValidationError as exc:
         print(f"[FAIL] {exc}", file=sys.stderr)
         return 1

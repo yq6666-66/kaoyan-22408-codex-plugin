@@ -1,8 +1,8 @@
 # 考研 22408 Skills 插件
 
-`kaoyan-22408` 是面向数学二、英语二、408 与政治的中文学习插件，可在支持 Skills 插件的 ChatGPT 与 Codex 环境中使用。项目只包含 12 个 Skills、共享契约与品牌图标，不提供独立应用、App、MCP、后台服务、账号或内置题库。用户可选择把本地 Obsidian Vault 作为跨会话学习记忆；发布者无法访问该 Vault。
+`kaoyan-22408` 是面向数学二、英语二、408 与政治的中文学习插件，可在支持 Skills 插件的 ChatGPT 与 Codex 环境中使用。项目只包含 12 个 Skills、共享契约与品牌图标，不提供独立应用、App、MCP、后台服务、账号或内置题库。用户可选择把本地 Obsidian Vault 或已授权的 Notion 工作区作为跨会话学习记忆；发布者无法访问这些笔记。
 
-当前版本：`1.3.0`
+当前版本：`1.4.0`
 
 默认采用自适应简洁输出：先给可执行结论或立即行动，复杂问题再展开必要依据；需要连续学习时使用三行 Markdown 交接卡，必须生成的 Schema 1.1 JSON 永远放在回答末尾。
 
@@ -30,6 +30,8 @@
 - 发布者没有接收会话、文件、学习记录或 API Key 的服务器。
 - 未启用 Obsidian 大脑时，插件只处理当前会话内容，不写入用户设备，也不暗示拥有跨会话记忆。
 - 启用 Obsidian 大脑后，宿主只按本地配置读取和结构化更新用户自己的 Vault；配置、笔记和学习记录不会发送给插件发布者。
+- 连接 Notion 后，宿主只通过用户已授权的 Notion 工具检索和结构化更新用户选择的页面；发布者没有 Notion Token、后台账号或独立读取权限。
+- Notion 默认只沉淀可复用的学习增量，不复制整段会话、密钥、完整付费材料或未授权题库；用户说“本次不记忆”“只读模式”或“不要同步 Notion”时，本轮禁止写入。
 - 真题和学习材料只处理用户当前会话直接提供的有限内容，或用户有权使用且实际提供的文件；不会搜索、补全或重建整套资料。
 - 跨会话继续时，用户仍可复制插件输出的 Schema 1.1 `StudyProfile`、`ProgressSnapshot` 或 `ReviewQueue` JSON；启用 Obsidian 后这些对象也可作为本地可审计记忆。
 - 招考信息以教育部、研招网和目标院校官网为依据；时政与政策事实以中国政府网、国务院、中央部门或事项发布机构官网为依据。不能核验时会标记 `[待核验]`。
@@ -53,7 +55,7 @@ GitHub 仓库是 repo marketplace 的安装源。GitHub Release 中的 ZIP 与 S
 以下命令要求当前 CLI 的 `codex plugin` 帮助中存在相应子命令：
 
 ```text
-codex plugin marketplace add yq6666-66/kaoyan-22408-codex-plugin --ref v1.3.0
+codex plugin marketplace add yq6666-66/kaoyan-22408-codex-plugin --ref v1.4.0
 codex plugin add kaoyan-22408@kaoyan-22408
 ```
 
@@ -62,7 +64,7 @@ codex plugin add kaoyan-22408@kaoyan-22408
 ### 桌面端安装
 
 ```text
-git clone --branch v1.3.0 --depth 1 https://github.com/yq6666-66/kaoyan-22408-codex-plugin.git
+git clone --branch v1.4.0 --depth 1 https://github.com/yq6666-66/kaoyan-22408-codex-plugin.git
 ```
 
 在 ChatGPT Desktop 或 Codex Desktop 中打开克隆后的仓库，重启桌面端，然后从仓库提供的 marketplace 安装 `kaoyan-22408`。桌面端菜单名称可能随版本变化。
@@ -110,6 +112,12 @@ python scripts/configure_obsidian_brain.py disable
 python scripts/configure_obsidian_brain.py enable
 ```
 
+### 可选 Notion 学习大脑
+
+Notion 通过当前宿主已连接的 `Notion` 工具工作，不需要在仓库中保存 Token 或私人页面 ID。首次使用时在当前任务中连接 Notion，然后说“同步到 Notion”或指定目标页面；插件会先搜索并读取相关页面，再把本轮确认的概念、错因、复测安排或稳定方法作为最小增量更新到已有页面。没有可靠目标页面时会先询问，不会随意创建或覆盖页面。
+
+每轮输出会区分 `[Notion记忆]`、`[Obsidian记忆]`、`[用户材料]`、`[模型推导]` 和 `[官方核验]`。Notion 工具不可用时自动退化为当前会话模式，并明确显示未写入状态。完整边界见 [`notion-brain-contract.md`](plugins/kaoyan-22408/references/notion-brain-contract.md)。
+
 ## 调用示例
 
 Codex 可使用 `$skill-name` 显式调用；ChatGPT 可从插件或 Skill 选择器调用。例如：
@@ -129,25 +137,11 @@ python scripts/check.py
 python scripts/build_release.py
 ```
 
-`check.py` 运行仓库静态检查、结构校验和测试。`build_release.py` 从 `plugin.json.version` 派生 ZIP 文件名，同时生成对应的 `.zip.sha256`，并只打包完整路径允许列表中的插件文件。正式发布还要求官方插件校验、12 个 Skill 校验、动态前向评测证据，以及 Windows 与 Ubuntu 构建得到完全相同的 SHA-256。
+`check.py` 运行完全离线的仓库静态检查、结构校验、单元测试、Semgrep 和官方 validator 证据校验，不调用模型，也不要求安装或登录 Codex CLI。`build_release.py` 从 `plugin.json.version` 派生 ZIP 文件名，同时生成对应的 `.zip.sha256`，并只打包完整路径允许列表中的插件文件。
 
-动态评测在已提交且输入树干净的版本上运行。评测器会生成证据和逐响应摘要清单：
+发布门禁包括 60 个路由场景和 36 个行为场景的数量、ID、主责 Skill、最近邻冲突、rubric、Schema 与覆盖完整性检查。它验证规则和测试资产是否完整，但不声称这些场景已经由某个模型实际运行。语义体验可在 ChatGPT/Codex 新任务中人工抽查，不作为自动发布阻塞条件。
 
-```text
-python evals/trusted_forward_eval.py --model <固定的-Codex-模型> --service-tier <固定服务层> --no-cache
-python evals/forward_attestation.py prepare --repo .
-ssh-keygen -Y sign -f <离线签名私钥路径> -n kaoyan-forward-eval tests/forward-eval-attestation.json
-```
-
-私钥不得进入仓库、CI 变量或评测工作区。仓库只提交评测证据、响应摘要清单、规范化声明和 OpenSSH 分离签名。受保护工作流从基分支运行可信验证器，并从仓库变量 `KAOYAN_FORWARD_EVAL_ALLOWED_SIGNERS` 将维护者公钥固定到候选 checkout 之外：
-
-```text
-python evals/forward_attestation.py verify --repo . --allowed-signers <仓库外-allowed_signers-路径>
-```
-
-`evals/verify_forward_evidence.py` 只检查仓库内证据的一致性，不能证明模型运行来源；它不替代上述分离签名门禁。签名有效期最多 30 天，且签名锁定源提交、插件树、测试集、评测器、完整证据字节和 132 份结构化响应摘要（60 份路由响应、36 份行为响应与 36 份独立 judge 结果）。正式门禁要求路由 `60/60`、行为 `36/36`，并拒绝混用模型、服务层或失败缓存。
-
-非 dry-run 评测必须显式使用 `--no-cache`，证据同时记录 `cache_mode: disabled`。未达到完整门禁时不会覆盖仓库中的正式证据；仅把诊断副本写入被 Git 忽略的 `.cache/forward-eval-failures/`，且后续运行不会读取这些副本。
+CI 在 Windows 与 Ubuntu 分别执行同一离线门禁并构建发布包，随后要求两个 ZIP 字节一致。Tag workflow 只允许位于 `main` 历史中的、版本与 manifest 一致的 `v*` 标签发布。完整设计见 [离线质量门禁](QUALITY_GATES.md)。
 
 版本记录见 [CHANGELOG.md](CHANGELOG.md)。
 

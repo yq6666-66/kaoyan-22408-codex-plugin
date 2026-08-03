@@ -41,6 +41,7 @@ EXPECTED_REFERENCES = {
     "capability-routing-contract.md",
     "evidence-copyright-contract.md",
     "obsidian-brain-contract.md",
+    "notion-brain-contract.md",
     "portable-learning-records.md",
     "portable-learning-records.schema.json",
 }
@@ -321,6 +322,7 @@ def check_links(plugin: Path) -> None:
 def check_obsidian_brain_contract(plugin: Path) -> None:
     routing = read_utf8_text(plugin / "references" / "capability-routing-contract.md")
     brain = read_utf8_text(plugin / "references" / "obsidian-brain-contract.md")
+    notion = read_utf8_text(plugin / "references" / "notion-brain-contract.md")
     require(
         "obsidian-brain-contract.md" in routing,
         "routing contract must load the Obsidian brain contract",
@@ -340,6 +342,25 @@ def check_obsidian_brain_contract(plugin: Path) -> None:
         "completed",
     ):
         require(marker in brain, f"Obsidian brain contract is missing marker: {marker}")
+    require(
+        "notion-brain-contract.md" in routing,
+        "routing contract must conditionally load the Notion brain contract",
+    )
+    for marker in (
+        "Notion:search",
+        "Notion:fetch",
+        "Notion:notion-create-pages",
+        "Notion:notion-update-page",
+        "filters: {}",
+        "[Notion记忆]",
+        "本次不记忆",
+        "old_str",
+        "new_str",
+        "planned",
+        "completed",
+        "hypothesis",
+    ):
+        require(marker in notion, f"Notion brain contract is missing marker: {marker}")
     combined = "\n".join(
         read_utf8_text(path)
         for path in plugin.rglob("*")
@@ -645,6 +666,7 @@ def check_repository_docs(repo: Path) -> None:
         "TERMS.md",
         "SECURITY.md",
         "THIRD_PARTY_CONTENT.md",
+        "QUALITY_GATES.md",
         ".agents/plugins/marketplace.json",
         "tests/forward-cases.json",
         "tests/behavior-cases.json",
@@ -752,58 +774,10 @@ def check_git_history(repo: Path) -> None:
                 require(pattern.search(payload) is None, f"Git history contains a removed-system marker in {path or requested_id}")
 
 
-def check_forward_evidence(repo: Path, *, binding_mode: str = "pr") -> None:
-    require(
-        binding_mode in {"pr", "protected-main"},
-        "forward-evidence binding mode is invalid",
-    )
-    bundle = {
-        "evidence": repo / "tests" / "forward-eval-evidence.json",
-        "response manifest": repo / "tests/forward-eval-response-manifest.json",
-        "attestation statement": repo / "tests/forward-eval-attestation.json",
-        "attestation signature": repo / "tests/forward-eval-attestation.json.sig",
-    }
-    existing = {label for label, path in bundle.items() if path.exists()}
-    if not existing:
-        return
-    require(
-        existing == set(bundle),
-        "forward-eval evidence bundle is incomplete: "
-        f"present={sorted(existing)}",
-    )
-    for label, path in bundle.items():
-        require(path.is_file(), f"forward-eval {label} must be a regular file")
-        require(not path.is_symlink(), f"forward-eval {label} must not be a symlink")
-    evidence = bundle["evidence"]
-    verifier = repo / "evals" / "verify_forward_evidence.py"
-    require(verifier.is_file(), "forward-eval evidence exists but its verifier is missing")
-    result = subprocess.run(
-        [
-            sys.executable,
-            str(verifier),
-            "--max-age-days",
-            "30",
-            "--binding-mode",
-            binding_mode,
-        ],
-        cwd=repo,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        check=False,
-    )
-    detail = (result.stderr or result.stdout).strip()
-    require(result.returncode == 0, f"forward-eval evidence is invalid or stale: {detail}")
-
-
 def validate_repo(
     repo: Path | None = None,
     *,
-    verify_evidence: bool = True,
     scan_history: bool = True,
-    evidence_binding_mode: str = "pr",
 ) -> list[str]:
     repo = (repo or Path(__file__).resolve().parents[1]).resolve()
     plugin = repo / Path(*PLUGIN_RELATIVE_PATH.parts)
@@ -825,28 +799,21 @@ def validate_repo(
     check_behavior_cases(repo)
     if scan_history:
         check_git_history(repo)
-    if verify_evidence:
-        check_forward_evidence(repo, binding_mode=evidence_binding_mode)
     return [
         "manifest and marketplace",
         "12 Skills and openai.yaml files",
         "shared contracts, optional Obsidian brain, and portable-record JSON Schema",
         "exact release allowlist, UTF-8/LF, and sensitive-content scan",
-        "60 routing cases and 36 behavior cases",
-        "Git-history and forward-evidence gates",
+        "60 routing and 36 behavior scenario coverage checks",
+        "Git-history, secret, and removed-system scans",
     ]
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--evidence-binding-mode",
-        choices=("pr", "protected-main"),
-        default="pr",
-    )
-    args = parser.parse_args()
+    parser.parse_args()
     try:
-        results = validate_repo(evidence_binding_mode=args.evidence_binding_mode)
+        results = validate_repo()
     except (OSError, UnicodeError, ValidationError) as exc:
         print(f"[FAIL] {exc}", file=sys.stderr)
         return 1

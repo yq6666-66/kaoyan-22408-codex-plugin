@@ -2,12 +2,10 @@ from __future__ import annotations
 
 import json
 import re
-import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
 
 
 REPO = Path(__file__).resolve().parents[1]
@@ -19,7 +17,6 @@ except ImportError:
     from test_support import commit_all, copy_as_committed_repo  # type: ignore[no-redef]
 from validate_repository import (  # noqa: E402
     ValidationError,
-    check_forward_evidence,
     check_git_history,
     validate_repo,
 )
@@ -39,7 +36,7 @@ class RepositoryMutationTests(unittest.TestCase):
 
     def assert_invalid(self) -> None:
         with self.assertRaises(ValidationError):
-            validate_repo(self.repo, verify_evidence=False, scan_history=False)
+            validate_repo(self.repo, scan_history=False)
 
     def test_extra_release_file_is_rejected(self) -> None:
         (self.plugin / ".codex-plugin" / "extra.json").write_text("{}\n", encoding="utf-8")
@@ -59,7 +56,7 @@ class RepositoryMutationTests(unittest.TestCase):
             newline="\n",
         )
         with self.assertRaisesRegex(ValidationError, "private local path"):
-            validate_repo(self.repo, verify_evidence=False, scan_history=False)
+            validate_repo(self.repo, scan_history=False)
 
     def test_missing_obsidian_brain_loader_is_rejected(self) -> None:
         path = self.plugin / "references" / "capability-routing-contract.md"
@@ -69,7 +66,7 @@ class RepositoryMutationTests(unittest.TestCase):
         )
         path.write_text(text, encoding="utf-8", newline="\n")
         with self.assertRaisesRegex(ValidationError, "Obsidian brain contract"):
-            validate_repo(self.repo, verify_evidence=False, scan_history=False)
+            validate_repo(self.repo, scan_history=False)
 
     def test_invalid_utf8_is_rejected(self) -> None:
         path = self.plugin / "references" / "evidence-copyright-contract.md"
@@ -139,7 +136,7 @@ class RepositoryMutationTests(unittest.TestCase):
             newline="\n",
         )
         with self.assertRaisesRegex(ValidationError, "README current version"):
-            validate_repo(self.repo, verify_evidence=False, scan_history=False)
+            validate_repo(self.repo, scan_history=False)
 
     def test_readme_install_ref_drift_is_rejected(self) -> None:
         path = self.repo / "README.md"
@@ -151,7 +148,7 @@ class RepositoryMutationTests(unittest.TestCase):
             newline="\n",
         )
         with self.assertRaisesRegex(ValidationError, "README marketplace ref"):
-            validate_repo(self.repo, verify_evidence=False, scan_history=False)
+            validate_repo(self.repo, scan_history=False)
 
     def test_readme_clone_tag_drift_is_rejected(self) -> None:
         path = self.repo / "README.md"
@@ -163,7 +160,7 @@ class RepositoryMutationTests(unittest.TestCase):
             newline="\n",
         )
         with self.assertRaisesRegex(ValidationError, "README clone tag"):
-            validate_repo(self.repo, verify_evidence=False, scan_history=False)
+            validate_repo(self.repo, scan_history=False)
 
     def test_changelog_version_drift_is_rejected(self) -> None:
         path = self.repo / "CHANGELOG.md"
@@ -180,30 +177,7 @@ class RepositoryMutationTests(unittest.TestCase):
             newline="\n",
         )
         with self.assertRaisesRegex(ValidationError, "CHANGELOG current version"):
-            validate_repo(self.repo, verify_evidence=False, scan_history=False)
-
-    def test_partial_forward_evidence_bundle_is_rejected(self) -> None:
-        evidence = self.repo / "tests/forward-eval-evidence.json"
-        evidence.write_text("{}\n", encoding="utf-8", newline="\n")
-        with self.assertRaisesRegex(ValidationError, "bundle is incomplete"):
-            check_forward_evidence(self.repo)
-
-    def test_forward_evidence_binding_mode_is_passed_explicitly(self) -> None:
-        tests = self.repo / "tests"
-        for name in (
-            "forward-eval-evidence.json",
-            "forward-eval-response-manifest.json",
-            "forward-eval-attestation.json",
-            "forward-eval-attestation.json.sig",
-        ):
-            (tests / name).write_text("{}\n", encoding="utf-8", newline="\n")
-        completed = subprocess.CompletedProcess([], 0, stdout="[OK]", stderr="")
-        with patch("validate_repository.subprocess.run", return_value=completed) as run:
-            check_forward_evidence(self.repo, binding_mode="protected-main")
-        command = run.call_args.args[0]
-        self.assertEqual(command[-2:], ["--binding-mode", "protected-main"])
-        with self.assertRaisesRegex(ValidationError, "binding mode"):
-            check_forward_evidence(self.repo, binding_mode="unsafe")
+            validate_repo(self.repo, scan_history=False)
 
     def test_deleted_secret_is_still_rejected_from_git_history(self) -> None:
         path = self.repo / "private-note.txt"
