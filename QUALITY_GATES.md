@@ -21,3 +21,5 @@
 ## 发布含义
 
 通过自动门禁表示插件文件、规则、测试资产、安全边界和发布包满足仓库声明；不表示任何特定模型对所有自然语言输入都能稳定选择同一 Skill 或产生相同答案。模型行为仍受宿主版本、可用工具、上下文和用户输入影响。
+
+发布既可由与 manifest 版本一致的 `v*` 标签触发，也可在无法使用本地 GitHub/Codex CLI 登录时，从 GitHub Actions 的 `CI` 工作流对最新 `main` 手动输入该标签。手动入口不会绕过检查：`validate`、`windows` 和 `reproducible` 必须全部成功，且标签必须严格等于 `plugin.json.version` 派生值，之后工作流才创建标签和 Release。

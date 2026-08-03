@@ -141,7 +141,7 @@ python scripts/build_release.py
 
 发布门禁包括 60 个路由场景和 36 个行为场景的数量、ID、主责 Skill、最近邻冲突、rubric、Schema 与覆盖完整性检查。它验证规则和测试资产是否完整，但不声称这些场景已经由某个模型实际运行。语义体验可在 ChatGPT/Codex 新任务中人工抽查，不作为自动发布阻塞条件。
 
-CI 在 Windows 与 Ubuntu 分别执行同一离线门禁并构建发布包，随后要求两个 ZIP 字节一致。Tag workflow 只允许位于 `main` 历史中的、版本与 manifest 一致的 `v*` 标签发布。完整设计见 [离线质量门禁](QUALITY_GATES.md)。
+CI 在 Windows 与 Ubuntu 分别执行同一离线门禁并构建发布包，随后要求两个 ZIP 字节一致。通常由位于 `main` 历史中、版本与 manifest 一致的 `v*` 标签触发发布；没有可用的本地 GitHub/Codex CLI 登录时，也可在 GitHub Actions 的 `CI` 工作流中从最新 `main` 手动输入同一标签。两条路径都必须先通过完整门禁，手动路径才会创建标签与 Release。完整设计见 [离线质量门禁](QUALITY_GATES.md)。
 
 版本记录见 [CHANGELOG.md](CHANGELOG.md)。
 
