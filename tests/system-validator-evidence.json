@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-08-03T17:11:00Z",
+  "generatedAt": "2026-08-04T13:15:36Z",
   "plugin": {
-    "name": "kaoyan-22408",
-    "treeSha256": "20fe69e24754e4da6b353ee97b47f8e9c7beb83b553f8f25ecfe97c201170581",
-    "version": "1.4.0"
+    "name": "kaoyan-408",
+    "treeSha256": "b39c019e1c42c18fb27a173804f3dbb8cd08f878c56859d0519a6c4dfca4b273",
+    "version": "2.0.0"
   },
   "results": {
     "plugin": {
@@ -11,7 +11,7 @@
       "passed": true
     },
     "skills": {
-      "kaoyan-22408-planner": {
+      "kaoyan-408-planner": {
         "exitCode": 0,
         "passed": true
       },
@@ -19,7 +19,7 @@
         "exitCode": 0,
         "passed": true
       },
-      "kaoyan-english2-coach": {
+      "kaoyan-english-coach": {
         "exitCode": 0,
         "passed": true
       },
@@ -31,7 +31,7 @@
         "exitCode": 0,
         "passed": true
       },
-      "kaoyan-math2-coach": {
+      "kaoyan-math-coach": {
         "exitCode": 0,
         "passed": true
       },
@@ -44,6 +44,10 @@
         "passed": true
       },
       "kaoyan-past-paper-analyst": {
+        "exitCode": 0,
+        "passed": true
+      },
+      "kaoyan-past-paper-searcher": {
         "exitCode": 0,
         "passed": true
       },

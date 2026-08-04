@@ -31,7 +31,7 @@ def _sha256(path: Path) -> str:
 
 
 def current_plugin_payloads(repo: Path) -> dict[str, bytes]:
-    plugin = repo / "plugins" / "kaoyan-22408"
+    plugin = repo / "plugins" / "kaoyan-408"
     payloads: dict[str, bytes] = {}
     for relative in sorted(ALLOWED_RELEASE_FILES):
         path = plugin.joinpath(*relative.split("/"))
@@ -101,7 +101,7 @@ def generate_evidence(
     now: datetime | None = None,
 ) -> dict[str, Any]:
     repo = repo.resolve()
-    plugin = repo / "plugins" / "kaoyan-22408"
+    plugin = repo / "plugins" / "kaoyan-408"
     plugin_validator, skill_validator, plugin_spec = locate_validators(system_root.resolve())
     env = os.environ.copy()
     env["PYTHONUTF8"] = "1"
@@ -153,7 +153,7 @@ def generate_evidence(
         "schemaVersion": SCHEMA_VERSION,
         "generatedAt": generated.isoformat().replace("+00:00", "Z"),
         "plugin": {
-            "name": "kaoyan-22408",
+            "name": "kaoyan-408",
             "version": manifest["version"],
             "treeSha256": current_plugin_tree_hash(repo),
         },
@@ -216,10 +216,10 @@ def verify_evidence(
         raise EvidenceError(f"validator evidence is older than {max_age_days} days")
 
     plugin = document.get("plugin")
-    if not isinstance(plugin, dict) or plugin.get("name") != "kaoyan-22408":
+    if not isinstance(plugin, dict) or plugin.get("name") != "kaoyan-408":
         raise EvidenceError("validator evidence plugin identity is invalid")
     manifest = json.loads(
-        (repo / "plugins" / "kaoyan-22408" / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8")
+        (repo / "plugins" / "kaoyan-408" / ".codex-plugin" / "plugin.json").read_text(encoding="utf-8")
     )
     if plugin.get("version") != manifest.get("version"):
         raise EvidenceError("validator evidence plugin version does not match the manifest")
@@ -277,7 +277,7 @@ def verify_evidence(
         raise EvidenceError("plugin validation did not pass")
     skills = results.get("skills")
     if not isinstance(skills, dict) or set(skills) != EXPECTED_SKILLS:
-        raise EvidenceError("quick_validate evidence does not cover exactly 12 Skills")
+        raise EvidenceError("quick_validate evidence does not cover exactly 13 Skills")
     if any(result != {"passed": True, "exitCode": 0} for result in skills.values()):
         raise EvidenceError("one or more quick_validate results did not pass")
     return document

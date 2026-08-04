@@ -29,14 +29,14 @@ class RepositoryContractTests(unittest.TestCase):
 
     def test_manifest_is_release_semver_and_skills_only(self) -> None:
         manifest = json.loads(
-            (REPO / "plugins/kaoyan-22408/.codex-plugin/plugin.json").read_text(encoding="utf-8")
+            (REPO / "plugins/kaoyan-408/.codex-plugin/plugin.json").read_text(encoding="utf-8")
         )
         self.assertRegex(manifest["version"], r"^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$")
         self.assertEqual(manifest["skills"], "./skills/")
         self.assertTrue({"apps", "mcpServers", "hooks"}.isdisjoint(manifest))
 
     def test_exact_skill_and_release_file_sets(self) -> None:
-        plugin = REPO / "plugins/kaoyan-22408"
+        plugin = REPO / "plugins/kaoyan-408"
         skills = {path.name for path in (plugin / "skills").iterdir() if path.is_dir()}
         files = {
             path.relative_to(plugin).as_posix()
@@ -47,14 +47,14 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertEqual(files, set(ALLOWED_RELEASE_FILES))
 
     def test_schema_and_eval_case_contracts(self) -> None:
-        plugin = REPO / "plugins/kaoyan-22408"
+        plugin = REPO / "plugins/kaoyan-408"
         check_portable_schema(plugin)
         check_obsidian_brain_contract(plugin)
         check_forward_cases(REPO)
         check_behavior_cases(REPO)
 
     def test_behavior_sensitive_skills_state_explicit_contracts(self) -> None:
-        skills = REPO / "plugins/kaoyan-22408/skills"
+        skills = REPO / "plugins/kaoyan-408/skills"
         mock = (skills / "kaoyan-mock-exam-coach/SKILL.md").read_text(
             encoding="utf-8"
         )
@@ -67,13 +67,13 @@ class RepositoryContractTests(unittest.TestCase):
         diagnostician = (
             skills / "kaoyan-progress-diagnostician/SKILL.md"
         ).read_text(encoding="utf-8")
-        planner = (skills / "kaoyan-22408-planner/SKILL.md").read_text(
+        planner = (skills / "kaoyan-408-planner/SKILL.md").read_text(
             encoding="utf-8"
         )
         error_loop = (skills / "kaoyan-error-loop-coach/SKILL.md").read_text(
             encoding="utf-8"
         )
-        english = (skills / "kaoyan-english2-coach/SKILL.md").read_text(
+        english = (skills / "kaoyan-english-coach/SKILL.md").read_text(
             encoding="utf-8"
         )
         official = (

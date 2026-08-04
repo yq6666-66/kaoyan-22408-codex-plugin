@@ -12,8 +12,11 @@ from pathlib import Path, PurePosixPath
 from typing import Any
 
 
-SCHEMA_VERSION = "1.0"
-DEFAULT_PROJECT_ROOT = "20-项目/考研 22408"
+SCHEMA_VERSION = "1.1"
+LEGACY_SCHEMA_VERSION = "1.0"
+DEFAULT_PROJECT_ROOT = "20-项目/408考研"
+DEFAULT_KNOWLEDGE_ROOT = "30-知识/408考研"
+DEFAULT_PAST_PAPER_ROOT = "40-真题/408考研"
 DEFAULT_WRITE_MODE = "auto-structured"
 DEFAULT_RETRIEVAL_SCOPE = "project-first"
 EXPECTED_KEYS = {
@@ -21,6 +24,8 @@ EXPECTED_KEYS = {
     "enabled",
     "vaultPath",
     "projectRoot",
+    "knowledgeRoot",
+    "pastPaperRoot",
     "writeMode",
     "retrievalScope",
 }
@@ -31,6 +36,10 @@ class BrainConfigError(RuntimeError):
 
 
 def default_config_path() -> Path:
+    return Path.home() / ".codex" / "kaoyan-408" / "obsidian-brain.json"
+
+
+def default_legacy_config_path() -> Path:
     return Path.home() / ".codex" / "kaoyan-22408" / "obsidian-brain.json"
 
 
@@ -86,16 +95,37 @@ def validate_config(data: Any, *, require_paths: bool = True) -> dict[str, Any]:
         raise BrainConfigError(f"retrievalScope must be {DEFAULT_RETRIEVAL_SCOPE!r}")
     if not isinstance(data["vaultPath"], str) or not data["vaultPath"]:
         raise BrainConfigError("vaultPath must be a non-empty string")
-    if not isinstance(data["projectRoot"], str):
-        raise BrainConfigError("projectRoot must be a string")
-    project = _validate_project_root(data["projectRoot"])
+    roots: dict[str, PurePosixPath] = {}
+    for key in ("projectRoot", "knowledgeRoot", "pastPaperRoot"):
+        if not isinstance(data[key], str):
+            raise BrainConfigError(f"{key} must be a string")
+        roots[key] = _validate_project_root(data[key])
     if require_paths:
         vault = _require_real_directory(Path(data["vaultPath"]), "Vault")
         for required in ("AGENTS.md", "00-系统/知识库索引.md"):
             candidate = vault / Path(*PurePosixPath(required).parts)
             if not candidate.is_file():
                 raise BrainConfigError(f"Vault is missing required file: {required}")
-        _assert_no_symlink_chain(vault, vault / Path(*project.parts))
+        for root in roots.values():
+            _assert_no_symlink_chain(vault, vault / Path(*root.parts))
+    return data
+
+
+def load_legacy_config(path: Path) -> dict[str, Any]:
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise BrainConfigError(f"cannot read legacy config: {path}: {exc}") from exc
+    expected = {"schemaVersion", "enabled", "vaultPath", "projectRoot", "writeMode", "retrievalScope"}
+    if not isinstance(data, dict) or set(data) != expected or data.get("schemaVersion") != LEGACY_SCHEMA_VERSION:
+        raise BrainConfigError("legacy config must be a valid Schema 1.0 object")
+    if not isinstance(data.get("enabled"), bool):
+        raise BrainConfigError("legacy enabled must be boolean")
+    if data.get("writeMode") != DEFAULT_WRITE_MODE or data.get("retrievalScope") != DEFAULT_RETRIEVAL_SCOPE:
+        raise BrainConfigError("legacy config has unsupported modes")
+    vault = _require_real_directory(Path(data.get("vaultPath", "")), "Vault")
+    project = _validate_project_root(data.get("projectRoot", ""))
+    _assert_no_symlink_chain(vault, vault / Path(*project.parts))
     return data
 
 
@@ -159,15 +189,25 @@ def _append_once(path: Path, marker: str, addition: str, actions: list[str], *, 
         _atomic_write(path, current.rstrip() + "\n\n" + addition.rstrip() + "\n")
 
 
-def scaffold_vault(vault: Path, project_root: PurePosixPath, *, dry_run: bool) -> list[str]:
+def scaffold_vault(
+    vault: Path,
+    project_root: PurePosixPath,
+    knowledge_root: PurePosixPath,
+    past_paper_root: PurePosixPath,
+    *,
+    dry_run: bool,
+) -> list[str]:
     project = vault / Path(*project_root.parts)
-    knowledge = vault / "30-知识" / "考研 22408"
+    knowledge = vault / Path(*knowledge_root.parts)
+    past_papers = vault / Path(*past_paper_root.parts)
     _assert_no_symlink_chain(vault, project)
     _assert_no_symlink_chain(vault, knowledge)
+    _assert_no_symlink_chain(vault, past_papers)
     actions: list[str] = []
     if not dry_run:
         project.mkdir(parents=True, exist_ok=True)
         knowledge.mkdir(parents=True, exist_ok=True)
+        past_papers.mkdir(parents=True, exist_ok=True)
     today = local_date()
     common = f"""---
 type: project
@@ -176,19 +216,22 @@ created: {today}
 updated: {today}
 tags:
   - 考研
-  - 22408
+  - 408
 ---
 """
     files = {
         "主页.md": common
         + """
-# 考研 22408
+# 408考研
+
+kaoyan-408-brain
 
 - [[学习档案]]
 - [[当前进度]]
 - [[错题队列]]
 - [[记忆索引]]
 - [[知识库索引]]
+- [[真题索引]]
 """,
         "学习档案.md": common
         + """
@@ -242,20 +285,39 @@ tags:
     }
     for name, payload in files.items():
         _write_if_missing(project / name, payload.lstrip(), actions, dry_run=dry_run)
+    home = project / "主页.md"
+    if home.exists():
+        _append_once(
+            home,
+            "kaoyan-408-brain",
+            "## 408考研插件\n\n- kaoyan-408-brain\n- 真题入口：[[真题索引]]",
+            actions,
+            dry_run=dry_run,
+        )
+    _write_if_missing(
+        past_papers / "真题索引.md",
+        (common + "\n# 真题索引\n\n范围：2010—2026 年数学一、数学二、英语一、英语二、408。\n").lstrip(),
+        actions,
+        dry_run=dry_run,
+    )
+    for subject in ("数学一", "数学二", "英语一", "英语二", "408"):
+        subject_dir = past_papers / subject
+        if not dry_run:
+            subject_dir.mkdir(parents=True, exist_ok=True)
     index = vault / "00-系统" / "知识库索引.md"
     growth = vault / "00-系统" / "成长日志.md"
     _append_once(
         index,
-        "[[考研 22408]]",
-        "## 考研 22408\n\n- [[考研 22408]]\n- [[记忆索引]]",
+        "kaoyan-408-brain",
+        "## 408考研插件\n\n- kaoyan-408-brain\n- [[主页]]\n- [[记忆索引]]\n- [[真题索引]]",
         actions,
         dry_run=dry_run,
     )
     if growth.exists():
         _append_once(
             growth,
-            f"{today} | [[考研 22408]] | 初始化 Obsidian 学习大脑",
-            f"- {today} | [[考研 22408]] | 初始化 Obsidian 学习大脑",
+            f"{today} | 408考研插件 | 初始化 Obsidian 学习大脑",
+            f"- {today} | 408考研插件 | 初始化 Obsidian 学习大脑",
             actions,
             dry_run=dry_run,
         )
@@ -268,16 +330,20 @@ def configure(args: argparse.Namespace) -> int:
         if not (vault / Path(*PurePosixPath(required).parts)).is_file():
             raise BrainConfigError(f"Vault is missing required file: {required}")
     project_root = _validate_project_root(args.project_root)
+    knowledge_root = _validate_project_root(args.knowledge_root)
+    past_paper_root = _validate_project_root(args.past_paper_root)
     config = {
         "schemaVersion": SCHEMA_VERSION,
         "enabled": True,
         "vaultPath": str(vault),
         "projectRoot": project_root.as_posix(),
+        "knowledgeRoot": knowledge_root.as_posix(),
+        "pastPaperRoot": past_paper_root.as_posix(),
         "writeMode": DEFAULT_WRITE_MODE,
         "retrievalScope": DEFAULT_RETRIEVAL_SCOPE,
     }
     validate_config(config)
-    actions = scaffold_vault(vault, project_root, dry_run=args.dry_run)
+    actions = scaffold_vault(vault, project_root, knowledge_root, past_paper_root, dry_run=args.dry_run)
     config_path = args.config.expanduser()
     actions.append(f"write {config_path}")
     if not args.dry_run:
@@ -303,12 +369,51 @@ def set_enabled(args: argparse.Namespace, enabled: bool) -> int:
     return 0
 
 
+def migrate(args: argparse.Namespace) -> int:
+    legacy_path = args.legacy_config.expanduser()
+    legacy = load_legacy_config(legacy_path)
+    target = args.config.expanduser()
+    if target.exists() and not args.force:
+        raise BrainConfigError(f"new config already exists; refusing to overwrite: {target}")
+    vault = _require_real_directory(Path(legacy["vaultPath"]), "Vault")
+    project_root = _validate_project_root(legacy["projectRoot"])
+    legacy_knowledge = PurePosixPath("30-知识/考研 22408")
+    knowledge_root = (
+        legacy_knowledge
+        if (vault / Path(*legacy_knowledge.parts)).is_dir()
+        else PurePosixPath(DEFAULT_KNOWLEDGE_ROOT)
+    )
+    past_paper_root = PurePosixPath(DEFAULT_PAST_PAPER_ROOT)
+    config = {
+        "schemaVersion": SCHEMA_VERSION,
+        "enabled": legacy["enabled"],
+        "vaultPath": str(vault),
+        "projectRoot": project_root.as_posix(),
+        "knowledgeRoot": knowledge_root.as_posix(),
+        "pastPaperRoot": past_paper_root.as_posix(),
+        "writeMode": DEFAULT_WRITE_MODE,
+        "retrievalScope": DEFAULT_RETRIEVAL_SCOPE,
+    }
+    validate_config(config)
+    actions = scaffold_vault(vault, project_root, knowledge_root, past_paper_root, dry_run=args.dry_run)
+    actions.append(f"write {target}")
+    if not args.dry_run:
+        _atomic_write(target, json.dumps(config, ensure_ascii=False, indent=2) + "\n")
+    prefix = "[DRY-RUN]" if args.dry_run else "[OK]"
+    for action in actions:
+        print(f"{prefix} {action}")
+    print(f"{prefix} legacy config preserved: {legacy_path}")
+    return 0
+
+
 def check(args: argparse.Namespace) -> int:
     config = load_config(args.config.expanduser())
     print(f"[OK] config: {args.config.expanduser()}")
     print(f"[OK] enabled: {str(config['enabled']).lower()}")
     print(f"[OK] Vault: {config['vaultPath']}")
     print(f"[OK] projectRoot: {config['projectRoot']}")
+    print(f"[OK] knowledgeRoot: {config['knowledgeRoot']}")
+    print(f"[OK] pastPaperRoot: {config['pastPaperRoot']}")
     return 0
 
 
@@ -320,11 +425,19 @@ def build_parser() -> argparse.ArgumentParser:
     configure_parser = subparsers.add_parser("configure")
     configure_parser.add_argument("--vault", type=Path, required=True)
     configure_parser.add_argument("--project-root", default=DEFAULT_PROJECT_ROOT)
+    configure_parser.add_argument("--knowledge-root", default=DEFAULT_KNOWLEDGE_ROOT)
+    configure_parser.add_argument("--past-paper-root", default=DEFAULT_PAST_PAPER_ROOT)
     configure_parser.add_argument("--dry-run", action="store_true")
     configure_parser.set_defaults(handler=configure)
 
     check_parser = subparsers.add_parser("check")
     check_parser.set_defaults(handler=check)
+
+    migrate_parser = subparsers.add_parser("migrate")
+    migrate_parser.add_argument("--legacy-config", type=Path, default=default_legacy_config_path())
+    migrate_parser.add_argument("--force", action="store_true")
+    migrate_parser.add_argument("--dry-run", action="store_true")
+    migrate_parser.set_defaults(handler=migrate)
 
     for name, enabled in (("enable", True), ("disable", False)):
         toggle = subparsers.add_parser(name)

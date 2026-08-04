@@ -21,17 +21,18 @@ from yaml.constructor import ConstructorError
 from yaml.nodes import MappingNode
 
 
-PLUGIN_RELATIVE_PATH = PurePosixPath("plugins/kaoyan-22408")
+PLUGIN_RELATIVE_PATH = PurePosixPath("plugins/kaoyan-408")
 EXPECTED_SKILLS = {
-    "kaoyan-22408-planner",
+    "kaoyan-408-planner",
     "kaoyan-review-executor",
     "kaoyan-progress-diagnostician",
     "kaoyan-error-loop-coach",
     "kaoyan-mock-exam-coach",
     "kaoyan-408-tutor",
-    "kaoyan-math2-coach",
-    "kaoyan-english2-coach",
+    "kaoyan-math-coach",
+    "kaoyan-english-coach",
     "kaoyan-politics-coach",
+    "kaoyan-past-paper-searcher",
     "kaoyan-past-paper-analyst",
     "kaoyan-material-study-assistant",
     "kaoyan-official-info-researcher",
@@ -44,6 +45,9 @@ EXPECTED_REFERENCES = {
     "notion-brain-contract.md",
     "portable-learning-records.md",
     "portable-learning-records.schema.json",
+    "past-paper-source-contract.md",
+    "past-paper-knowledge.schema.json",
+    "beginner-visual-answer-contract.md",
 }
 
 ALLOWED_PLUGIN_ROOTS = {".codex-plugin", "skills", "references", "assets"}
@@ -53,7 +57,7 @@ FORBIDDEN_PATH_PARTS = {"app", "android", "corpus", "raw", "index", "user"}
 HISTORY_FORBIDDEN_PATH_PARTS = {"app", "android", "corpus", "raw"}
 
 PORTABLE_RECORD_SKILLS = {
-    "kaoyan-22408-planner",
+    "kaoyan-408-planner",
     "kaoyan-review-executor",
     "kaoyan-progress-diagnostician",
     "kaoyan-error-loop-coach",
@@ -67,8 +71,8 @@ OUTPUT_TAG_SKILLS = {
         "kaoyan-error-loop-coach",
         "kaoyan-mock-exam-coach",
         "kaoyan-408-tutor",
-        "kaoyan-math2-coach",
-        "kaoyan-english2-coach",
+        "kaoyan-math-coach",
+        "kaoyan-english-coach",
         "kaoyan-politics-coach",
         "kaoyan-past-paper-analyst",
         "kaoyan-material-study-assistant",
@@ -77,14 +81,27 @@ OUTPUT_TAG_SKILLS = {
         "kaoyan-error-loop-coach",
         "kaoyan-mock-exam-coach",
         "kaoyan-408-tutor",
-        "kaoyan-math2-coach",
-        "kaoyan-english2-coach",
+        "kaoyan-math-coach",
+        "kaoyan-english-coach",
         "kaoyan-politics-coach",
         "kaoyan-past-paper-analyst",
         "kaoyan-material-study-assistant",
     },
     "[官方核验]": {"kaoyan-official-info-researcher"},
     "[待核验]": {"kaoyan-politics-coach", "kaoyan-official-info-researcher"},
+    "[真题证据]": {
+        "kaoyan-408-tutor",
+        "kaoyan-math-coach",
+        "kaoyan-english-coach",
+        "kaoyan-past-paper-searcher",
+        "kaoyan-past-paper-analyst",
+    },
+    "[真题未命中]": {
+        "kaoyan-408-tutor",
+        "kaoyan-math-coach",
+        "kaoyan-english-coach",
+        "kaoyan-past-paper-searcher",
+    },
 }
 
 LEGACY_PATTERNS = (
@@ -232,7 +249,7 @@ def parse_frontmatter(path: Path) -> dict[str, Any]:
 def expected_release_files() -> frozenset[str]:
     names = {
         ".codex-plugin/plugin.json",
-        "assets/kaoyan-22408.svg",
+        "assets/kaoyan-408.svg",
         *(f"references/{name}" for name in EXPECTED_REFERENCES),
     }
     for skill in EXPECTED_SKILLS:
@@ -248,7 +265,7 @@ def check_manifest(plugin: Path) -> dict[str, Any]:
     manifest_path = plugin / ".codex-plugin" / "plugin.json"
     manifest = load_json(manifest_path)
     require(isinstance(manifest, dict), "plugin manifest must be an object")
-    require(manifest.get("name") == "kaoyan-22408", "manifest name must be kaoyan-22408")
+    require(manifest.get("name") == "kaoyan-408", "manifest name must be kaoyan-408")
     version = manifest.get("version")
     require(isinstance(version, str) and SEMVER.fullmatch(version) is not None, "manifest version must be strict semver")
     require(manifest.get("skills") == "./skills/", "manifest skills path must be ./skills/")
@@ -328,8 +345,10 @@ def check_obsidian_brain_contract(plugin: Path) -> None:
         "routing contract must load the Obsidian brain contract",
     )
     for marker in (
-        ".codex/kaoyan-22408/obsidian-brain.json",
-        '"schemaVersion": "1.0"',
+        ".codex/kaoyan-408/obsidian-brain.json",
+        '"schemaVersion": "1.1"',
+        '"knowledgeRoot"',
+        '"pastPaperRoot"',
         '"writeMode": "auto-structured"',
         '"retrievalScope": "project-first"',
         "[Obsidian记忆]",
@@ -347,12 +366,10 @@ def check_obsidian_brain_contract(plugin: Path) -> None:
         "routing contract must conditionally load the Notion brain contract",
     )
     for marker in (
-        "Notion:search",
-        "Notion:fetch",
-        "Notion:notion-create-pages",
-        "Notion:notion-update-page",
-        "filters: {}",
-        "[Notion记忆]",
+        "kaoyan-408-brain:1.0",
+        "update_content",
+        "update_properties",
+        "dedupeKey",
         "本次不记忆",
         "old_str",
         "new_str",
@@ -558,6 +575,44 @@ def check_progress_accuracy_semantics(record: dict[str, Any]) -> None:
             )
 
 
+def check_past_paper_schema(plugin: Path) -> None:
+    schema = load_json(plugin / "references" / "past-paper-knowledge.schema.json")
+    require(isinstance(schema, dict), "past-paper schema must be an object")
+    try:
+        Draft202012Validator.check_schema(schema)
+    except SchemaError as exc:
+        raise ValidationError(f"invalid past-paper JSON Schema: {exc.message}") from exc
+    validator = Draft202012Validator(schema, format_checker=FormatChecker())
+    source = {
+        "schemaVersion": "1.0",
+        "recordType": "PastPaperSource",
+        "sourceId": "math1-2026-a",
+        "subject": "数学一",
+        "paperYear": 2026,
+        "examDate": "2025-12-21",
+        "paperType": "全国统考",
+        "sourceUrl": "https://example.org/math1.pdf",
+        "sourceKind": "official",
+        "publisher": "example",
+        "repository": None,
+        "filePath": None,
+        "commit": None,
+        "license": "CC-BY-4.0",
+        "retrievedAt": "2026-08-04T00:00:00Z",
+        "contentSha256": "a" * 64,
+        "completeness": "complete",
+        "verificationStatus": "verified",
+        "storagePolicy": "full-text",
+    }
+    validator.validate(source)
+    for mutation in (
+        {**source, "subject": "政治"},
+        {**source, "paperYear": 2009},
+        {**source, "sourceUrl": "http://example.org/paper"},
+    ):
+        require(not validator.is_valid(mutation), "past-paper schema accepted an out-of-scope source")
+
+
 def check_release_tree(plugin: Path) -> None:
     roots = {path.name for path in plugin.iterdir()}
     require(roots == ALLOWED_PLUGIN_ROOTS, f"plugin roots do not match the release allowlist: {sorted(roots)}")
@@ -585,11 +640,11 @@ def check_release_tree(plugin: Path) -> None:
 
 def check_forward_cases(repo: Path) -> None:
     forward = load_json(repo / "tests" / "forward-cases.json")
-    require(isinstance(forward, dict) and forward.get("schemaVersion") == "1.3", "forward cases must use schemaVersion 1.3")
+    require(isinstance(forward, dict) and forward.get("schemaVersion") == "2.0", "forward cases must use schemaVersion 2.0")
     cases = forward.get("cases")
-    require(isinstance(cases, list) and len(cases) == 60, "forward cases must contain exactly 60 cases")
+    require(isinstance(cases, list) and len(cases) == 65, "forward cases must contain exactly 65 cases")
     ids = [case.get("id") for case in cases if isinstance(case, dict)]
-    require(len(ids) == 60 and len(set(ids)) == 60 and all(isinstance(item, str) and item for item in ids), "forward case IDs must be unique non-empty strings")
+    require(len(ids) == 65 and len(set(ids)) == 65 and all(isinstance(item, str) and item for item in ids), "forward case IDs must be unique non-empty strings")
     counts: dict[str, Counter[str]] = defaultdict(Counter)
     for case in cases:
         require(isinstance(case, dict), "each forward case must be an object")
@@ -617,9 +672,9 @@ def check_forward_cases(repo: Path) -> None:
 
 def check_behavior_cases(repo: Path) -> None:
     behavior = load_json(repo / "tests" / "behavior-cases.json")
-    require(isinstance(behavior, dict) and behavior.get("schemaVersion") == "1.3", "behavior cases must use schemaVersion 1.3")
+    require(isinstance(behavior, dict) and behavior.get("schemaVersion") == "2.0", "behavior cases must use schemaVersion 2.0")
     cases = behavior.get("cases")
-    require(isinstance(cases, list) and len(cases) == 36, "behavior cases must contain exactly 36 cases")
+    require(isinstance(cases, list) and len(cases) == 52, "behavior cases must contain exactly 52 cases")
     ids: list[str] = []
     for case in cases:
         require(isinstance(case, dict), "each behavior case must be an object")
@@ -654,7 +709,7 @@ def check_behavior_cases(repo: Path) -> None:
         for case_id in ids
         if (match := re.fullmatch(r"behavior-(\d{2})-[a-z0-9-]+", case_id))
     }
-    require(numbers == set(range(1, 37)), "behavior case IDs must cover behavior-01 through behavior-36 exactly")
+    require(numbers == set(range(1, 53)), "behavior case IDs must cover behavior-01 through behavior-52 exactly")
 
 
 def check_repository_docs(repo: Path) -> None:
@@ -710,13 +765,13 @@ def check_repository_docs(repo: Path) -> None:
     )
 
     marketplace = load_json(repo / ".agents" / "plugins" / "marketplace.json")
-    require(isinstance(marketplace, dict) and marketplace.get("name") == "kaoyan-22408", "marketplace name is invalid")
+    require(isinstance(marketplace, dict) and marketplace.get("name") == "kaoyan-408", "marketplace name is invalid")
     plugins = marketplace.get("plugins")
     require(isinstance(plugins, list) and len(plugins) == 1, "marketplace must contain exactly one plugin")
     entry = plugins[0]
-    require(isinstance(entry, dict) and entry.get("name") == "kaoyan-22408", "marketplace plugin name is invalid")
+    require(isinstance(entry, dict) and entry.get("name") == "kaoyan-408", "marketplace plugin name is invalid")
     require(entry.get("category") == "Education", "marketplace category must be Education")
-    require(entry.get("source", {}).get("path") == "./plugins/kaoyan-22408", "marketplace source.path is invalid")
+    require(entry.get("source", {}).get("path") == "./plugins/kaoyan-408", "marketplace source.path is invalid")
     require(entry.get("policy", {}).get("installation") == "AVAILABLE", "marketplace installation policy is invalid")
     require(entry.get("policy", {}).get("authentication") == "ON_INSTALL", "marketplace authentication policy is invalid")
 
@@ -788,10 +843,11 @@ def validate_repo(
     check_release_tree(plugin)
     check_obsidian_brain_contract(plugin)
     check_portable_schema(plugin)
+    check_past_paper_schema(plugin)
 
     skill_root = plugin / "skills"
     skill_dirs = {path.name: path for path in skill_root.iterdir() if path.is_dir()}
-    require(set(skill_dirs) == EXPECTED_SKILLS, "Skill set must match the 12-Skill design")
+    require(set(skill_dirs) == EXPECTED_SKILLS, "Skill set must match the 13-Skill design")
     for name in sorted(EXPECTED_SKILLS):
         check_skill(skill_dirs[name])
     check_links(plugin)
@@ -801,10 +857,10 @@ def validate_repo(
         check_git_history(repo)
     return [
         "manifest and marketplace",
-        "12 Skills and openai.yaml files",
-        "shared contracts, optional Obsidian brain, and portable-record JSON Schema",
+        "13 Skills and openai.yaml files",
+        "shared contracts, dual brains, portable-record and past-paper JSON Schemas",
         "exact release allowlist, UTF-8/LF, and sensitive-content scan",
-        "60 routing and 36 behavior scenario coverage checks",
+        "65 routing and 52 behavior scenario coverage checks",
         "Git-history, secret, and removed-system scans",
     ]
 

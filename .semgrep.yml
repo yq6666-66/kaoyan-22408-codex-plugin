@@ -5,7 +5,7 @@ rules:
     languages: [generic]
     paths:
       include:
-        - /plugins/kaoyan-22408/**
+        - /plugins/kaoyan-408/**
       exclude:
         - /.semgrep.yml
     pattern-regex: '(?i)\b(?:baidu|netdisk|localstorage|study-state)\b'

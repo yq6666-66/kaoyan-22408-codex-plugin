@@ -61,14 +61,14 @@ class ReleaseArchiveTests(unittest.TestCase):
     def test_default_name_is_derived_from_manifest(self) -> None:
         artifact = build_archive(self.repo)
         manifest = json.loads(
-            (REPO / "plugins/kaoyan-22408/.codex-plugin/plugin.json").read_text(encoding="utf-8")
+            (REPO / "plugins/kaoyan-408/.codex-plugin/plugin.json").read_text(encoding="utf-8")
         )
         self.assertEqual(artifact.version, manifest["version"])
-        self.assertEqual(artifact.archive.name, f"kaoyan-22408-{artifact.version}.zip")
-        self.assertEqual(artifact.checksum.name, f"kaoyan-22408-{artifact.version}.zip.sha256")
+        self.assertEqual(artifact.archive.name, f"kaoyan-408-{artifact.version}.zip")
+        self.assertEqual(artifact.checksum.name, f"kaoyan-408-{artifact.version}.zip.sha256")
 
     def test_dirty_plugin_tree_is_rejected(self) -> None:
-        manifest = self.repo / "plugins/kaoyan-22408/.codex-plugin/plugin.json"
+        manifest = self.repo / "plugins/kaoyan-408/.codex-plugin/plugin.json"
         manifest.write_bytes(manifest.read_bytes() + b"\n")
         with self.assertRaisesRegex(ValidationError, "dirty"):
             build_archive(self.repo, self.root / "dirty.zip")

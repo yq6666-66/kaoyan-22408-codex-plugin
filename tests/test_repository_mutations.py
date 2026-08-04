@@ -26,7 +26,7 @@ class RepositoryMutationTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
         self.repo = copy_as_committed_repo(Path(self.temporary.name) / "repo")
-        self.plugin = self.repo / "plugins/kaoyan-22408"
+        self.plugin = self.repo / "plugins/kaoyan-408"
         self.version = json.loads(
             (self.plugin / ".codex-plugin/plugin.json").read_text(encoding="utf-8")
         )["version"]

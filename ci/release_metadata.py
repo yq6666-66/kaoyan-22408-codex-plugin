@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 REPO = Path(__file__).resolve().parents[1]
-MANIFEST = REPO / "plugins" / "kaoyan-22408" / ".codex-plugin" / "plugin.json"
+MANIFEST = REPO / "plugins" / "kaoyan-408" / ".codex-plugin" / "plugin.json"
 
 
 def metadata(suffix: str | None = None) -> dict[str, str]:
@@ -18,13 +18,13 @@ def metadata(suffix: str | None = None) -> dict[str, str]:
     version = manifest["version"]
     if not re.fullmatch(r"\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?", version):
         raise ValueError(f"manifest version is not release semver: {version}")
-    archive = f"kaoyan-22408-{version}.zip"
+    archive = f"kaoyan-408-{version}.zip"
     result = {
         "version": version,
         "tag": f"v{version}",
         "archive": archive,
         "checksum": f"{archive}.sha256",
-        "artifact": f"kaoyan-22408-{version}" + (f"-{suffix}" if suffix else ""),
+        "artifact": f"kaoyan-408-{version}" + (f"-{suffix}" if suffix else ""),
     }
     return result
 

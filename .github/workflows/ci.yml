@@ -170,7 +170,7 @@ jobs:
             "${{ steps.meta.outputs.tag }}"
             "dist/${{ steps.meta.outputs.archive }}"
             "dist/${{ steps.meta.outputs.checksum }}"
-            --title "kaoyan-22408 ${{ steps.meta.outputs.tag }}"
+            --title "kaoyan-408 ${{ steps.meta.outputs.tag }}"
             --generate-notes
           )
           if [[ "$RELEASE_EVENT" == "workflow_dispatch" ]]; then

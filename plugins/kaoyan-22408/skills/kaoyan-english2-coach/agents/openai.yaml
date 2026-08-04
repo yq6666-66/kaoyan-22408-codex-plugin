@@ -1,4 +1,0 @@
-interface:
-  display_name: "考研英语二教练"
-  short_description: "用原文证据链精读英语二，并逐点修改翻译与作文、给非官方估分"
-  default_prompt: "使用 $kaoyan-english2-coach 按原文证据链分析并批改这段英语二内容。"

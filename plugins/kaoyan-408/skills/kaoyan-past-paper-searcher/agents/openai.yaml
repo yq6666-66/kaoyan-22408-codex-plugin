@@ -1,0 +1,4 @@
+interface:
+  display_name: "考研真题搜索器"
+  short_description: "检索并核验2010至2026年五类考研真题来源、许可和重复项"
+  default_prompt: "使用 $kaoyan-past-paper-searcher 搜索指定年份和科目的合法真题来源。"
