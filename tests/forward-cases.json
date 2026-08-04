@@ -1,12 +1,12 @@
 {
-  "schemaVersion": "1.3",
+  "schemaVersion": "2.0",
   "cases": [
     {
       "id": "planner-P1",
-      "skillUnderTest": "kaoyan-22408-planner",
+      "skillUnderTest": "kaoyan-408-planner",
       "kind": "positive",
       "prompt": "距离初试还有 20 周，每周 30 小时，帮我制定四科周计划。",
-      "expectedPrimary": "kaoyan-22408-planner",
+      "expectedPrimary": "kaoyan-408-planner",
       "expectedBehavior": [
         "按目标日期倒排跨周配额",
         "附 StudyProfile 且 JSON 位于末尾"
@@ -14,10 +14,10 @@
     },
     {
       "id": "planner-P2",
-      "skillUnderTest": "kaoyan-22408-planner",
+      "skillUnderTest": "kaoyan-408-planner",
       "kind": "positive",
       "prompt": "我进入强化期，工作日每天 3 小时、周末每天 7 小时，请排下个月节奏。",
-      "expectedPrimary": "kaoyan-22408-planner",
+      "expectedPrimary": "kaoyan-408-planner",
       "expectedBehavior": [
         "形成阶段与月度里程碑",
         "每周预算严格闭合"
@@ -25,10 +25,10 @@
     },
     {
       "id": "planner-L1",
-      "skillUnderTest": "kaoyan-22408-planner",
+      "skillUnderTest": "kaoyan-408-planner",
       "kind": "colloquial",
       "prompt": "我今年考研，每周能挤 25 小时，四科这几个月咋分？",
-      "expectedPrimary": "kaoyan-22408-planner",
+      "expectedPrimary": "kaoyan-408-planner",
       "expectedBehavior": [
         "个人今年目标不是官方事实触发",
         "输出跨科倒排和立即动作"
@@ -36,7 +36,7 @@
     },
     {
       "id": "planner-C1",
-      "skillUnderTest": "kaoyan-22408-planner",
+      "skillUnderTest": "kaoyan-408-planner",
       "kind": "conflict",
       "prompt": "我上周计划 28 个任务只完成 17 个，为什么落后，最大风险是什么？",
       "expectedPrimary": "kaoyan-progress-diagnostician",
@@ -44,11 +44,11 @@
         "先诊断既有偏差",
         "不由规划师抢答"
       ],
-      "expectedNotPrimary": "kaoyan-22408-planner"
+      "expectedNotPrimary": "kaoyan-408-planner"
     },
     {
       "id": "planner-M1",
-      "skillUnderTest": "kaoyan-22408-planner",
+      "skillUnderTest": "kaoyan-408-planner",
       "kind": "compound",
       "prompt": "先确认今年数学二考试范围，再按每周 25 小时给我排到初试。",
       "expectedPrimary": "kaoyan-official-info-researcher",
@@ -95,7 +95,7 @@
       "skillUnderTest": "kaoyan-review-executor",
       "kind": "conflict",
       "prompt": "我还没有复习计划，帮我从现在规划到初试。",
-      "expectedPrimary": "kaoyan-22408-planner",
+      "expectedPrimary": "kaoyan-408-planner",
       "expectedBehavior": [
         "目标日倒排属于规划",
         "不把长期路线当一次时段"
@@ -263,7 +263,7 @@
       "skillUnderTest": "kaoyan-mock-exam-coach",
       "kind": "conflict",
       "prompt": "给我 5 道导数练习，每出一道就立即讲答案。",
-      "expectedPrimary": "kaoyan-math2-coach",
+      "expectedPrimary": "kaoyan-math-coach",
       "expectedBehavior": [
         "即时讲题归数学教练",
         "不满足冻结统一交卷"
@@ -339,10 +339,10 @@
     },
     {
       "id": "math2-P1",
-      "skillUnderTest": "kaoyan-math2-coach",
+      "skillUnderTest": "kaoyan-math-coach",
       "kind": "positive",
       "prompt": "讲解这个二元函数极值题，并说明拉格朗日乘数法的适用条件。",
-      "expectedPrimary": "kaoyan-math2-coach",
+      "expectedPrimary": "kaoyan-math-coach",
       "expectedBehavior": [
         "前提检查后给主解",
         "使用独立信号复核"
@@ -350,10 +350,10 @@
     },
     {
       "id": "math2-P2",
-      "skillUnderTest": "kaoyan-math2-coach",
+      "skillUnderTest": "kaoyan-math-coach",
       "kind": "positive",
       "prompt": "我求导时总漏掉复合函数外层，请定位错因并设计 3 题专项训练。",
-      "expectedPrimary": "kaoyan-math2-coach",
+      "expectedPrimary": "kaoyan-math-coach",
       "expectedBehavior": [
         "定位当前题第一处错误",
         "给一条迁移规则"
@@ -361,10 +361,10 @@
     },
     {
       "id": "math2-L1",
-      "skillUnderTest": "kaoyan-math2-coach",
+      "skillUnderTest": "kaoyan-math-coach",
       "kind": "colloquial",
       "prompt": "这道积分我老算错，先看我哪一步最早翻车，再独立验一遍。",
-      "expectedPrimary": "kaoyan-math2-coach",
+      "expectedPrimary": "kaoyan-math-coach",
       "expectedBehavior": [
         "单题总是错仍归数学二",
         "固定五段流程"
@@ -372,7 +372,7 @@
     },
     {
       "id": "math2-C1",
-      "skillUnderTest": "kaoyan-math2-coach",
+      "skillUnderTest": "kaoyan-math-coach",
       "kind": "conflict",
       "prompt": "用原创高数题组织 30 分钟计时测验，我交卷后再统一评分。",
       "expectedPrimary": "kaoyan-mock-exam-coach",
@@ -380,14 +380,14 @@
         "统一计时交卷归模考",
         "不由数学教练即时讲"
       ],
-      "expectedNotPrimary": "kaoyan-math2-coach"
+      "expectedNotPrimary": "kaoyan-math-coach"
     },
     {
       "id": "math2-M1",
-      "skillUnderTest": "kaoyan-math2-coach",
+      "skillUnderTest": "kaoyan-math-coach",
       "kind": "compound",
       "prompt": "先找出我这道极限题的第一处错误，再把这个错误类型交给错题教练聚类。",
-      "expectedPrimary": "kaoyan-math2-coach",
+      "expectedPrimary": "kaoyan-math-coach",
       "expectedBehavior": [
         "当前主产物是单题定位",
         "后续聚类用交接卡"
@@ -395,10 +395,10 @@
     },
     {
       "id": "english2-P1",
-      "skillUnderTest": "kaoyan-english2-coach",
+      "skillUnderTest": "kaoyan-english-coach",
       "kind": "positive",
       "prompt": "批改我的英语二图表作文，重点看任务完成度、逻辑和语言。",
-      "expectedPrimary": "kaoyan-english2-coach",
+      "expectedPrimary": "kaoyan-english-coach",
       "expectedBehavior": [
         "先逐点修改再示例改写",
         "估分明确非官方"
@@ -406,10 +406,10 @@
     },
     {
       "id": "english2-P2",
-      "skillUnderTest": "kaoyan-english2-coach",
+      "skillUnderTest": "kaoyan-english-coach",
       "kind": "positive",
       "prompt": "分析这段英语二阅读的长难句，并检查我的中文翻译。",
-      "expectedPrimary": "kaoyan-english2-coach",
+      "expectedPrimary": "kaoyan-english-coach",
       "expectedBehavior": [
         "拆主干与关系错误",
         "用原文证据链"
@@ -417,10 +417,10 @@
     },
     {
       "id": "english2-L1",
-      "skillUnderTest": "kaoyan-english2-coach",
+      "skillUnderTest": "kaoyan-english-coach",
       "kind": "colloquial",
       "prompt": "这道阅读 B 和 C 到底看哪句？把证据链给我捋清。",
-      "expectedPrimary": "kaoyan-english2-coach",
+      "expectedPrimary": "kaoyan-english-coach",
       "expectedBehavior": [
         "设问到原文再到选项",
         "定位证据链第一处断裂"
@@ -428,7 +428,7 @@
     },
     {
       "id": "english2-C1",
-      "skillUnderTest": "kaoyan-english2-coach",
+      "skillUnderTest": "kaoyan-english-coach",
       "kind": "conflict",
       "prompt": "把我过去两周的英语错题按根因分组并安排间隔复测。",
       "expectedPrimary": "kaoyan-error-loop-coach",
@@ -436,14 +436,14 @@
         "跨题复测归错题闭环",
         "不由英语教练替代"
       ],
-      "expectedNotPrimary": "kaoyan-english2-coach"
+      "expectedNotPrimary": "kaoyan-english-coach"
     },
     {
       "id": "english2-M1",
-      "skillUnderTest": "kaoyan-english2-coach",
+      "skillUnderTest": "kaoyan-english-coach",
       "kind": "compound",
       "prompt": "先按英语二标准批改这篇作文并给非官方估分，之后把错误交给错题教练。",
-      "expectedPrimary": "kaoyan-english2-coach",
+      "expectedPrimary": "kaoyan-english-coach",
       "expectedBehavior": [
         "当前主要产物是作文批改",
         "跨题闭环作为交接"
@@ -672,6 +672,47 @@
         "官方事实阻塞后续规划",
         "输出最小交接卡"
       ]
+    },
+    {
+      "id": "paper-search-P1",
+      "skillUnderTest": "kaoyan-past-paper-searcher",
+      "kind": "positive",
+      "prompt": "帮我找 2018 年数学一真题的公开来源，并检查 GitHub 文件许可证。",
+      "expectedPrimary": "kaoyan-past-paper-searcher",
+      "expectedBehavior": ["执行网页与 GitHub 定向发现", "记录来源、commit、许可证和保存策略"]
+    },
+    {
+      "id": "paper-search-P2",
+      "skillUnderTest": "kaoyan-past-paper-searcher",
+      "kind": "positive",
+      "prompt": "搜索 2010 到 2026 年英语二试卷索引，只要合法来源，不要复制整卷。",
+      "expectedPrimary": "kaoyan-past-paper-searcher",
+      "expectedBehavior": ["限制年份与科目", "许可证不明时只建立索引"]
+    },
+    {
+      "id": "paper-search-L1",
+      "skillUnderTest": "kaoyan-past-paper-searcher",
+      "kind": "colloquial",
+      "prompt": "GitHub 上有 2022 的 408 卷子没？顺便搜搜网页。",
+      "expectedPrimary": "kaoyan-past-paper-searcher",
+      "expectedBehavior": ["识别找卷意图", "不把搜索摘要当成真题证明"]
+    },
+    {
+      "id": "paper-search-C1",
+      "skillUnderTest": "kaoyan-past-paper-searcher",
+      "kind": "conflict",
+      "prompt": "我已经贴出 2021 数学二第 5 题，请一步步讲解并画图。",
+      "expectedPrimary": "kaoyan-math-coach",
+      "expectedNotPrimary": "kaoyan-past-paper-searcher",
+      "expectedBehavior": ["题面已提供时由数学教练主责", "搜索器不抢占逐题教学"]
+    },
+    {
+      "id": "paper-search-M1",
+      "skillUnderTest": "kaoyan-past-paper-searcher",
+      "kind": "compound",
+      "prompt": "先找 2019 英语一真题的可靠来源，找到后再交给分析师做整卷覆盖表。",
+      "expectedPrimary": "kaoyan-past-paper-searcher",
+      "expectedBehavior": ["先完成来源核验", "用交接卡传递给真题分析师"]
     }
   ]
 }

@@ -98,7 +98,7 @@ def main() -> int:
     elif semgrep:
         env.setdefault(
             "SEMGREP_SETTINGS_FILE",
-            str(Path(tempfile.gettempdir()) / "kaoyan-22408-semgrep-settings.yml"),
+            str(Path(tempfile.gettempdir()) / "kaoyan-408-semgrep-settings.yml"),
         )
         env.setdefault("SEMGREP_SEND_METRICS", "off")
         expected_semgrep = pinned_requirement_version(requirements, "semgrep")

@@ -110,31 +110,48 @@ class LocalInstallerTests(unittest.TestCase):
             completed(["list"], stdout="personal"),
             completed(["marketplace-add"]),
             completed(["plugin-add"]),
+            completed(["plugin-list"], stdout="kaoyan-408 enabled\n"),
         ]
         code, stdout, stderr, runner = self.run_installer(results)
         self.assertEqual(code, 0)
-        self.assertIn("Installed kaoyan-22408", stdout)
+        self.assertIn("Installed kaoyan-408", stdout)
         self.assertEqual(stderr, "")
-        self.assertEqual(runner.commands[-2][-3:-1], ["marketplace", "add"])
-        self.assertEqual(runner.commands[-1][-2:], ["add", "kaoyan-22408@kaoyan-22408"])
+        self.assertEqual(runner.commands[-3][-3:-1], ["marketplace", "add"])
+        self.assertEqual(runner.commands[-2][-2:], ["add", "kaoyan-408@kaoyan-408"])
+        self.assertEqual(runner.commands[-1][-2:], ["plugin", "list"])
 
     def test_existing_marketplace_skips_add(self) -> None:
         results = [
             completed(["check"]),
             completed(["help"], stdout="Usage: codex plugin"),
-            completed(["list"], stdout=f"kaoyan-22408  {REPO.resolve()}\n"),
+            completed(["list"], stdout=f"kaoyan-408  {REPO.resolve()}\n"),
             completed(["plugin-add"]),
+            completed(["plugin-list"], stdout="kaoyan-408 enabled\n"),
         ]
         code, stdout, _, runner = self.run_installer(results)
         self.assertEqual(code, 0)
         self.assertIn("Installed", stdout)
-        self.assertEqual(len(runner.commands), 4)
+        self.assertEqual(len(runner.commands), 5)
+
+    def test_legacy_plugin_warning_only_after_success(self) -> None:
+        results = [
+            completed(["check"]),
+            completed(["help"], stdout="Usage: codex plugin"),
+            completed(["list"], stdout=f"kaoyan-408  {REPO.resolve()}\n"),
+            completed(["plugin-add"]),
+            completed(["plugin-list"], stdout="kaoyan-408 enabled\nkaoyan-22408 enabled\n"),
+        ]
+        code, stdout, stderr, _ = self.run_installer(results)
+        self.assertEqual(code, 0)
+        self.assertEqual(stderr, "")
+        self.assertIn("Verify kaoyan-408", stdout)
+        self.assertIn("kaoyan-22408", stdout)
 
     def test_same_name_with_unverified_source_is_rejected(self) -> None:
         results = [
             completed(["check"]),
             completed(["help"], stdout="Usage: codex plugin"),
-            completed(["list"], stdout="kaoyan-22408  C:/different/repository"),
+            completed(["list"], stdout="kaoyan-408  C:/different/repository"),
         ]
         code, stdout, stderr, runner = self.run_installer(results)
         self.assertEqual(code, 1)
@@ -146,7 +163,7 @@ class LocalInstallerTests(unittest.TestCase):
         results = [
             completed(["check"]),
             completed(["help"], stdout="Usage: codex plugin"),
-            completed(["list"], stdout=f"kaoyan-22408  {REPO.resolve()}-shadow"),
+            completed(["list"], stdout=f"kaoyan-408  {REPO.resolve()}-shadow"),
         ]
         code, stdout, stderr, runner = self.run_installer(results)
         self.assertEqual(code, 1)
@@ -158,7 +175,7 @@ class LocalInstallerTests(unittest.TestCase):
         results = [
             completed(["check"]),
             completed(["help"], stdout="Usage: codex plugin"),
-            completed(["list"], stdout=f"kaoyan-22408  {REPO.resolve()}"),
+            completed(["list"], stdout=f"kaoyan-408  {REPO.resolve()}"),
             completed(["plugin-add"], code=1, stderr="install failed"),
         ]
         code, stdout, stderr, _ = self.run_installer(results)

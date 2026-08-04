@@ -1,4 +1,0 @@
-interface:
-  display_name: "考研数学二教练"
-  short_description: "按前提、主解、独立复核、第一处错误和迁移规则讲解数学二"
-  default_prompt: "使用 $kaoyan-math2-coach 检查这道题的前提、主解法和第一处错误。"

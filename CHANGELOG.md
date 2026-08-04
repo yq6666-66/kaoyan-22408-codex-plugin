@@ -2,6 +2,26 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/)。
 
+## [2.0.0] - 2026-08-04
+
+### 变更
+
+- 插件 ID、目录和 Marketplace 名称改为 `kaoyan-408`，显示名改为“408考研插件”。
+- 数学与英语 Skills 扩展为数学一/二、英语一/二；规划 Skill 改名为 `kaoyan-408-planner`。
+- 默认学科讲解改为真题可追溯的新手图文结构；无可靠来源时明确使用原创示例。
+- Obsidian 配置升级至 Schema 1.1，并提供保留旧私人目录的 1.0 迁移；Notion 改为一次绑定后在确认范围内自动增量更新。
+
+### 新增
+
+- 新增 `kaoyan-past-paper-searcher`，固定发现 2010—2026 年数学一、数学二、英语一、英语二和 408 公开来源。
+- 新增真题来源与版权契约、新手图文讲解契约及可机器验证的真题知识 Schema。
+- 路由和行为离线场景扩展为 `65/65` 与 `52/52`。
+
+### 安全
+
+- 网页、搜索结果和 GitHub 仓库一律按不可信输入处理；许可证不明时禁止保存全文。
+- 发布包继续排除真题、搜索缓存、Notion 页面 ID、Vault 路径和私人学习记录。
+
 ## [1.4.0] - 2026-08-03
 
 ### 新增
@@ -89,6 +109,7 @@
 - 采用纯 Skills 架构，无 App、MCP、后台服务、账号系统或数据持久化。
 - 不内置第三方题库、讲义、真题合集或解析库。
 
+[2.0.0]: https://github.com/yq6666-66/kaoyan-22408-codex-plugin/compare/v1.4.0...v2.0.0
 [1.4.0]: https://github.com/yq6666-66/kaoyan-22408-codex-plugin/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/yq6666-66/kaoyan-22408-codex-plugin/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/yq6666-66/kaoyan-22408-codex-plugin/compare/v1.1.0...v1.2.0

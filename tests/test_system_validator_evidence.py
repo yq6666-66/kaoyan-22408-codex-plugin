@@ -27,13 +27,13 @@ class SystemValidatorEvidenceTests(unittest.TestCase):
         self.path = Path(self.temporary.name) / "evidence.json"
         self.now = datetime(2026, 7, 15, 12, 0, tzinfo=timezone.utc)
         manifest = json.loads(
-            (REPO / "plugins/kaoyan-22408/.codex-plugin/plugin.json").read_text(encoding="utf-8")
+            (REPO / "plugins/kaoyan-408/.codex-plugin/plugin.json").read_text(encoding="utf-8")
         )
         self.evidence = {
             "schemaVersion": "1.1",
             "generatedAt": self.now.isoformat().replace("+00:00", "Z"),
             "plugin": {
-                "name": "kaoyan-22408",
+                "name": "kaoyan-408",
                 "version": manifest["version"],
                 "treeSha256": current_plugin_tree_hash(REPO),
             },
@@ -92,7 +92,7 @@ class SystemValidatorEvidenceTests(unittest.TestCase):
         incomplete = deepcopy(self.evidence)
         incomplete["results"]["skills"].pop(next(iter(EXPECTED_SKILLS)))
         self.write(incomplete)
-        with self.assertRaisesRegex(EvidenceError, "exactly 12"):
+        with self.assertRaisesRegex(EvidenceError, "exactly 13"):
             verify_evidence(REPO, self.path, now=self.now)
 
     def test_stale_repository_validator_hash_is_rejected(self) -> None:

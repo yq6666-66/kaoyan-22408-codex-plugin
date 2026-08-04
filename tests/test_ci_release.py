@@ -97,13 +97,13 @@ class ReleaseCiTests(unittest.TestCase):
     def test_metadata_is_derived_from_manifest(self) -> None:
         values = metadata("ubuntu")
         manifest = json.loads(
-            (REPO / "plugins/kaoyan-22408/.codex-plugin/plugin.json").read_text(encoding="utf-8")
+            (REPO / "plugins/kaoyan-408/.codex-plugin/plugin.json").read_text(encoding="utf-8")
         )
         version = manifest["version"]
         self.assertEqual(values["version"], version)
         self.assertEqual(values["tag"], f"v{version}")
-        self.assertEqual(values["archive"], f"kaoyan-22408-{version}.zip")
-        self.assertEqual(values["artifact"], f"kaoyan-22408-{version}-ubuntu")
+        self.assertEqual(values["archive"], f"kaoyan-408-{version}.zip")
+        self.assertEqual(values["artifact"], f"kaoyan-408-{version}-ubuntu")
 
     def test_release_pair_verifies_checksum(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

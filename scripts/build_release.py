@@ -224,7 +224,7 @@ def build_archive(
     validate_repo(repo)
     payloads = committed_plugin_blobs(repo)
     version = _manifest_version(payloads)
-    archive_path = (output or repo / "dist" / f"kaoyan-22408-{version}.zip").resolve()
+    archive_path = (output or repo / "dist" / f"kaoyan-408-{version}.zip").resolve()
     checksum_path = archive_path.with_suffix(archive_path.suffix + ".sha256")
     archive_path.parent.mkdir(parents=True, exist_ok=True)
 

@@ -1,153 +1,107 @@
-# 考研 22408 Skills 插件
+# 408考研插件
 
-`kaoyan-22408` 是面向数学二、英语二、408 与政治的中文学习插件，可在支持 Skills 插件的 ChatGPT 与 Codex 环境中使用。项目只包含 12 个 Skills、共享契约与品牌图标，不提供独立应用、App、MCP、后台服务、账号或内置题库。用户可选择把本地 Obsidian Vault 或已授权的 Notion 工作区作为跨会话学习记忆；发布者无法访问这些笔记。
+`kaoyan-408` 是面向数学一、数学二、英语一、英语二、408 与政治的中文 Skills-only 学习插件。它提供 2010—2026 年五类真题的合规来源发现、真题分析、新手图文讲解、规划、执行、诊断、错题复测、原创模考以及可选 Notion/Obsidian 学习记忆。
 
-当前版本：`1.4.0`
+当前版本：`2.0.0`
 
-默认采用自适应简洁输出：先给可执行结论或立即行动，复杂问题再展开必要依据；需要连续学习时使用三行 Markdown 交接卡，必须生成的 Schema 1.1 JSON 永远放在回答末尾。
+项目没有 App、MCP、后台服务、云端题库、账号或 API Key。网页搜索、图片生成、Notion 和本地文件能力由当前 ChatGPT/Codex 宿主决定；不可用时插件会明确降级。
 
-## 能力
+## 13 个 Skills
 
-| Skill | 主责 |
+| Skill | 用途 |
 | --- | --- |
-| `kaoyan-22408-planner` | 阶段、月度、周度、目标日期倒排与跨科时间分配 |
-| `kaoyan-review-executor` | 把既有计划或用户给出的本次目标、科目与时长展开为当前学习时段 |
-| `kaoyan-progress-diagnostician` | 根据用户提供的记录诊断进度、风险与调整信号 |
-| `kaoyan-error-loop-coach` | 跨题错因聚类、间隔复测与掌握证据判断 |
-| `kaoyan-mock-exam-coach` | 组织原创或用户授权题目的自计时测验，并在交卷后评分复盘 |
-| `kaoyan-408-tutor` | 408 单题、概念、题面缺失与答案冲突处理 |
-| `kaoyan-math2-coach` | 数学二解题、单题错误定位与专项训练 |
-| `kaoyan-english2-coach` | 英语二阅读、翻译、完形、新题型与写作批改 |
-| `kaoyan-politics-coach` | 政治理论、材料题与背诵复测 |
-| `kaoyan-past-paper-analyst` | 分析用户实际提供且有权使用的真题文件 |
-| `kaoyan-material-study-assistant` | 把用户提供的材料转成摘要、卡片、提纲与练习 |
-| `kaoyan-official-info-researcher` | 核验当年大纲、报名、招生、考试安排与当前政策事实 |
+| `kaoyan-408-planner` | 阶段、月度、周度和跨科配额 |
+| `kaoyan-review-executor` | 将计划展开为当前学习时段 |
+| `kaoyan-progress-diagnostician` | 根据真实记录诊断进度和风险 |
+| `kaoyan-error-loop-coach` | 跨题错因聚类、复测和掌握证据 |
+| `kaoyan-mock-exam-coach` | 原创或授权题目的冻结题面模考 |
+| `kaoyan-408-tutor` | 408 单题与概念的新手图文讲解 |
+| `kaoyan-math-coach` | 数学一/二单题、验算与专项训练 |
+| `kaoyan-english-coach` | 英语一/二阅读、翻译和写作批改 |
+| `kaoyan-politics-coach` | 政治理论、材料题和背诵复测 |
+| `kaoyan-past-paper-searcher` | 五类真题来源、许可、冲突与重复项核验 |
+| `kaoyan-past-paper-analyst` | 已提供或已核验真题的覆盖与有限趋势分析 |
+| `kaoyan-material-study-assistant` | 用户材料的摘要、卡片和原创练习 |
+| `kaoyan-official-info-researcher` | 当年大纲、报名、院校和考试安排核验 |
 
-材料路由按意图判断：讲解材料中的学科概念或题目时使用对应学科 Skill；做摘要、卡片、提纲或改写时使用 `kaoyan-material-study-assistant`。
+## 真题与图文回答
 
-## 数据与内容边界
+- 自动发现范围固定为试卷年度 2010—2026，科目固定为数学一、数学二、英语一、英语二和 408。政治辅导保留，但不建设政治真题库。
+- 宿主搜索可用时同时执行普通网页发现与 `site:github.com` 查询。只有实际访问 Google 结果时才会标明 Google；搜索关闭时输出 `[真题未命中]` 和可复制搜索式。
+- GitHub 来源记录仓库、文件、commit、raw URL 与许可证。许可证不明时只保存索引、必要短摘录和 `[原创解析]`，不复制整卷。
+- 数学、英语、408、政治单题与真题逐题解析默认面向新手，包含前置知识、可编辑图解、逐步推导、独立复核、第一处易错点和 `[原创练习]`。
+- 精确关系优先用 Mermaid、表格、状态图或可审计 SVG；宿主支持图片生成时可附辅助示意图，但图片不替代公式、代码或答案证据。
 
-- 发布者没有接收会话、文件、学习记录或 API Key 的服务器。
-- 未启用 Obsidian 大脑时，插件只处理当前会话内容，不写入用户设备，也不暗示拥有跨会话记忆。
-- 启用 Obsidian 大脑后，宿主只按本地配置读取和结构化更新用户自己的 Vault；配置、笔记和学习记录不会发送给插件发布者。
-- 连接 Notion 后，宿主只通过用户已授权的 Notion 工具检索和结构化更新用户选择的页面；发布者没有 Notion Token、后台账号或独立读取权限。
-- Notion 默认只沉淀可复用的学习增量，不复制整段会话、密钥、完整付费材料或未授权题库；用户说“本次不记忆”“只读模式”或“不要同步 Notion”时，本轮禁止写入。
-- 真题和学习材料只处理用户当前会话直接提供的有限内容，或用户有权使用且实际提供的文件；不会搜索、补全或重建整套资料。
-- 跨会话继续时，用户仍可复制插件输出的 Schema 1.1 `StudyProfile`、`ProgressSnapshot` 或 `ReviewQueue` JSON；启用 Obsidian 后这些对象也可作为本地可审计记忆。
-- 招考信息以教育部、研招网和目标院校官网为依据；时政与政策事实以中国政府网、国务院、中央部门或事项发布机构官网为依据。不能核验时会标记 `[待核验]`。
-- 输出使用 `[用户材料]`、`[原创练习]`、`[官方核验]`、`[待核验]` 区分证据来源。
+## 安装
 
-详见 [隐私政策](PRIVACY.md)、[使用条款](TERMS.md) 与 [第三方内容边界](THIRD_PARTY_CONTENT.md)。
+新版 Codex CLI/IDE 可添加仓库 marketplace 后安装：
 
-## 分发与兼容性
-
-GitHub 仓库是 repo marketplace 的安装源。GitHub Release 中的 ZIP 与 SHA-256 文件用于审计、离线检查和复现构建，不是另一套应用安装包。
-
-| 环境 | 使用方式 |
-| --- | --- |
-| 支持插件命令的新版 Codex CLI / IDE | 添加固定版本的 GitHub marketplace，再从插件目录安装 |
-| ChatGPT Desktop / Codex Desktop | 克隆并打开仓库，重启桌面端，再从 repo marketplace 选择 `kaoyan-22408` |
-| 不支持插件命令的旧版 CLI | CLI 不能直接安装；使用上面的桌面端 repo marketplace 流程 |
-| ChatGPT Web | 仅当个人或工作区已经提供、安装或分享该插件时可用；不能直接从 GitHub 搜索安装 |
-
-### 新版 CLI 安装
-
-以下命令要求当前 CLI 的 `codex plugin` 帮助中存在相应子命令：
-
-```text
-codex plugin marketplace add yq6666-66/kaoyan-22408-codex-plugin --ref v1.4.0
-codex plugin add kaoyan-22408@kaoyan-22408
+```powershell
+codex plugin marketplace add yq6666-66/kaoyan-22408-codex-plugin --ref v2.0.0
+codex plugin add kaoyan-408@kaoyan-408
 ```
 
-安装后新建任务，让宿主重新加载 Skills。
+也可克隆固定版本，在 ChatGPT Desktop 或 Codex Desktop 打开仓库并从 repo marketplace 安装：
 
-### 桌面端安装
-
-```text
-git clone --branch v1.4.0 --depth 1 https://github.com/yq6666-66/kaoyan-22408-codex-plugin.git
+```powershell
+git clone --branch v2.0.0 --depth 1 https://github.com/yq6666-66/kaoyan-22408-codex-plugin.git
 ```
 
-在 ChatGPT Desktop 或 Codex Desktop 中打开克隆后的仓库，重启桌面端，然后从仓库提供的 marketplace 安装 `kaoyan-22408`。桌面端菜单名称可能随版本变化。
+跨平台安装器：
 
-### 本地开发安装
-
-在仓库根目录运行跨平台安装器：
-
-```text
+```powershell
+python scripts/install_local.py --check
 python scripts/install_local.py
 ```
 
-只验证、不安装：
+退出码：`0` 成功；`1` 校验、命令或安装失败；`2` 当前 Codex 不支持插件命令，需要桌面端人工安装。只有实际成功才输出 `Installed kaoyan-408`。
 
-```text
-python scripts/install_local.py --validate-only
-```
+### 从 v1.4.0 迁移
 
-Windows 也可使用只负责转发参数与退出码的 PowerShell 包装：
+`kaoyan-408` 是新的插件 ID，不会静默覆盖 `kaoyan-22408`。先安装并验证 v2，再禁用或移除旧插件；旧 Releases 和旧便携记录保持可用。
+
+## Obsidian 大脑
+
+新配置位置为 `.codex/kaoyan-408/obsidian-brain.json`，Schema 1.1 增加 `knowledgeRoot` 和 `pastPaperRoot`：
 
 ```powershell
-./scripts/install-local.ps1
-./scripts/install-local.ps1 -ValidateOnly
-```
-
-退出码含义：`0` 表示验证成功或实际安装成功；`1` 表示验证、命令或安装失败；`2` 表示当前 Codex 不支持插件命令，需要改用桌面端 repo marketplace 人工安装。只有 `codex plugin add` 确实成功时，安装器才会输出 `Installed kaoyan-22408`。
-
-### 可选 Obsidian 大脑
-
-本功能只在具有本地文件权限的 Codex Desktop、Codex CLI 或兼容宿主中可用。ChatGPT Web 无法直接访问电脑上的 Vault，会自动退化为会话模式。
-
-在仓库根目录运行一次配置：
-
-```text
-python scripts/configure_obsidian_brain.py configure --vault <你的-Obsidian-Vault-绝对路径>
+python scripts/configure_obsidian_brain.py configure --vault <Vault绝对路径>
 python scripts/configure_obsidian_brain.py check
 ```
 
-配置保存在当前用户目录下的 `.codex/kaoyan-22408/obsidian-brain.json`，不进入 Git。任一 22408 Skill 启动时都会检查该配置，优先检索 `20-项目/考研 22408`，并只自动沉淀目标、进度、错因、掌握证据和稳定方法等长期有效内容。
+从 Schema 1.0 无损迁移：
 
-临时只读可在请求中说“本次不记忆”或“只读模式”。全局开关：
-
-```text
-python scripts/configure_obsidian_brain.py disable
-python scripts/configure_obsidian_brain.py enable
+```powershell
+python scripts/configure_obsidian_brain.py migrate --dry-run
+python scripts/configure_obsidian_brain.py migrate
 ```
 
-### 可选 Notion 学习大脑
+迁移会保留旧配置和私人目录，沿用旧 Vault、项目目录及已存在的知识目录，不自动移动或删除 `考研 22408` 笔记。新安装默认使用 `20-项目/408考研`、`30-知识/408考研`、`40-真题/408考研`。
 
-Notion 通过当前宿主已连接的 `Notion` 工具工作，不需要在仓库中保存 Token 或私人页面 ID。首次使用时在当前任务中连接 Notion，然后说“同步到 Notion”或指定目标页面；插件会先搜索并读取相关页面，再把本轮确认的概念、错因、复测安排或稳定方法作为最小增量更新到已有页面。没有可靠目标页面时会先询问，不会随意创建或覆盖页面。
+## Notion 大脑
 
-每轮输出会区分 `[Notion记忆]`、`[Obsidian记忆]`、`[用户材料]`、`[模型推导]` 和 `[官方核验]`。Notion 工具不可用时自动退化为当前会话模式，并明确显示未写入状态。完整边界见 [`notion-brain-contract.md`](plugins/kaoyan-22408/references/notion-brain-contract.md)。
+首次写入时确认一个“408考研”主页或数据库，插件写入标记 `kaoyan-408-brain:1.0`。之后只在该范围内自动搜索、去重和增量更新；多个标记、授权失败或目标不可访问时停止写入。
 
-## 调用示例
+默认结构为 `00｜真题索引`、`01｜数学一`、`02｜数学二`、`03｜英语一`、`04｜英语二`、`05｜408`。写入后会重新读取验证；页面 ID 和工作区信息不会进入仓库或发布包。
 
-Codex 可使用 `$skill-name` 显式调用；ChatGPT 可从插件或 Skill 选择器调用。例如：
+用户说“本次不记忆”“只读模式”或“不要同步 Notion”时，本轮禁止 Notion 和 Obsidian 写入。
 
-```text
-使用 $kaoyan-review-executor。我现在有 90 分钟，目标是复习数据结构树与二叉树并完成一次闭卷复述，请安排这个学习时段。
-```
+## 开发与发布门禁
 
-```text
-使用 $kaoyan-mock-exam-coach，生成 10 道原创操作系统章节测；我会自行计时，明确交卷前不要显示答案、提示或得分线索。
-```
-
-## 开发、验证与发布包
-
-```text
+```powershell
 python scripts/check.py
 python scripts/build_release.py
+python scripts/install_local.py --check
 ```
 
-`check.py` 运行完全离线的仓库静态检查、结构校验、单元测试、Semgrep 和官方 validator 证据校验，不调用模型，也不要求安装或登录 Codex CLI。`build_release.py` 从 `plugin.json.version` 派生 ZIP 文件名，同时生成对应的 `.zip.sha256`，并只打包完整路径允许列表中的插件文件。
+门禁完全离线，不要求登录 Codex CLI：真实 YAML/JSON Schema、13 个官方 `quick_validate.py` 证据、65 个路由场景、52 个行为场景、单元测试、Semgrep、Git 历史凭据扫描与 Windows/Ubuntu 可重复 ZIP。发布包采用完整路径允许列表，不包含真题、搜索缓存、私人配置或知识库数据。
 
-发布门禁包括 60 个路由场景和 36 个行为场景的数量、ID、主责 Skill、最近邻冲突、rubric、Schema 与覆盖完整性检查。它验证规则和测试资产是否完整，但不声称这些场景已经由某个模型实际运行。语义体验可在 ChatGPT/Codex 新任务中人工抽查，不作为自动发布阻塞条件。
+## 隐私与版权
 
-CI 在 Windows 与 Ubuntu 分别执行同一离线门禁并构建发布包，随后要求两个 ZIP 字节一致。通常由位于 `main` 历史中、版本与 manifest 一致的 `v*` 标签触发发布；没有可用的本地 GitHub/Codex CLI 登录时，也可在 GitHub Actions 的 `CI` 工作流中从最新 `main` 手动输入同一标签。两条路径都必须先通过完整门禁，手动路径才会创建标签与 Release。完整设计见 [离线质量门禁](QUALITY_GATES.md)。
+- 发布者没有后台服务，无法访问会话、Notion、Obsidian、真题文件、学习记录或 API Key。
+- 只有官方明确允许或开放许可证覆盖时才保存真题全文；其他来源只保存索引、合法短摘录和原创解析。
+- 不提供付费题库、批量答案、网盘资料或未授权材料下载。
 
-版本记录见 [CHANGELOG.md](CHANGELOG.md)。
+参见 [PRIVACY.md](PRIVACY.md)、[TERMS.md](TERMS.md)、[SECURITY.md](SECURITY.md) 和 [THIRD_PARTY_CONTENT.md](THIRD_PARTY_CONTENT.md)。
 
-## 支持与许可
-
-- 源码与 marketplace：[GitHub 仓库](https://github.com/yq6666-66/kaoyan-22408-codex-plugin)
-- 问题与建议：[GitHub Issues](https://github.com/yq6666-66/kaoyan-22408-codex-plugin/issues)
-- 安全问题：[SECURITY.md](SECURITY.md)
-- 许可：[MIT](LICENSE)
+源码与支持：[GitHub 仓库](https://github.com/yq6666-66/kaoyan-22408-codex-plugin) · [Issues](https://github.com/yq6666-66/kaoyan-22408-codex-plugin/issues)

@@ -13,8 +13,9 @@ from pathlib import Path
 from typing import Callable, TextIO
 
 
-PLUGIN_NAME = "kaoyan-22408"
-MARKETPLACE_NAME = "kaoyan-22408"
+PLUGIN_NAME = "kaoyan-408"
+MARKETPLACE_NAME = "kaoyan-408"
+LEGACY_PLUGIN_NAME = "kaoyan-22408"
 ANSI_ESCAPE = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
 Runner = Callable[[list[str], Path], subprocess.CompletedProcess[str]]
 Which = Callable[[str], str | None]
@@ -109,7 +110,7 @@ def install_local(
     if not codex:
         print(
             "This Codex CLI cannot install plugins. Restart ChatGPT/Codex Desktop and install "
-            "kaoyan-22408 from this repository marketplace.",
+            "kaoyan-408 from this repository marketplace.",
             file=stderr,
         )
         return 2
@@ -119,7 +120,7 @@ def install_local(
     if plugin_help.returncode != 0 or "plugin" not in help_text:
         print(
             "This Codex CLI has no usable plugin subcommand. Restart ChatGPT/Codex Desktop and "
-            "install kaoyan-22408 from this repository marketplace.",
+            "install kaoyan-408 from this repository marketplace.",
             file=stderr,
         )
         return 2
@@ -134,7 +135,7 @@ def install_local(
     if _marketplace_present(marketplace_output):
         if not _marketplace_points_to_repo(marketplace_output, repo):
             print(
-                "A marketplace named kaoyan-22408 already exists, but its source cannot be verified "
+                "A marketplace named kaoyan-408 already exists, but its source cannot be verified "
                 "as this repository. Refusing to install from an ambiguous source.",
                 file=stderr,
             )
@@ -159,6 +160,14 @@ def install_local(
         return 1
 
     print(f"Installed {PLUGIN_NAME}. Start a new task before testing the Skills.", file=stdout)
+    installed_plugins = runner([codex, "plugin", "list"], repo)
+    installed_text = f"{installed_plugins.stdout}\n{installed_plugins.stderr}".casefold()
+    if installed_plugins.returncode == 0 and LEGACY_PLUGIN_NAME.casefold() in installed_text:
+        print(
+            f"Migration: {LEGACY_PLUGIN_NAME} is still installed. Verify {PLUGIN_NAME} in a new task "
+            "before disabling or removing the legacy plugin.",
+            file=stdout,
+        )
     return 0
 
 

@@ -1,14 +1,14 @@
 {
-  "name": "kaoyan-22408",
+  "name": "kaoyan-408",
   "interface": {
-    "displayName": "考研 22408"
+    "displayName": "408考研插件"
   },
   "plugins": [
     {
-      "name": "kaoyan-22408",
+      "name": "kaoyan-408",
       "source": {
         "source": "local",
-        "path": "./plugins/kaoyan-22408"
+        "path": "./plugins/kaoyan-408"
       },
       "policy": {
         "installation": "AVAILABLE",

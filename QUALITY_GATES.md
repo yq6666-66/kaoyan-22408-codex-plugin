@@ -5,7 +5,7 @@
 
 ## 自动阻塞项
 
-- 插件 manifest、marketplace、12 个 Skill frontmatter 与 12 个 `agents/openai.yaml` 的真实 YAML/JSON 解析。
+- 插件 manifest、marketplace、13 个 Skill frontmatter 与 13 个 `agents/openai.yaml` 的真实 YAML/JSON 解析。
 - 完整路径发布允许列表、UTF-8/LF、符号链接、路径穿越、重复 ZIP 成员和脏插件树检查。
 - 便携学习记录 Schema 1.1、1.0 兼容输入和正确率数值关系验证。
 - 60 个路由场景的数量、唯一 ID、主责 Skill、最近邻冲突和每 Skill 覆盖分布。

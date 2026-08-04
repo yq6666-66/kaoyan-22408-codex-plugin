@@ -1,0 +1,4 @@
+interface:
+  display_name: "考研数学一/二教练"
+  short_description: "结合可核验真题，用图解、逐步推导和独立复核辅导数学一或数学二"
+  default_prompt: "使用 $kaoyan-math-coach 结合真题背景和可编辑图解讲清这道数学一或数学二题。"

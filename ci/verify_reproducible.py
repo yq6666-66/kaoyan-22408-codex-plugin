@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 def release_pair(directory: Path) -> tuple[Path, Path, str]:
-    archives = list(directory.rglob("kaoyan-22408-*.zip"))
+    archives = list(directory.rglob("kaoyan-408-*.zip"))
     if len(archives) != 1:
         raise ValueError(f"expected one ZIP below {directory}, found {len(archives)}")
     archive = archives[0]

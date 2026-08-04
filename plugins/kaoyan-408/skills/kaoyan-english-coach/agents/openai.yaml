@@ -1,0 +1,4 @@
+interface:
+  display_name: "考研英语一/二教练"
+  short_description: "结合可核验真题，用证据链图解和逐点修改辅导英语一或英语二"
+  default_prompt: "使用 $kaoyan-english-coach 结合真题背景和证据链图解分析这段英语一或英语二内容。"

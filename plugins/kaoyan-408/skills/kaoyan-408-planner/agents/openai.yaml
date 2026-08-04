@@ -1,0 +1,4 @@
+interface:
+  display_name: "408考研规划师"
+  short_description: "处理考研阶段倒排、跨周配额、月度节奏与报考科目时间闭合"
+  default_prompt: "使用 $kaoyan-408-planner 根据目标日期、卷种和每周预算制定闭合的跨科计划。"
