@@ -1,10 +1,18 @@
 # 408考研插件
 
-`kaoyan-408` 是面向数学一、数学二、英语一、英语二、408 与政治的中文 Skills-only 学习插件。它提供 2010—2026 年五类真题的合规来源发现、真题分析、新手图文讲解、规划、执行、诊断、错题复测、原创模考以及可选 Notion/Obsidian 学习记忆。
+`kaoyan-408` 是面向考研 408 方向的中文 Skills-only 学习插件，帮助你在 Codex 和 ChatGPT 中完成真题检索、图文讲解、学习规划、错题复测与双知识库记忆。它覆盖数学一、数学二、英语一、英语二和 408，并保留政治辅导。
 
 当前版本：`2.0.0`
 
-项目没有 App、MCP、后台服务、云端题库、账号或 API Key。网页搜索、图片生成、Notion 和本地文件能力由当前 ChatGPT/Codex 宿主决定；不可用时插件会明确降级。
+项目没有 App、MCP、后台服务、云端题库、账号或 API Key。网页搜索、图片生成、Notion 和本地文件能力由当前 ChatGPT/Codex 宿主决定；不可用时插件会明确降级，不伪造搜索结果或学习记录。
+
+## 主要功能
+
+- 真题搜索与核验：按试卷年度 2010—2026 检索数学一、数学二、英语一、英语二和 408 的公开来源，记录仓库、文件、commit、raw URL 与许可证；搜索关闭时输出 `[真题未命中]` 和可复制搜索式。
+- 新手图文讲解：单题解析包含题型定位、`[真题证据]`、前置知识、可编辑图解（Mermaid/表格/SVG）、逐步推导、独立复核、第一处易错点与 `[原创练习]`，全程用“为什么”解释每一步。
+- 学习闭环：阶段/月/周规划、单次学习时段执行、进度诊断、错因聚类与复测、原创或授权模考，以及便携学习记录（Schema 1.1）。
+- 双知识库记忆：可选接入 Obsidian Vault 与授权 Notion 工作区，自动检索相关记忆并增量写回；未配置或权限不足时自动降级为会话内模式。
+- 官方信息核验：当年大纲、报名、院校招生和考试安排只以教育部、研招网、院校官网及政府机构来源为准，离线时明确说明无法核验。
 
 ## 13 个 Skills
 
@@ -24,27 +32,30 @@
 | `kaoyan-material-study-assistant` | 用户材料的摘要、卡片和原创练习 |
 | `kaoyan-official-info-researcher` | 当年大纲、报名、院校和考试安排核验 |
 
-## 真题与图文回答
+## 使用示例
 
-- 自动发现范围固定为试卷年度 2010—2026，科目固定为数学一、数学二、英语一、英语二和 408。政治辅导保留，但不建设政治真题库。
-- 宿主搜索可用时同时执行普通网页发现与 `site:github.com` 查询。只有实际访问 Google 结果时才会标明 Google；搜索关闭时输出 `[真题未命中]` 和可复制搜索式。
-- GitHub 来源记录仓库、文件、commit、raw URL 与许可证。许可证不明时只保存索引、必要短摘录和 `[原创解析]`，不复制整卷。
-- 数学、英语、408、政治单题与真题逐题解析默认面向新手，包含前置知识、可编辑图解、逐步推导、独立复核、第一处易错点和 `[原创练习]`。
-- 精确关系优先用 Mermaid、表格、状态图或可审计 SVG；宿主支持图片生成时可附辅助示意图，但图片不替代公式、代码或答案证据。
+```text
+帮我搜索 2024 年数学一真题的公开来源
+用图解和前置知识讲一下这道 408 数据结构题
+我做了 2023 年英语二阅读，帮我批改并标出证据链
+根据我的目标和每周时间，制定 408 四科周计划
+用原创题目生成一张章节测，交卷后评分复盘
+把本次错因复测计划写入 Obsidian 和 Notion
+```
 
 ## 安装
 
 新版 Codex CLI/IDE 可添加仓库 marketplace 后安装：
 
 ```powershell
-codex plugin marketplace add yq6666-66/kaoyan-22408-codex-plugin --ref v2.0.0
+codex plugin marketplace add yq6666-66/408-codex-plugin --ref v2.0.0
 codex plugin add kaoyan-408@kaoyan-408
 ```
 
 也可克隆固定版本，在 ChatGPT Desktop 或 Codex Desktop 打开仓库并从 repo marketplace 安装：
 
 ```powershell
-git clone --branch v2.0.0 --depth 1 https://github.com/yq6666-66/kaoyan-22408-codex-plugin.git
+git clone --branch v2.0.0 --depth 1 https://github.com/yq6666-66/408-codex-plugin.git
 ```
 
 跨平台安装器：
@@ -56,27 +67,16 @@ python scripts/install_local.py
 
 退出码：`0` 成功；`1` 校验、命令或安装失败；`2` 当前 Codex 不支持插件命令，需要桌面端人工安装。只有实际成功才输出 `Installed kaoyan-408`。
 
-### 从 v1.4.0 迁移
-
-`kaoyan-408` 是新的插件 ID，不会静默覆盖 `kaoyan-22408`。先安装并验证 v2，再禁用或移除旧插件；旧 Releases 和旧便携记录保持可用。
-
 ## Obsidian 大脑
 
-新配置位置为 `.codex/kaoyan-408/obsidian-brain.json`，Schema 1.1 增加 `knowledgeRoot` 和 `pastPaperRoot`：
+配置位置为 `.codex/kaoyan-408/obsidian-brain.json`，支持 `knowledgeRoot` 和 `pastPaperRoot`：
 
 ```powershell
 python scripts/configure_obsidian_brain.py configure --vault <Vault绝对路径>
 python scripts/configure_obsidian_brain.py check
 ```
 
-从 Schema 1.0 无损迁移：
-
-```powershell
-python scripts/configure_obsidian_brain.py migrate --dry-run
-python scripts/configure_obsidian_brain.py migrate
-```
-
-迁移会保留旧配置和私人目录，沿用旧 Vault、项目目录及已存在的知识目录，不自动移动或删除 `考研 22408` 笔记。新安装默认使用 `20-项目/408考研`、`30-知识/408考研`、`40-真题/408考研`。
+新安装默认使用 `20-项目/408考研`、`30-知识/408考研`、`40-真题/408考研`。插件只保存学习档案、当前进度、错题队列和可复用方法；不保存整段对话、私人敏感内容或未授权材料。写入前会重新读取目标文件并合并，冲突时保留双方内容并标记待整理。
 
 ## Notion 大脑
 
@@ -86,22 +86,13 @@ python scripts/configure_obsidian_brain.py migrate
 
 用户说“本次不记忆”“只读模式”或“不要同步 Notion”时，本轮禁止 Notion 和 Obsidian 写入。
 
-## 开发与发布门禁
-
-```powershell
-python scripts/check.py
-python scripts/build_release.py
-python scripts/install_local.py --check
-```
-
-门禁完全离线，不要求登录 Codex CLI：真实 YAML/JSON Schema、13 个官方 `quick_validate.py` 证据、65 个路由场景、52 个行为场景、单元测试、Semgrep、Git 历史凭据扫描与 Windows/Ubuntu 可重复 ZIP。发布包采用完整路径允许列表，不包含真题、搜索缓存、私人配置或知识库数据。
-
 ## 隐私与版权
 
 - 发布者没有后台服务，无法访问会话、Notion、Obsidian、真题文件、学习记录或 API Key。
 - 只有官方明确允许或开放许可证覆盖时才保存真题全文；其他来源只保存索引、合法短摘录和原创解析。
 - 不提供付费题库、批量答案、网盘资料或未授权材料下载。
+- 插件不收集、不保存用户数据；用户上传的题目、材料和进度只由当前会话处理。
 
 参见 [PRIVACY.md](PRIVACY.md)、[TERMS.md](TERMS.md)、[SECURITY.md](SECURITY.md) 和 [THIRD_PARTY_CONTENT.md](THIRD_PARTY_CONTENT.md)。
 
-源码与支持：[GitHub 仓库](https://github.com/yq6666-66/kaoyan-22408-codex-plugin) · [Issues](https://github.com/yq6666-66/kaoyan-22408-codex-plugin/issues)
+源码与支持：[GitHub 仓库](https://github.com/yq6666-66/408-codex-plugin) · [Issues](https://github.com/yq6666-66/408-codex-plugin/issues)
