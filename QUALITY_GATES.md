@@ -8,10 +8,10 @@
 - 插件 manifest、marketplace、13 个 Skill frontmatter 与 13 个 `agents/openai.yaml` 的真实 YAML/JSON 解析。
 - 完整路径发布允许列表、UTF-8/LF、符号链接、路径穿越、重复 ZIP 成员和脏插件树检查。
 - 便携学习记录 Schema 1.1、1.0 兼容输入和正确率数值关系验证。
-- 60 个路由场景的数量、唯一 ID、主责 Skill、最近邻冲突和每 Skill 覆盖分布。
-- 36 个行为场景的数量、唯一 ID、会话输入、主责 Skill 和逐条 rubric 完整性。
+- 65 个路由场景的数量、唯一 ID、主责 Skill、最近邻冲突和每 Skill 覆盖分布。
+- 52 个行为场景的数量、唯一 ID、会话输入、主责 Skill 和逐条 rubric 完整性。
 - 单元测试、变异测试、Linux CI 中固定版本的 Semgrep、完整 Git 历史密钥/旧系统残留扫描。Windows 本地与 Windows CI 运行其余离线门禁，避免依赖 Semgrep 在 Windows 上的系统证书实现。
-- 官方插件 validator、12 个 `quick_validate.py` 结果及其与当前插件树哈希的绑定。
+- 官方插件 validator、13 个 `quick_validate.py` 结果及其与当前插件树哈希的绑定。
 - Windows 与 Ubuntu 生成字节一致的 ZIP 与 SHA-256。
 
 ## 非阻塞人工抽查

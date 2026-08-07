@@ -2,7 +2,7 @@
 
 `kaoyan-408` 是面向考研 408 方向的中文 Skills-only 学习插件，帮助你在 Codex 和 ChatGPT 中完成真题检索、图文讲解、学习规划、错题复测与双知识库记忆。它覆盖数学一、数学二、英语一、英语二和 408，并保留政治辅导。
 
-当前版本：`2.0.0`
+当前版本：`2.1.0`
 
 项目没有 App、MCP、后台服务、云端题库、账号或 API Key。网页搜索、图片生成、Notion 和本地文件能力由当前 ChatGPT/Codex 宿主决定；不可用时插件会明确降级，不伪造搜索结果或学习记录。
 
@@ -12,7 +12,7 @@
 - 新手图文讲解：单题解析包含题型定位、`[真题证据]`、前置知识、可编辑图解（Mermaid/表格/SVG）、逐步推导、独立复核、第一处易错点与 `[原创练习]`，全程用“为什么”解释每一步。
 - 学习闭环：阶段/月/周规划、单次学习时段执行、进度诊断、错因聚类与复测、原创或授权模考，以及便携学习记录（Schema 1.1）。
 - 双知识库记忆：可选接入 Obsidian Vault 与授权 Notion 工作区，自动检索相关记忆并增量写回；未配置或权限不足时自动降级为会话内模式。
-- 官方信息核验：当年大纲、报名、院校招生和考试安排只以教育部、研招网、院校官网及政府机构来源为准，离线时明确说明无法核验。
+- 官方信息核验：当年大纲、报名、考试安排只以教育部、研招网、省级考试院及政府机构来源为准；支持“用户指定 + 研招网硕士专业目录发现”定位考 408 的院校，逐校官网核验招生目录、复试内容和最近两个招生年度录取情况（只提取统计口径，不复制拟录取名单）；插件无后台监控能力，每次调用重新核验并给核验日期，离线时明确说明无法核验。
 
 ## 13 个 Skills
 
@@ -30,7 +30,7 @@
 | `kaoyan-past-paper-searcher` | 五类真题来源、许可、冲突与重复项核验 |
 | `kaoyan-past-paper-analyst` | 已提供或已核验真题的覆盖与有限趋势分析 |
 | `kaoyan-material-study-assistant` | 用户材料的摘要、卡片和原创练习 |
-| `kaoyan-official-info-researcher` | 当年大纲、报名、院校和考试安排核验 |
+| `kaoyan-official-info-researcher` | 当年招考、408 院校目录发现、复试与近两年录取核验 |
 
 ## 使用示例
 
@@ -39,6 +39,7 @@
 用图解和前置知识讲一下这道 408 数据结构题
 我做了 2023 年英语二阅读，帮我批改并标出证据链
 根据我的目标和每周时间，制定 408 四科周计划
+查一下哪些学校考 408，再核验某校复试科目和近两年录取分数
 用原创题目生成一张章节测，交卷后评分复盘
 把本次错因复测计划写入 Obsidian 和 Notion
 ```
@@ -48,14 +49,14 @@
 新版 Codex CLI/IDE 可添加仓库 marketplace 后安装：
 
 ```powershell
-codex plugin marketplace add yq6666-66/408-codex-plugin --ref v2.0.0
+codex plugin marketplace add yq6666-66/408-codex-plugin --ref v2.1.0
 codex plugin add kaoyan-408@kaoyan-408
 ```
 
 也可克隆固定版本，在 ChatGPT Desktop 或 Codex Desktop 打开仓库并从 repo marketplace 安装：
 
 ```powershell
-git clone --branch v2.0.0 --depth 1 https://github.com/yq6666-66/408-codex-plugin.git
+git clone --branch v2.1.0 --depth 1 https://github.com/yq6666-66/408-codex-plugin.git
 ```
 
 跨平台安装器：
