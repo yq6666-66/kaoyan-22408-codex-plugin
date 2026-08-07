@@ -51,6 +51,15 @@ EXPECTED_REFERENCES = {
     "udemy-course-source-contract.md",
     "sider-scholar-search-contract.md",
     "goodnotes-note-brain-contract.md",
+    "exa-search-contract.md",
+    "wolfram-computation-contract.md",
+    "az-dictionary-contract.md",
+    "quizlet-flashcard-contract.md",
+    "ace-quiz-maker-contract.md",
+    "ace-knowledge-graph-contract.md",
+    "ahamotion-video-contract.md",
+    "vocabulary-trainer-contract.md",
+    "kahoot-review-contract.md",
 }
 
 ALLOWED_PLUGIN_ROOTS = {".codex-plugin", "skills", "references", "assets"}

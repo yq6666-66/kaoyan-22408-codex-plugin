@@ -1,6 +1,6 @@
 # 能力路由契约
 
-始终条件式读取 [Obsidian 大脑契约](obsidian-brain-contract.md)；宿主提供并已授权 Notion 工具时同时读取 [Notion 学习大脑契约](notion-brain-contract.md)。宿主提供 Udemy 工具时读取 [Udemy 课程资源契约](udemy-course-source-contract.md)；提供 Sider Scholar 工具时读取 [Sider Scholar 资料检索契约](sider-scholar-search-contract.md)；提供 GoodNotes 工具或用户已导出笔记时读取 [GoodNotes 笔记记忆契约](goodnotes-note-brain-contract.md)。学习层只负责检索与沉淀，不改变唯一主责 Skill。
+始终条件式读取 [Obsidian 大脑契约](obsidian-brain-contract.md)；宿主提供并已授权 Notion 工具时同时读取 [Notion 学习大脑契约](notion-brain-contract.md)。宿主提供 Udemy 工具时读取 [Udemy 课程资源契约](udemy-course-source-contract.md)；提供 Sider Scholar 或 Exa 工具时读取对应 [Sider Scholar 资料检索契约](sider-scholar-search-contract.md) 与 [Exa 资料检索契约](exa-search-contract.md)；提供 GoodNotes 工具或用户已导出笔记时读取 [GoodNotes 笔记记忆契约](goodnotes-note-brain-contract.md)；提供 Wolfram 工具时读取 [Wolfram 计算核验契约](wolfram-computation-contract.md)；提供 A-Z Dictionary 工具时读取 [A-Z Dictionary 词典契约](az-dictionary-contract.md)；提供 Quizlet 工具时读取 [Quizlet 闪卡记忆契约](quizlet-flashcard-contract.md)；提供 Ace Quiz Maker 工具时读取 [Ace Quiz Maker 章节测契约](ace-quiz-maker-contract.md)；提供 Ace Knowledge Graph 工具时读取 [Ace Knowledge Graph 知识图谱契约](ace-knowledge-graph-contract.md)；提供 AhaMotion 工具时读取 [AhaMotion 视频讲解契约](ahamotion-video-contract.md)；提供 Vocabulary Trainer 工具时读取 [Vocabulary Trainer 词汇训练契约](vocabulary-trainer-contract.md)；提供 Kahoot 工具时读取 [Kahoot 互动复习契约](kahoot-review-contract.md)。学习层只负责检索与沉淀，不改变唯一主责 Skill。
 
 ## 公共规则
 
