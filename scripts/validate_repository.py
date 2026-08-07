@@ -48,6 +48,9 @@ EXPECTED_REFERENCES = {
     "past-paper-source-contract.md",
     "past-paper-knowledge.schema.json",
     "beginner-visual-answer-contract.md",
+    "udemy-course-source-contract.md",
+    "sider-scholar-search-contract.md",
+    "goodnotes-note-brain-contract.md",
 }
 
 ALLOWED_PLUGIN_ROOTS = {".codex-plugin", "skills", "references", "assets"}
