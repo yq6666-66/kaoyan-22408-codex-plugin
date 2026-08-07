@@ -6,7 +6,7 @@
 
 `kaoyan-408` 是静态 Skills 学习辅助插件，提供规划、执行、讲解、练习、诊断、复测、公开真题来源发现和信息核验工作流。输出不构成教育主管部门、招生单位或命题机构的官方意见，也不保证考试结果。
 
-用户可选启用本地 Obsidian 记忆、已授权的 Notion 记忆，以及 Udemy 课程、Sider Scholar 检索、GoodNotes 笔记学习层。前者由具备本地文件权限的宿主直接操作用户指定的 Vault；其余由宿主通过用户已登录并授权的工具访问。这些都不构成发布者提供的托管存储、同步或备份服务。
+用户可选启用本地 Obsidian 记忆、已授权的 Notion 记忆，以及 Udemy 课程、Sider Scholar/Exa 检索、GoodNotes 笔记、Wolfram 计算、A-Z Dictionary 词典、Quizlet 闪卡、Ace Quiz Maker 章节测、Ace Knowledge Graph 图谱、AhaMotion 视频、Vocabulary Trainer 词汇与 Kahoot 互动复习学习层。前者由具备本地文件权限的宿主直接操作用户指定的 Vault；其余由宿主通过用户已登录并授权的工具访问。这些都不构成发布者提供的托管存储、同步或备份服务。
 
 ## 用户责任
 

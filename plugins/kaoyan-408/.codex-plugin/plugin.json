@@ -1,49 +1,49 @@
 {
-  "name": "kaoyan-408",
-  "version": "2.2.0",
-  "description": "面向数学一、数学二、英语一、英语二、408 与政治的中文考研 Skills，提供真题搜索与分析、新手图文讲解、学习规划和可选 Obsidian/Notion 记忆。",
-  "author": {
-    "name": "yq6666-66",
-    "url": "https://github.com/yq6666-66"
-  },
-  "homepage": "https://github.com/yq6666-66/408-codex-plugin",
-  "repository": "https://github.com/yq6666-66/408-codex-plugin",
-  "license": "MIT",
-  "keywords": [
-    "kaoyan",
-    "408",
-    "math-i",
-    "math-ii",
-    "english-i",
-    "english-ii",
-    "past-papers",
-    "education"
-  ],
-  "skills": "./skills/",
-  "interface": {
-    "displayName": "408考研插件",
-    "shortDescription": "五类真题检索、图文解析与双知识库学习助手",
-    "longDescription": "纯 Skills 考研学习插件，覆盖 2010—2026 年数学一、数学二、英语一、英语二和 408 的合规真题发现与分析，并保留政治辅导、规划、执行、诊断、错题复测和原创模考。可选连接用户自己的 Obsidian Vault 或已授权 Notion 工作区；发布者不接收笔记、真题或学习记录。",
-    "developerName": "yq6666-66",
-    "category": "Education",
-    "capabilities": [
-      "Education",
-      "Past Paper Research",
-      "Tutoring",
-      "Assessment",
-      "Planning",
-      "Local Knowledge"
-    ],
-    "websiteURL": "https://github.com/yq6666-66/408-codex-plugin",
-    "privacyPolicyURL": "https://github.com/yq6666-66/408-codex-plugin/blob/main/PRIVACY.md",
-    "termsOfServiceURL": "https://github.com/yq6666-66/408-codex-plugin/blob/main/TERMS.md",
-    "defaultPrompt": [
-      "搜索并核验 2010—2026 年指定科目的合法真题来源",
-      "结合可验证真题，用图解和新手步骤讲清这道数学、英语或 408 题",
-      "把本轮原创解析去重同步到已绑定的 Notion 和 Obsidian"
-    ],
-    "brandColor": "#0F766E",
-    "composerIcon": "./assets/kaoyan-408.svg",
-    "logo": "./assets/kaoyan-408.svg"
-  }
+    "name":  "kaoyan-408",
+    "version":  "2.3.0",
+    "description":  "面向数学一、数学二、英语一、英语二、408 与政治的中文考研 Skills，提供真题搜索与分析、新手图文讲解、学习规划和可选 Obsidian/Notion 记忆。",
+    "author":  {
+                   "name":  "yq6666-66",
+                   "url":  "https://github.com/yq6666-66"
+               },
+    "homepage":  "https://github.com/yq6666-66/408-codex-plugin",
+    "repository":  "https://github.com/yq6666-66/408-codex-plugin",
+    "license":  "MIT",
+    "keywords":  [
+                     "kaoyan",
+                     "408",
+                     "math-i",
+                     "math-ii",
+                     "english-i",
+                     "english-ii",
+                     "past-papers",
+                     "education"
+                 ],
+    "skills":  "./skills/",
+    "interface":  {
+                      "displayName":  "408考研插件",
+                      "shortDescription":  "五类真题检索、图文解析与双知识库学习助手",
+                      "longDescription":  "纯 Skills 考研学习插件，覆盖 2010—2026 年数学一、数学二、英语一、英语二和 408 的合规真题发现与分析，并保留政治辅导、规划、执行、诊断、错题复测和原创模考。可选连接用户自己的 Obsidian Vault 或已授权 Notion 工作区；发布者不接收笔记、真题或学习记录。",
+                      "developerName":  "yq6666-66",
+                      "category":  "Education",
+                      "capabilities":  [
+                                           "Education",
+                                           "Past Paper Research",
+                                           "Tutoring",
+                                           "Assessment",
+                                           "Planning",
+                                           "Local Knowledge"
+                                       ],
+                      "websiteURL":  "https://github.com/yq6666-66/408-codex-plugin",
+                      "privacyPolicyURL":  "https://github.com/yq6666-66/408-codex-plugin/blob/main/PRIVACY.md",
+                      "termsOfServiceURL":  "https://github.com/yq6666-66/408-codex-plugin/blob/main/TERMS.md",
+                      "defaultPrompt":  [
+                                            "搜索并核验 2010—2026 年指定科目的合法真题来源",
+                                            "结合可验证真题，用图解和新手步骤讲清这道数学、英语或 408 题",
+                                            "把本轮原创解析去重同步到已绑定的 Notion 和 Obsidian"
+                                        ],
+                      "brandColor":  "#0F766E",
+                      "composerIcon":  "./assets/kaoyan-408.svg",
+                      "logo":  "./assets/kaoyan-408.svg"
+                  }
 }
