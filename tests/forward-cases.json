@@ -632,22 +632,22 @@
       "id": "official-P2",
       "skillUnderTest": "kaoyan-official-info-researcher",
       "kind": "positive",
-      "prompt": "请核验目标院校今年 085404 的招生目录；我稍后补院校名称。",
+    "prompt": "不用查官网，按 2018—2020 真题直接告诉我 2026 数学一考试范围。",
       "expectedPrimary": "kaoyan-official-info-researcher",
       "expectedBehavior": [
-        "请求最小院校缺口",
-        "比较文件年度和效力"
+      "拒绝用历年真题替代 2026 年官方考试范围",
+      "无法联网时使用待核验并说明官方入口"
       ]
     },
     {
       "id": "official-L1",
       "skillUnderTest": "kaoyan-official-info-researcher",
       "kind": "colloquial",
-      "prompt": "今年报名到底啥时候？别按记忆说，给我官网和核验日期。",
+    "prompt": "有哪些学校考 408？再看下 XX 大学复试考什么、这两年录取多少分。",
       "expectedPrimary": "kaoyan-official-info-researcher",
       "expectedBehavior": [
-        "当前报名触发官方核验",
-        "失败时使用待核验"
+      "未指定院校时通过研招网专业目录发现候选单位",
+      "逐校核验复试内容和最近两个招生年度录取统计"
       ]
     },
     {
@@ -666,7 +666,7 @@
       "id": "official-M1",
       "skillUnderTest": "kaoyan-official-info-researcher",
       "kind": "compound",
-      "prompt": "先核验目标院校今年专业目录和考试科目，再把准确结果交给规划师排计划。",
+    "prompt": "先核验目标院校今年 408 招生目录、复试方案和近两年录取统计，再把准确结果交给规划师排计划。",
       "expectedPrimary": "kaoyan-official-info-researcher",
       "expectedBehavior": [
         "官方事实阻塞后续规划",

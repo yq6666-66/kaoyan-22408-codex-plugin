@@ -1,13 +1,13 @@
 {
   "name": "kaoyan-408",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "面向数学一、数学二、英语一、英语二、408 与政治的中文考研 Skills，提供真题搜索与分析、新手图文讲解、学习规划和可选 Obsidian/Notion 记忆。",
   "author": {
     "name": "yq6666-66",
     "url": "https://github.com/yq6666-66"
   },
-  "homepage": "https://github.com/yq6666-66/kaoyan-22408-codex-plugin",
-  "repository": "https://github.com/yq6666-66/kaoyan-22408-codex-plugin",
+  "homepage": "https://github.com/yq6666-66/408-codex-plugin",
+  "repository": "https://github.com/yq6666-66/408-codex-plugin",
   "license": "MIT",
   "keywords": [
     "kaoyan",
@@ -34,9 +34,9 @@
       "Planning",
       "Local Knowledge"
     ],
-    "websiteURL": "https://github.com/yq6666-66/kaoyan-22408-codex-plugin",
-    "privacyPolicyURL": "https://github.com/yq6666-66/kaoyan-22408-codex-plugin/blob/main/PRIVACY.md",
-    "termsOfServiceURL": "https://github.com/yq6666-66/kaoyan-22408-codex-plugin/blob/main/TERMS.md",
+    "websiteURL": "https://github.com/yq6666-66/408-codex-plugin",
+    "privacyPolicyURL": "https://github.com/yq6666-66/408-codex-plugin/blob/main/PRIVACY.md",
+    "termsOfServiceURL": "https://github.com/yq6666-66/408-codex-plugin/blob/main/TERMS.md",
     "defaultPrompt": [
       "搜索并核验 2010—2026 年指定科目的合法真题来源",
       "结合可验证真题，用图解和新手步骤讲清这道数学、英语或 408 题",
