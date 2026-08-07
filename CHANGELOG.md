@@ -2,6 +2,21 @@
 
 本项目遵循 [Semantic Versioning](https://semver.org/)。
 
+## [2.2.0] - 2026-08-07
+
+### 新增
+
+- 新增 Udemy 课程资源契约：宿主提供已授权 Udemy 工具时检索课程、章节与讲义，支持“课程章节对应考试范围”“按课程排计划”等场景。
+- 新增 Sider Scholar 资料检索契约：宿主提供工具时检索学术论文与扩展资料，结果仅作为线索，不替代一手官网。
+- 新增 GoodNotes 笔记记忆契约：宿主提供工具时直连读写手写笔记；否则支持用户导出 Markdown/PDF 兜底，不解析私有格式。
+
+### 调整
+
+- 能力路由契约改为条件式加载五层学习层（Obsidian / Notion / Udemy / Sider Scholar / GoodNotes），并统一“学习层状态”输出。
+- 证据与版权契约补充 Udemy 课程、Sider Scholar 论文与 GoodNotes 笔记的授权与版权边界。
+- README、PRIVACY、TERMS 更新：三应用均为用户授权的可选学习层，发布者不接收其登录态、会话或导出数据。
+
+
 ## [2.1.0] - 2026-08-07
 
 ### 新增

@@ -1,11 +1,11 @@
 # 能力路由契约
 
-始终条件式读取 [Obsidian 大脑契约](obsidian-brain-contract.md)；宿主提供并已授权 Notion 工具时同时读取 [Notion 学习大脑契约](notion-brain-contract.md)。记忆层只负责检索与沉淀，不改变唯一主责 Skill。
+始终条件式读取 [Obsidian 大脑契约](obsidian-brain-contract.md)；宿主提供并已授权 Notion 工具时同时读取 [Notion 学习大脑契约](notion-brain-contract.md)。宿主提供 Udemy 工具时读取 [Udemy 课程资源契约](udemy-course-source-contract.md)；提供 Sider Scholar 工具时读取 [Sider Scholar 资料检索契约](sider-scholar-search-contract.md)；提供 GoodNotes 工具或用户已导出笔记时读取 [GoodNotes 笔记记忆契约](goodnotes-note-brain-contract.md)。学习层只负责检索与沉淀，不改变唯一主责 Skill。
 
 ## 公共规则
 
 1. 每轮只指定一个主责 Skill。先完成当前主要产物，再用三行交接卡传递最小结果。
-2. 默认先给结论或立即行动，再给必要依据、可选交接卡、Obsidian/Notion 状态，最后才是必需的 Schema 1.1 JSON。
+2. 默认先给结论或立即行动，再给必要依据、可选交接卡、学习层状态，最后才是必需的 Schema 1.1 JSON。
 3. 信息不足时只询问会改变结果的最小字段；未知值使用 `null`，不得编造个人进度、真题出处或当前事实。
 4. 数学一/二、英语一/二、408、政治单题以及真题逐题解析必须读取 [新手图文讲解契约](beginner-visual-answer-contract.md)。
 5. 搜索、引用或保存真题时必须读取 [真题来源与入库契约](past-paper-source-contract.md) 和 [证据与版权契约](evidence-copyright-contract.md)。
